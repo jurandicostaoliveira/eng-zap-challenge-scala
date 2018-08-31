@@ -2,21 +2,33 @@ package scheduling.job
 
 import java.sql.ResultSet
 
-import models.ConfigModel
-import org.quartz.JobExecutionContext
-import org.quartz.Job
+import repositories.{ConfigRepository, UserRuleRepository}
+import org.quartz.{DisallowConcurrentExecution, Job, JobExecutionContext, PersistJobDataAfterExecution}
+import traits.JobTrait
 
-class JobCreateQueue extends Job {
+@PersistJobDataAfterExecution
+@DisallowConcurrentExecution
+class JobCreateQueue extends Job with JobTrait {
 
-  var configModel : ConfigModel = null
+  var configRepository : ConfigRepository = null
+
+  var userRuleRepository : UserRuleRepository = null
 
   override def execute(jobExecutionContext: JobExecutionContext) : Unit = {
-    configModel = new ConfigModel
-    dispatch
+    configRepository = new ConfigRepository
+    userRuleRepository = new UserRuleRepository
+    asyncDispatch
   }
 
-  def dispatch : Unit = {
-    val configs : ResultSet = configModel.findByUserId(14)
+  override def asyncDispatch: Unit = {
+    val activeUsers : ResultSet = userRuleRepository.findActiveUsers
+    while(activeUsers.next()) {
+      dispatch(activeUsers.getString("userId"))
+    }
+  }
+
+  def dispatch(userId : String) : Unit = {
+    val configs : ResultSet = configRepository.findByUserId(14)
 
     while(configs.next()) {
       println("btg: " + configs.getInt("btg"))

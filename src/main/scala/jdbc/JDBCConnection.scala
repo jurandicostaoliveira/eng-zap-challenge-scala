@@ -4,6 +4,7 @@ import java.sql.{Connection, DriverManager}
 import java.util.Properties
 
 import services.PropService
+import constants.Environment
 
 class JDBCConnection {
 
@@ -18,7 +19,7 @@ class JDBCConnection {
   def setDbDriver(driver : String) : Unit = dbDriver = driver
 
   def getProperties : Properties = {
-    val fileName = String.format("%s-%s.properties", this.dbDriver, "development")
+    val fileName = String.format("%s-%s.properties", this.dbDriver, Environment.getAppEnv)
     new PropService().get(fileName)
   }
 

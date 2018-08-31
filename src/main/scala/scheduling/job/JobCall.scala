@@ -64,11 +64,11 @@ class JobCall extends Job {
   override def execute(jobExecutionContext: JobExecutionContext) = {
     import Greeter._
 
-    val system: ActorSystem = ActorSystem("helloAkka")
+    val system : ActorSystem = ActorSystem("helloAkka")
 
-    val printer: ActorRef = system.actorOf(Printer.props, "printerActor")
+    val printer : ActorRef = system.actorOf(Printer.props, "printerActor")
 
-    val howdyGreeter: ActorRef =
+    val howdyGreeter : ActorRef =
       system.actorOf(Greeter.props("Howdy", printer), "howdyGreeter")
 
 //    val helloGreeter: ActorRef =
@@ -77,7 +77,7 @@ class JobCall extends Job {
 //    val goodDayGreeter: ActorRef =
 //      system.actorOf(Greeter.props("Good day", printer), "goodDayGreeter")
 
-        val list: List[Int] = List(1, 2, 3, 4, 5)
+        val list : List[Int] = List(1, 2, 3, 4, 5)
     
         list.foreach(item => {
           howdyGreeter ! WhoToGreet(item)

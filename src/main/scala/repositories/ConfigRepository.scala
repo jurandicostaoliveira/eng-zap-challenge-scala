@@ -1,11 +1,11 @@
-package models
+package repositories
 
 import java.sql.{Connection, ResultSet, Statement}
 
-import application.Model
+import application.Repository
 import constants.{Database, Table}
 
-class ConfigModel extends Model {
+class ConfigRepository extends Repository {
 
   val dbDriver : String = "mysql"
 
