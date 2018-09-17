@@ -5,9 +5,9 @@ import java.util.Properties
 
 class PropService {
 
-  def get(fileName : String) : Properties = {
-    val properties : Properties = new Properties()
-    var inputStream : InputStream = null
+  def get(fileName: String): Properties = {
+    val properties: Properties = new Properties()
+    var inputStream: InputStream = null
     try {
       inputStream = getClass.getClassLoader.getResourceAsStream(fileName)
       if (inputStream != null) {
@@ -15,8 +15,9 @@ class PropService {
       }
       properties
     } catch {
-      case e : Exception => e.printStackTrace()
-        null
+      case e: Exception => println(e.getLocalizedMessage)
+        properties
     }
   }
+
 }
