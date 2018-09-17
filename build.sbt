@@ -10,6 +10,8 @@ val akkaVersion = "2.3.16"
 
 val mysqlConnectorVersion = "5.1.12"
 
+val log4jVersion = "11.0"
+
 mainClass in (Compile, run) := Some("main.scala.run.Main")
 
 mainClass in (Compile, packageBin) := Some("main.scala.run.Main")
@@ -20,5 +22,6 @@ libraryDependencies ++= Seq(
     "org.apache.spark" % "spark-sql_2.10" % sparkVersion,
     "org.quartz-scheduler" % "quartz" % quartzVersion,
     "com.typesafe.akka" % "akka-actor_2.10" % akkaVersion,
-    "mysql" % "mysql-connector-java" % mysqlConnectorVersion
+    "mysql" % "mysql-connector-java" % mysqlConnectorVersion,
+    "org.apache.logging.log4j" % "log4j-scala" % log4jVersion
  )

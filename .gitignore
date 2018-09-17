@@ -8,3 +8,4 @@ src/main/resources/.environment.properties
 .project
 .settings/
 target/
+storage/
