@@ -5,7 +5,7 @@ import org.apache.spark.SparkConf
 
 object SparkContextSingleton {
 
-  private var CONTEXT: SparkContext = null
+  private var CONTEXT: SparkContext = _
 
   def getSparkConf(): SparkConf = {
     return new SparkConf().setAppName("Spark Scala").setMaster("local[*]")

@@ -27,7 +27,7 @@ object CronTrigger {
    
    def triggerDefinition() {
      triggerJobCreateQueue = TriggerBuilder.newTrigger().withIdentity("triggerJobCall", "group1")
-                     .withSchedule(CronScheduleBuilder.cronSchedule("0 01 14 * * ?")).build()
+                     .withSchedule(CronScheduleBuilder.cronSchedule("0 01 17 * * ?")).build()
    }
    
    def run() {

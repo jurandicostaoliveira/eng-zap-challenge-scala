@@ -111,7 +111,6 @@ object AlterTableToPeal {
           howdyGreeter ! Greet
           println(s"Tabela $tableName renomeada!")
         }
-
       }
     }
   }
