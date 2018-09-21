@@ -40,7 +40,7 @@ class JobCreateQueue extends Job with JobTrait {
 
       var accountEntity: AccountEntity = new AccountEntity
       accountEntity.accountId_=(configs.getInt("btg"))
-      var worker: Worker = new Worker(accountEntity)
+      val worker: Worker = new Worker(accountEntity)
       worker.process(classOf[QueueCreateModel])
     }
   }

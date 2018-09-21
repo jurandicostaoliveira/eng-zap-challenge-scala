@@ -5,51 +5,51 @@ import scala.util.parsing.json.{JSONArray, JSONObject}
 @SerialVersionUID(1L)
 class AccountEntity extends Serializable {
 
-  private[this] var _accountId: Int = _
+  private var _accountId: Int = _
 
-  private[this] var _accountAllinId: Int = _
+  private var _accountAllinId: Int = _
 
-  private[this] var _ruleId: Int = _
+  private var _ruleId: Int = _
 
-  private[this] var _rulePealId: Int = _
+  private var _rulePealId: Int = _
 
-  private[this] var _ruleName: String = _
+  private var _ruleName: String = _
 
-  private[this] var _ruleTypeId: Int = _
+  private var _ruleTypeId: Int = _
 
-  private[this] var _periodId: Int = 1
+  private var _periodId: Int = 1
 
-  private[this] var _interval: Int = _
+  private var _interval: Int = _
 
-  private[this] var _purchaseInterval: Int = 10
+  private var _purchaseInterval: Int = 10
 
-  private[this] var _maxProducts: Int = 10
+  private var _maxProducts: Int = 10
 
-  private[this] var _totalFiltersBought: Int = _
+  private var _totalFiltersBought: Int = _
 
-  private[this] var _totalFiltersSend: Int = _
+  private var _totalFiltersSend: Int = _
 
-  private[this] var _fidelityType: Int = _
+  private var _fidelityType: Int = _
 
-  private[this] var _fidelityValue: Int = _
+  private var _fidelityValue: Int = _
 
-  private[this] var _layoutType: Int = _
+  private var _layoutType: Int = _
 
-  private[this] var _timeInactivity: Int = _
+  private var _timeInactivity: Int = _
 
-  private[this] var _isPeal: Boolean = false
+  private var _isPeal: Boolean = false
 
-  @transient private[this] var _boughtFilterOptions: JSONObject = _
+  @transient private var _boughtFilterOptions: JSONObject = _
 
-  @transient private[this] var _toSendFilterOptions: JSONObject = _
+  @transient private var _toSendFilterOptions: JSONObject = _
 
-  @transient private[this] var _boughtFilterValues: JSONArray = _
+  @transient private var _boughtFilterValues: JSONArray = _
 
-  @transient private[this] var _toSendFilterValues: JSONArray = _
+  @transient private var _toSendFilterValues: JSONArray = _
 
-  @transient private[this] var _recurrenceConfig: JSONObject = _
+  @transient private var _recurrenceConfig: JSONObject = _
 
-  private[this] var _channels: List[String] = List()
+  private var _channels: List[String] = List()
 
   def channels: List[String] = _channels
 

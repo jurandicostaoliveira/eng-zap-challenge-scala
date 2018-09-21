@@ -39,14 +39,18 @@ object SparkContextSingleton {
     return sparkConf
   }
 
-  def getSparkContext(): SparkContext = {
+  /**
+    * this.synchronized is to resolve CONTEXT => null in concurrence
+    * @return
+    */
+  def getSparkContext(): SparkContext = this.synchronized {
     if (CONTEXT == null) {
       CONTEXT = new SparkContext(getSparkConf)
     }
     return CONTEXT
   }
 
-  def destroyContext() {
+  def destroyContext(): Unit = {
     if (CONTEXT != null) {
       CONTEXT.clearJobGroup()
       CONTEXT = null

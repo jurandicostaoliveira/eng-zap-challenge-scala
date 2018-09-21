@@ -2,8 +2,6 @@ package br.com.btg360.run
 
 import br.com.btg360.spark.SparkContextSingleton
 import com.datastax.spark.connector._
-import com.datastax.spark.connector.cql._
-import java.util.Calendar
 
 object Main {
   def main(args: Array[String]) {
