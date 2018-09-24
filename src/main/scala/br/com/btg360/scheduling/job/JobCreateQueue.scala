@@ -2,46 +2,51 @@ package br.com.btg360.scheduling.job
 
 import java.sql.ResultSet
 
-import br.com.btg360.application.Worker
-import br.com.btg360.entities.AccountEntity
+import akka.actor.{ActorSystem, Props}
+import br.com.btg360.actors.BtgAkkaActors
 import br.com.btg360.model.QueueCreateModel
 import br.com.btg360.repositories.{ConfigRepository, UserRuleRepository}
-import org.quartz.{DisallowConcurrentExecution, Job, JobExecutionContext, PersistJobDataAfterExecution}
 import br.com.btg360.traits.JobTrait
+import org.quartz.{DisallowConcurrentExecution, Job, JobExecutionContext, PersistJobDataAfterExecution}
 
 @PersistJobDataAfterExecution
 @DisallowConcurrentExecution
 class JobCreateQueue extends Job with JobTrait {
 
-  var configRepository : ConfigRepository = null
+  var configRepository: ConfigRepository = null
 
-  var userRuleRepository : UserRuleRepository = null
+  var userRuleRepository: UserRuleRepository = null
 
-  override def execute(jobExecutionContext: JobExecutionContext) : Unit = {
+  override def execute(jobExecutionContext: JobExecutionContext): Unit = {
     configRepository = new ConfigRepository
     userRuleRepository = new UserRuleRepository
     asyncDispatch
   }
 
   override def asyncDispatch: Unit = {
-    val activeUsers : ResultSet = userRuleRepository.findActiveUsers
-    while(activeUsers.next()) {
-      dispatch(activeUsers.getString("userId"))
+    val activeUsers: ResultSet = userRuleRepository.findActiveUsers
+    while (activeUsers.next()) {
+      dispatch(activeUsers.getInt("userId"))
     }
   }
 
-  def dispatch(userId : String) : Unit = {
-    val configs : ResultSet = configRepository.findByUserId(14)
+  def dispatch(userId: Int): Unit = {
+    import br.com.btg360.actors.BtgAkkaActors._
 
+    val configs: ResultSet = configRepository.findByUserId(userId)
+    val system = ActorSystem("btgActorSystem")
 
-    while(configs.next()) {
+    while (configs.next()) {
 
-      println("btg: " + configs.getInt("btg"))
+      if(configs != null && configs.getInt("btg")  == 1){
 
-      var accountEntity: AccountEntity = new AccountEntity
-      accountEntity.accountId_=(configs.getInt("btg"))
-      val worker: Worker = new Worker(accountEntity)
-      worker.process(classOf[QueueCreateModel])
+        var firstRef = system.actorOf(Props[BtgAkkaActors], "first-create-queue-actor" + userId)
+        println(s"First: $firstRef")
+
+        firstRef ! callIt(userId, classOf[QueueCreateModel])
+      }
     }
+
+    //system.shutdown()
   }
 }

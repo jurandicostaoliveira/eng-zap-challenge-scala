@@ -14,8 +14,10 @@ class QueueCreateModel(context: Context) extends Model with Serializable with Mo
     val data = Array(accountId+1, accountId+2, accountId+3, accountId+4, accountId+5)
     val distData = sc.parallelize(data)
     distData.foreach(data => {
-      println(data)
+      println("Serial: " + data)
     })
+
+    println("APOS FOREACH")
 
   }
 }
