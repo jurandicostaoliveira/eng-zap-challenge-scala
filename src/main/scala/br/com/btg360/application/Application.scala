@@ -5,7 +5,7 @@ import java.util.Properties
 import br.com.btg360.jdbc.JDBCConnection
 import br.com.btg360.services.PropService
 
-class Application {
+abstract class Application {
 
   def propService : PropService = { new PropService }
 

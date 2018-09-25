@@ -1,12 +1,10 @@
 package br.com.btg360.run
 
-import java.io.PrintStream
-
 import br.com.btg360.constants.Keyspace
-import br.com.btg360.extras.jimmoore.LoggingOutputStream
+import br.com.btg360.logger.PrintLogger
 import br.com.btg360.spark.SparkContextSingleton
 import com.datastax.spark.connector.toSparkContextFunctions
-import org.apache.log4j.{Level, Logger}
+import org.apache.log4j.Logger
 
 object ProductTableCounter {
 
@@ -18,7 +16,7 @@ object ProductTableCounter {
 
     System.setProperty("LOG_CUSTOM_NAME", tableName)
     val LOG = Logger.getRootLogger()
-    Console.setOut(new PrintStream(new LoggingOutputStream(LOG, Level.INFO), true))
+    PrintLogger.create(LOG)
 
     val sc = SparkContextSingleton.getSparkContext()
     val total = sc.cassandraTable(Keyspace.BTG360, tableName).count()
