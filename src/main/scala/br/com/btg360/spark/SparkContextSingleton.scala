@@ -12,12 +12,10 @@ object SparkContextSingleton {
 
   private var CONTEXT: SparkContext = _
 
-  private def getFileName: String = {
-    return "cassandra-%s.properties".format(Environment.getAppEnv)
-  }
+  private val fileName = "cassandra-%s.properties".format(Environment.getAppEnv)
 
   def getSparkConf(): SparkConf = {
-    val p: Properties = new PropService().get(getFileName)
+    val p: Properties = new PropService().get(fileName)
     val sparkConf = new SparkConf().setMaster(p.getProperty("master"))
       .setAppName(p.getProperty("appName"))
       .set("spark.cassandra.connection.host", p.getProperty("host"))
@@ -36,18 +34,19 @@ object SparkContextSingleton {
       sparkConf.set("spark.local.dir", p.getProperty("sparkLocalDir"))
     }
 
-    return sparkConf
+    sparkConf
   }
 
   /**
     * this.synchronized is to resolve CONTEXT => null in concurrence
+    *
     * @return
     */
   def getSparkContext(): SparkContext = this.synchronized {
     if (CONTEXT == null) {
       CONTEXT = new SparkContext(getSparkConf)
     }
-    return CONTEXT
+    CONTEXT
   }
 
   def destroyContext(): Unit = {

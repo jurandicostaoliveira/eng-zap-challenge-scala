@@ -1,10 +1,10 @@
 package br.com.btg360.run
 
-import com.redis._
+import br.com.btg360.services.RedisClientService
 
 object RedisExample extends App {
-  val redis = new RedisClient(database = 0, port=32768, host="0.0.0.0")
-  redis.set("btgId", "768")
+  val redis = new RedisClientService().connect
+  redis.set("btgId", "768HU@")
   val btgId = redis.get("btgId")
   println(btgId)
 }
