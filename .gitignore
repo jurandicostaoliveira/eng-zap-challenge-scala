@@ -1,5 +1,4 @@
 #Development file identifier
-src/main/resources/.development
 src/main/resources/.environment.properties
 
 /bin/
@@ -9,3 +8,4 @@ src/main/resources/.environment.properties
 .settings/
 target/
 storage/
+src/main/main.iml

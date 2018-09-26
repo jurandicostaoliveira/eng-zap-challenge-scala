@@ -12,6 +12,8 @@ val mysqlConnectorVersion = "5.1.12"
 
 val log4jVersion = "11.0"
 
+val redisVersion = "3.8"
+
 mainClass in (Compile, run) := Some("main.scala.run.Main")
 
 mainClass in (Compile, packageBin) := Some("main.scala.run.Main")
@@ -23,5 +25,8 @@ libraryDependencies ++= Seq(
     "org.quartz-scheduler" % "quartz" % quartzVersion,
     "com.typesafe.akka" % "akka-actor_2.10" % akkaVersion,
     "mysql" % "mysql-connector-java" % mysqlConnectorVersion,
-    "org.apache.logging.log4j" % "log4j-scala" % log4jVersion
+    "org.apache.logging.log4j" % "log4j-scala" % log4jVersion,
+
+    //https://github.com/debasishg/scala-redis
+    "net.debasishg" %% "redisclient" % redisVersion
  )
