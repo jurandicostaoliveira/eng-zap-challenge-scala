@@ -2,7 +2,7 @@ package br.com.btg360.services
 
 class DailySendLimitService {
 
-  val redis = new RedisClientService().connect
+  private val redis = new RedisClientService().connect
 
   private var _userId: Int = _
 
@@ -10,23 +10,25 @@ class DailySendLimitService {
 
   def userId: Int = _userId
 
-  def userId_=(value: Int): Unit = {
-    _userId = value
+  def userId_=(value: Int): DailySendLimitService = {
+    this._userId = value
+    this
   }
 
-  def limit: Int = _limit
+  def limit: Int = this._limit
 
-  def limit_=(value: Int): Unit = {
-    _limit = value
+  def limit_=(value: Int): DailySendLimitService = {
+    this._limit = value
+    this
   }
 
-  private def keyName: String = {
-    "send_limit_%d_%s".format(this._userId, "YYYY_MM_DD")
-  }
+  private def today: String = new PeriodService("yyyy-MM-dd").now
 
-  private def pluck: List[String] = {
+  private def createEntityName: String = "send_limit_%d_%s".format(this._userId, this.today)
+
+  private def pluck(entityName: String): List[String] = {
     var keys: List[String] = List()
-    redis.hgetall(this.keyName).foreach(row => {
+    redis.hgetall(entityName).foreach(row => {
       for ((key, value) <- row) {
         if (value.toInt <= limit) {
           keys = key :: keys
@@ -38,13 +40,14 @@ class DailySendLimitService {
   }
 
   def filter(users: List[String] = List()): List[String] = {
+    val entityName: String = this.createEntityName
     redis.pipeline(row => {
       for (key <- users) {
-        row.hincrby(this.keyName, key.toLowerCase(), 1)
+        row.hincrby(entityName, key, 1)
       }
     })
 
-    this.pluck
+    this.pluck(entityName)
   }
 
 }
