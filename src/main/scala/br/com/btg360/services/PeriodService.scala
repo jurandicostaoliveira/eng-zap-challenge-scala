@@ -2,8 +2,9 @@ package br.com.btg360.services
 
 import java.text.SimpleDateFormat
 import java.util.{Calendar, Date}
+import br.com.btg360.application.Service
 
-class PeriodService {
+class PeriodService extends Service {
 
   private val calendar = Calendar.getInstance()
 

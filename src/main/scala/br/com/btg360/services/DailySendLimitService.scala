@@ -1,8 +1,10 @@
 package br.com.btg360.services
 
-class DailySendLimitService {
+import br.com.btg360.application.Service
 
-  private val redis = new RedisClientService().connect
+class DailySendLimitService extends Service {
+
+  private val redis = this.redisClientService.connect
 
   private var _userId: Int = _
 
