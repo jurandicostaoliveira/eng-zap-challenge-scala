@@ -22,13 +22,13 @@ class DailySendLimitService {
     this
   }
 
-  private def today: String = new PeriodService("yyyy-MM-dd").now
+  private def today: String = new PeriodService("yyyy_MM_dd").now
 
   private def createEntityName: String = "send_limit_%d_%s".format(this._userId, this.today)
 
   private def pluck(entityName: String): List[String] = {
     var keys: List[String] = List()
-    redis.hgetall(entityName).foreach(row => {
+    this.redis.hgetall(entityName).foreach(row => {
       for ((key, value) <- row) {
         if (value.toInt <= limit) {
           keys = key :: keys
@@ -41,13 +41,23 @@ class DailySendLimitService {
 
   def filter(users: List[String] = List()): List[String] = {
     val entityName: String = this.createEntityName
-    redis.pipeline(row => {
+    this.redis.pipeline(row => {
       for (key <- users) {
         row.hincrby(entityName, key, 1)
       }
     })
 
     this.pluck(entityName)
+  }
+
+  def removeNotCurrent: Unit = {
+    val today: String = this.today
+    val rows = this.redis.keys("*")
+    rows.map(_.filter(value => !value.get.contains(today))).foreach(row => {
+      row.map(key => {
+        this.redis.del(key.get)
+      })
+    })
   }
 
 }
