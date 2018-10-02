@@ -30,7 +30,7 @@ class DailySendLimitService {
     var keys: List[String] = List()
     this.redis.hgetall(entityName).foreach(row => {
       for ((key, value) <- row) {
-        if (value.toInt <= limit) {
+        if (value.toInt <= this._limit) {
           keys = key :: keys
         }
       }
