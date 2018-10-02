@@ -52,11 +52,8 @@ class DailySendLimitService {
 
   def removeNotCurrent: Unit = {
     val today: String = this.today
-    val rows = this.redis.keys("*")
-    rows.map(_.filter(value => !value.get.contains(today))).foreach(row => {
-      row.map(key => {
-        this.redis.del(key.get)
-      })
+    this.redis.keys("*").toList.flatMap(_.filter(key => !key.get.contains(today))).foreach(row => {
+      this.redis.del(row.get)
     })
   }
 
