@@ -6,6 +6,8 @@ class DailySendLimitService extends Service {
 
   private val redis = this.redisClientService.connect
 
+  private val today = this.periodService("yyyy_MM_dd").now
+
   private var _userId: Int = _
 
   private var _limit: Int = 1
@@ -24,8 +26,6 @@ class DailySendLimitService extends Service {
     this
   }
 
-  private def today: String = new PeriodService("yyyy_MM_dd").now
-
   private def createEntityName: String = "send_limit_%d_%s".format(this._userId, this.today)
 
   private def pluck(entityName: String): List[String] = {
@@ -33,7 +33,7 @@ class DailySendLimitService extends Service {
     this.redis.hgetall(entityName).foreach(row => {
       for ((key, value) <- row) {
         if (value.toInt <= this._limit) {
-          keys = key :: keys
+          keys ::= key
         }
       }
     })
@@ -52,9 +52,8 @@ class DailySendLimitService extends Service {
     this.pluck(entityName)
   }
 
-  def removeNotCurrent: Unit = {
-    val today: String = this.today
-    this.redis.keys("*").toList.flatMap(_.filter(key => !key.get.contains(today))).foreach(row => {
+  def destroyNotCurrent: Unit = {
+    this.redis.keys("*").toList.flatMap(_.filter(key => !key.get.contains(this.today))).foreach(row => {
       this.redis.del(row.get)
     })
   }
