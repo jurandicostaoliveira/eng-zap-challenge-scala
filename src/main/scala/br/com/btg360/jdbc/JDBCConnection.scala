@@ -6,32 +6,48 @@ import java.util.Properties
 import br.com.btg360.services.PropService
 import br.com.btg360.constants.Environment
 
-class JDBCConnection {
+abstract class JDBCConnection {
 
-  private var dbDriver : String = "mysql"
+  protected var dbDriver: String = _
 
-  private var connection : Connection = _
+  protected var driver: String = _
 
-  def getConnection : Connection = connection
+  protected var host: String = _
 
-  def setConnection(value : Connection) : Unit = connection = value
+  protected var user: String = _
 
-  def setDbDriver(driver : String) : Unit = dbDriver = driver
+  protected var password: String = _
 
-  def getProperties : Properties = {
-    val fileName = String.format("%s-%s.properties", this.dbDriver, Environment.getAppEnv)
-    new PropService().get(fileName)
-  }
+  private var _connection: Connection = _
 
-  def open : Connection = {
+  def connection: Connection = this._connection
+
+  private def properties: Properties = new PropService().get("%s-%s.properties".format(this.dbDriver, Environment.getAppEnv))
+
+  def open: Connection = {
     try {
-      Class.forName(getProperties.getProperty("driver"))
-      connection = DriverManager.getConnection(getProperties.getProperty("host"),
-        getProperties.getProperty("user"), getProperties.getProperty("password"))
-      connection
+      val p = this.properties
+      Class.forName(p.getProperty(this.driver))
+      this._connection = DriverManager.getConnection(
+        p.getProperty(this.host),
+        p.getProperty(this.user),
+        p.getProperty(this.password)
+      )
+      this._connection
     } catch {
-      case e : Exception => e.printStackTrace()
-        null
+      case e: Exception => println(e.getLocalizedMessage)
+        this._connection
     }
   }
+
+  def close = {
+    try {
+      if (this._connection != null) {
+        this._connection.close()
+      }
+    } catch {
+      case e: Exception => println(e.getLocalizedMessage)
+    }
+  }
+
 }

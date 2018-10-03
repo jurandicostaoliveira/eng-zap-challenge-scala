@@ -6,8 +6,6 @@ import br.com.btg360.application.Repository
 
 class UserRuleRepository extends Repository {
 
-  val dbDriver : String = "mysql"
-
   def findActiveUsers : ResultSet = {
     try {
       val query : String = "SELECT " +
@@ -18,8 +16,7 @@ class UserRuleRepository extends Repository {
                               "WHERE " +
                               "ur.status = 1 AND " +
                               "u.isMultiChannel = 1;"
-      jdbcConnection.setDbDriver(dbDriver)
-      val connection: Connection = jdbcConnection.open
+      val connection: Connection = mySqlBtg360.open
       val stmt: Statement = connection.createStatement()
       val resultSet: ResultSet = stmt.executeQuery(query)
       resultSet

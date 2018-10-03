@@ -1,12 +1,11 @@
 package br.com.btg360.application
 
-import java.util.Properties
-import br.com.btg360.jdbc.JDBCConnection
+import br.com.btg360.jdbc.{MySqlAllin, MySqlBtg360}
 
 abstract class Application {
 
-  def jdbcConnection: JDBCConnection = new JDBCConnection
+  def mySqlAllin: MySqlAllin = new MySqlAllin()
 
-  def getJdbcProperties: Properties = this.jdbcConnection.getProperties
+  def mySqlBtg360: MySqlBtg360 = new MySqlBtg360()
 
 }
