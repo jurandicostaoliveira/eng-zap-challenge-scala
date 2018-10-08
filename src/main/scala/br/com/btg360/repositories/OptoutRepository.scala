@@ -50,7 +50,7 @@ class OptoutRepository extends Repository {
       rows.map(_.getString(0).trim.toLowerCase)
     } catch {
       case e: Exception => println(e.getLocalizedMessage)
-        sc.emptyRDD
+        this.sc.emptyRDD
     }
   }
 
