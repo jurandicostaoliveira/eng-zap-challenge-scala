@@ -24,29 +24,35 @@ class JobCreateQueue extends Job with JobTrait {
   }
 
   override def asyncDispatch: Unit = {
-    val activeUsers: ResultSet = userRuleRepository.findActiveUsers
-    while (activeUsers.next()) {
-      dispatch(activeUsers.getInt("userId"))
+    try {
+      val activeUsers: ResultSet = userRuleRepository.findActiveUsers
+      while (activeUsers.next()) {
+        dispatch(activeUsers.getInt("userId"))
+      }
+    } catch {
+      case e: Exception => e.printStackTrace()
     }
   }
 
   def dispatch(userId: Int): Unit = {
-    import br.com.btg360.actors.BtgAkkaActors._
+    try {
+      import br.com.btg360.actors.BtgAkkaActors._
 
-    val configs: ResultSet = configRepository.findByUserId(userId)
-    val system = ActorSystem("btgActorSystem")
+      val configs: ResultSet = configRepository.findByUserId(userId)
+      val system = ActorSystem("btgActorSystem")
 
-    while (configs.next()) {
+      while (configs.next()) {
 
-      if(configs != null && configs.getInt("btg")  == 1){
+        if (configs != null && configs.getInt("btg") == 1) {
 
-        var firstRef = system.actorOf(Props[BtgAkkaActors], "first-create-queue-actor" + userId)
-        println(s"First: $firstRef")
+          var firstRef = system.actorOf(Props[BtgAkkaActors], "first-create-queue-actor-" + userId)
+          println(s"First: $firstRef")
 
-        firstRef ! callIt(userId, classOf[QueueCreateModel])
+          firstRef ! callIt(userId, classOf[QueueCreateModel])
+        }
       }
+    } catch {
+      case e: Exception => e.printStackTrace()
     }
-
-    //system.shutdown()
   }
 }
