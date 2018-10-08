@@ -27,16 +27,16 @@ object CronTrigger {
      val jobKey1: JobKey = new JobKey("jobCall", "group1")
      jobCreateQueue = JobBuilder.newJob(classOf[JobCreateQueue]).withIdentity(jobKey1).build()
 
-     val jobKey2: JobKey = new JobKey("jobCall", "group1")
+     val jobKey2: JobKey = new JobKey("jobCall2", "group1")
      jobCreateQueue2 = JobBuilder.newJob(classOf[JobCreateQueue]).withIdentity(jobKey2).build()
    }
    
    def triggerDefinition() {
      triggerJobCreateQueue = TriggerBuilder.newTrigger().withIdentity("triggerJobCall", "group1")
-                     .withSchedule(CronScheduleBuilder.cronSchedule("0 39 19 * * ?")).build()
+                     .withSchedule(CronScheduleBuilder.cronSchedule("0 07 19 * * ?")).build()
 
-     triggerJobCreateQueue2 = TriggerBuilder.newTrigger().withIdentity("triggerJobCall", "group1")
-       .withSchedule(CronScheduleBuilder.cronSchedule("0 40 19 * * ?")).build()
+     triggerJobCreateQueue2 = TriggerBuilder.newTrigger().withIdentity("triggerJobCall2", "group1")
+       .withSchedule(CronScheduleBuilder.cronSchedule("0 53 11 * * ?")).build()
    }
    
    def run() {
