@@ -11,6 +11,13 @@ class OptoutService extends Service {
 
   val repository = new OptoutRepository()
 
+  /**
+    * Returns users by removing anyone on the optout list
+    *
+    * @param Int allinId
+    * @param RDD users
+    * @return
+    */
   def filter(allinId: Int, users: RDD[String]): RDD[String] = {
     try {
       val optouts = this.repository.allinId(allinId).getEmails
