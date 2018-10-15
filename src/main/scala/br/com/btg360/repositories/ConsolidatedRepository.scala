@@ -2,7 +2,6 @@ package br.com.btg360.repositories
 
 import br.com.btg360.entities.ConsolidatedEntity
 import br.com.btg360.jdbc.MySqlBtg360
-import br.com.btg360.traits.ConsolidatedKeyByTrait
 import org.apache.spark.rdd.RDD
 
 class ConsolidatedRepository {
@@ -41,13 +40,13 @@ class ConsolidatedRepository {
   }
 
   /**
-    * Get all registers with key by
+    * Get all registers in pair
     *
-    * @param ConsolidatedKeyByTrait keyBy
+    * @param entity
     * @return RDD
     */
-  def findAllKeyBy(keyBy: ConsolidatedKeyByTrait): RDD[(Any, ConsolidatedEntity)] = {
-    this.findAll.map[(Any, ConsolidatedEntity)](row => keyBy.call(row))
+  def findAllKeyBy(entity: ConsolidatedEntity => (Any, ConsolidatedEntity)): RDD[(Any, ConsolidatedEntity)] = {
+    this.findAll.map(row => entity(row))
   }
 
 }

@@ -7,6 +7,8 @@ import com.datastax.spark.connector.toSparkContextFunctions
 //import com.datastax.spark.connector.rdd.CassandraTableScanRDD
 import org.apache.spark.rdd.RDD
 
+import com.datastax.spark.connector.CassandraRow
+
 class ProductRepository {
 
   val sc = SparkContextSingleton.getSparkContext()
@@ -31,16 +33,23 @@ class ProductRepository {
     this
   }
 
-
+  /**
+    * Get all registers
+    *
+    * @return RDD
+    */
   def findAll: RDD[ProductEntity] = {
-    val rdd = this.sc.cassandraTable[ProductEntity](Keyspace.BTG360, this.table).limit(5)
-
-    rdd.foreach(row => {
-      println(row.productId + " -> " + row.priceBy)
-    })
-
-    null
+    this.sc.cassandraTable[ProductEntity](Keyspace.BTG360, this.table)
   }
 
+  /**
+    * Get all registers in pair
+    *
+    * @param entity
+    * @return RDD
+    */
+  def findAllKeyBy(entity: ProductEntity => (Any, ProductEntity)): RDD[(Any, ProductEntity)] = {
+    this.findAll.map(row => entity(row))
+  }
 
 }
