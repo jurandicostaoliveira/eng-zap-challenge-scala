@@ -1,13 +1,13 @@
 package br.com.btg360.run
 
 import br.com.btg360.constants.Keyspace
-import br.com.btg360.spark.SparkContextSingleton
+import br.com.btg360.spark.SparkCoreSingleton
 import com.datastax.spark.connector.{CassandraRow, toSparkContextFunctions}
 import org.apache.spark.rdd.RDD
 
 object DeleteCookieEmail extends App {
 
-  val sc = SparkContextSingleton.getSparkContext()
+  val sc = SparkCoreSingleton.getContext
   //val tableName: String = "cookie_email_8165"
   val tableName: String = "cookie_email_9"
 

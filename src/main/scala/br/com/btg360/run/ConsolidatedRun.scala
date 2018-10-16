@@ -3,6 +3,7 @@ package br.com.btg360.run
 import br.com.btg360.application.Entity
 import br.com.btg360.entities.ConsolidatedEntity
 import br.com.btg360.repositories.{ConsolidatedRepository, ProductRepository}
+import br.com.btg360.rules.Daily
 import org.apache.spark.rdd.RDD
 
 
@@ -32,12 +33,16 @@ object ConsolidatedRun extends App {
 
 
   //Cassandra
-  val productRepository = new ProductRepository()
+//  val productRepository = new ProductRepository()
 
   //Glamour [50, 36, 52]
-  val rdd = productRepository.table("product_52").findAllKeyBy(entity => (entity.productId, entity))
+//  val rdd = productRepository.table("product_52").findAllKeyBy(entity => (entity.productId, entity))
 
-  rdd.foreach(row => {
-    println(row._1 + " -> "+ row._2.subCategory)
-  })
+//  rdd.foreach(row => {
+//    println(row._1 + " -> "+ row._2.subCategory)
+//  })
+
+  val d = new Daily()
+  d.dispatch()
+
 }

@@ -1,11 +1,11 @@
 package br.com.btg360.run
 
-import br.com.btg360.spark.SparkContextSingleton
+import br.com.btg360.spark.SparkCoreSingleton
 import com.datastax.spark.connector._
 
 object Main {
   def main(args: Array[String]) {
-    val sc = SparkContextSingleton.getSparkContext()
+    val sc = SparkCoreSingleton.getContext
 
     val cart = sc.cassandraTable("btg360", "cart_15")
       .where("created_at >= ? AND created_at <= ?", "2018-08-07", "2018-08-07")

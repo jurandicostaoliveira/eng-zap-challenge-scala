@@ -8,13 +8,18 @@ import com.datastax.driver.core.Session
 import com.datastax.spark.connector.cql.CassandraConnector
 import org.apache.spark.{SparkConf, SparkContext}
 
-object SparkContextSingleton {
+object SparkCoreSingleton {
 
-  private var CONTEXT: SparkContext = _
+  private var sparkContext: SparkContext = _
 
   private val fileName = "cassandra-%s.properties".format(Environment.getAppEnv)
 
-  def getSparkConf(): SparkConf = {
+  /**
+    * Return the settings
+    *
+    * @return SparkConf
+    */
+  private def getConf: SparkConf = {
     val p: Properties = new PropService().get(fileName)
     val sparkConf = new SparkConf().setMaster(p.getProperty("master"))
       .setAppName(p.getProperty("appName"))
@@ -42,27 +47,35 @@ object SparkContextSingleton {
     *
     * @return
     */
-  def getSparkContext(): SparkContext = this.synchronized {
-    if (CONTEXT == null) {
-      CONTEXT = new SparkContext(getSparkConf)
+  def getContext: SparkContext = this.synchronized {
+    if (sparkContext == null) {
+      sparkContext = new SparkContext(this.getConf)
     }
-    CONTEXT
+    sparkContext
   }
 
-  def destroyContext(): Unit = {
-    if (CONTEXT != null) {
-      CONTEXT.clearJobGroup()
-      CONTEXT = null
-    }
-  }
-
-  def getSession(): Session = {
+  /**
+    * Get spark session
+    *
+    * @return
+    */
+  def getSession: Session = {
     try {
-      val connector = CassandraConnector.apply(getSparkConf())
+      val connector = CassandraConnector.apply(this.getConf)
       connector.openSession()
     } catch {
       case e: Exception => println(e.getLocalizedMessage)
         null
+    }
+  }
+
+  /**
+    * Destroy and clean the context
+    */
+  def destroyContext: Unit = {
+    if (sparkContext != null) {
+      sparkContext.clearJobGroup()
+      sparkContext = null
     }
   }
 

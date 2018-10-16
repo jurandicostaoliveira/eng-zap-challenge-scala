@@ -5,7 +5,7 @@ import java.util.Properties
 
 import br.com.btg360.services.PropService
 import br.com.btg360.constants.Environment
-import br.com.btg360.spark.SparkSqlContextSingleton
+import br.com.btg360.spark.SparkSqlSingleton
 import org.apache.spark.sql.{DataFrame, SaveMode}
 import org.apache.spark.rdd.RDD
 
@@ -24,7 +24,7 @@ abstract class AbstractJDBCManager {
 
   private var _connection: Connection = _
 
-  private val sqlContext = SparkSqlContextSingleton.get
+  private val sqlContext = SparkSqlSingleton.get
 
   def connection: Connection = this._connection
 

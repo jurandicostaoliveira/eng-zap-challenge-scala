@@ -1,6 +1,6 @@
 package br.com.btg360.run
 
-import br.com.btg360.spark.SparkContextSingleton
+import br.com.btg360.spark.SparkCoreSingleton
 import org.apache.spark.rdd.RDD
 
 object RDDExample {
@@ -12,7 +12,7 @@ object RDDExample {
     p2.name = "Tv"
     val list: List[ProductTest] = List(p1, p2)
 
-    val sc = SparkContextSingleton.getSparkContext()
+    val sc = SparkCoreSingleton.getContext
     val rdd: RDD[ProductTest] = sc.parallelize(list)
 
     rdd.foreach(row => {

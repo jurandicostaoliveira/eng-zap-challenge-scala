@@ -2,12 +2,12 @@ package br.com.btg360.services
 
 import br.com.btg360.application.Service
 import br.com.btg360.repositories.OptoutRepository
-import br.com.btg360.spark.SparkContextSingleton
+import br.com.btg360.spark.SparkCoreSingleton
 import org.apache.spark.rdd.RDD
 
 class OptoutService extends Service {
 
-  val sc = SparkContextSingleton.getSparkContext()
+  val sc = SparkCoreSingleton.getContext
 
   val repository = new OptoutRepository()
 

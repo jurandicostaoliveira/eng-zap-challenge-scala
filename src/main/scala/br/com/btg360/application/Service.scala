@@ -14,4 +14,6 @@ abstract class Service extends Application {
 
   def optoutService: OptoutService = new OptoutService()
 
+  def dataStockService: DataStockService = new DataStockService()
+
 }

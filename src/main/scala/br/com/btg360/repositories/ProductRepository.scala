@@ -2,16 +2,13 @@ package br.com.btg360.repositories
 
 import br.com.btg360.constants.Keyspace
 import br.com.btg360.entities.ProductEntity
-import br.com.btg360.spark.SparkContextSingleton
+import br.com.btg360.spark.SparkCoreSingleton
 import com.datastax.spark.connector.toSparkContextFunctions
-//import com.datastax.spark.connector.rdd.CassandraTableScanRDD
 import org.apache.spark.rdd.RDD
-
-import com.datastax.spark.connector.CassandraRow
 
 class ProductRepository {
 
-  val sc = SparkContextSingleton.getSparkContext()
+  val sc = SparkCoreSingleton.getContext
 
   private var _table: String = _
 
