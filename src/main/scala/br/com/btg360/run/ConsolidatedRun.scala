@@ -1,10 +1,12 @@
 package br.com.btg360.run
 
 import br.com.btg360.application.Entity
-import br.com.btg360.entities.ConsolidatedEntity
+import br.com.btg360.entities.{ConsolidatedEntity, QueueEntity}
 import br.com.btg360.repositories.{ConsolidatedRepository, ProductRepository}
 import br.com.btg360.rules.Daily
 import org.apache.spark.rdd.RDD
+import br.com.btg360.services.DataStockService
+import br.com.btg360.spark.SparkCoreSingleton
 
 
 object ConsolidatedRun extends App {
@@ -33,16 +35,21 @@ object ConsolidatedRun extends App {
 
 
   //Cassandra
-//  val productRepository = new ProductRepository()
+  //  val productRepository = new ProductRepository()
 
   //Glamour [50, 36, 52]
-//  val rdd = productRepository.table("product_52").findAllKeyBy(entity => (entity.productId, entity))
+  //  val rdd = productRepository.table("product_52").findAllKeyBy(entity => (entity.productId, entity))
 
-//  rdd.foreach(row => {
-//    println(row._1 + " -> "+ row._2.subCategory)
-//  })
+  //  rdd.foreach(row => {
+  //    println(row._1 + " -> "+ row._2.subCategory)
+  //  })
 
-  val d = new Daily()
-  d.dispatch()
+  val dataStockService = new DataStockService()
+  val queue = new QueueEntity()
+  queue.allinId = 9176
+  queue.consolidatedTable = "navigation_daily_8232_2975_2018_09_04"
+  queue.channelName = "email"
+  val rdd = dataStockService.queue(queue).groupData
+
 
 }

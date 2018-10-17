@@ -1,6 +1,8 @@
 package br.com.btg360.entities
 
-class ProductConsolidatedEntity {
+import br.com.btg360.application.Entity
+
+class ConsolidatedProductEntity extends Entity {
 
   //Product
   var attribute1: String = _
@@ -58,7 +60,15 @@ class ProductConsolidatedEntity {
   var platformId: Int = 0
   var createdAt: String = _
 
-  def setRow(productEntity: ProductEntity, consolidatedEntity: ConsolidatedEntity): ProductConsolidatedEntity = {
+  def setRow(consolidatedEntity: ConsolidatedEntity, productEntity: ProductEntity): ConsolidatedProductEntity = {
+    this.userId = consolidatedEntity.userId
+    this.userSent = consolidatedEntity.userSent
+    this.isSent = consolidatedEntity.isSent
+    this.isRecommendation = consolidatedEntity.isRecommendation
+    this.percentage = consolidatedEntity.percentage
+    this.platformId = consolidatedEntity.platformId
+    this.createdAt = consolidatedEntity.createdAt
+    //
     this.attribute1 = productEntity.attribute1
     this.attribute2 = productEntity.attribute2
     this.attribute3 = productEntity.attribute3
@@ -104,14 +114,6 @@ class ProductConsolidatedEntity {
     this.subCategory = productEntity.subCategory
     this.subCategoryTwo = productEntity.subCategoryTwo
     this.totalQtySold = productEntity.totalQtySold
-    //
-    this.userId = consolidatedEntity.userId
-    this.userSent = consolidatedEntity.userSent
-    this.isSent = consolidatedEntity.isSent
-    this.isRecommendation = consolidatedEntity.isRecommendation
-    this.percentage = consolidatedEntity.percentage
-    this.platformId = consolidatedEntity.platformId
-    this.createdAt = consolidatedEntity.createdAt
     this
   }
 

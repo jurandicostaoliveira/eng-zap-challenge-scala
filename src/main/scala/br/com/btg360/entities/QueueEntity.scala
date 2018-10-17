@@ -1,92 +1,85 @@
 package br.com.btg360.entities
 
-class QueueEntity {
+import br.com.btg360.application.Entity
+import br.com.btg360.constants.Database
 
-  private[this] var _userRuleId: Int = _
+class QueueEntity extends Entity {
 
-  private[this] var _userId: Int = _
+  //Queue
+  var userRuleId: Int = 0
+  var userId: Int = 0
+  var groupId: Int = 0
+  var ruleTypeId: Int = 0
+  var ruleActionName: String = _
+  var isPeal: Boolean = false
+  var priority: Int = 0
+  var status: Int = 0
+  var consolidatedTable: String = _
+  var productTable: String = _
+  var sendLimit: Int = 1
+  var vmta: String = _
 
-  private[this] var _groupId: Int = _
+  //Account
+  var btgId: Int = 0
+  var allinId: Int = 0
+  var transactionalId: Int = 0
+  var token: String = _
 
-  private[this] var _ruleTypeId: Int = _
+  //Rule
+  var ruleName: String = _
+  var subject: String = _
+  var hour: String = _
+  var senderEmail: String = _
+  var senderName: String = _
+  var replyEmail: String = _
+  var referenceListId: Int = 0
+  var listId: Int = 0
+  var listExclusionId: Int = 0
+  var field: String = _
+  var formatField: String = _
+  var filterId: Int = 0
+  var interval: Int = 0
+  var frequency: Int = 0
+  var dayWeek: Int = 0
+  var dayMonth: Int = 0
 
-  private[this] var _ruleActionName: Int = _
+  //HTML
+  var templateId: Int = 0
+  var themeId: Int = 0
+  var layoutId: Int = 0
+  var content: String = _
 
-  private[this] var _isPeal: Int = _
+  //Channels
+  var channels: String = _
+  var channelId: Int = 0
+  var channelName: String = _
+  var channelReference: String = _
+  var channelTitle: String = _
+  var channelMessage: String = _
+  var channelUrlScheme: String = _
+  var utmChannels: String = _
 
-  private[this] var _priority: Int = _
+  // Internal ####
+  var ruleLabel: String = _
+  var deliveryAt: String = _
+  var deliveryTimestamp: Int = 0
 
-  private[this] var _status: Int = _
-
-  private[this] var _consolidatedTableName: String = _
-
-  private[this] var _sendLimit: Int = _
-
-  private[this] var _vmta: String = _
-
-  def vmta: String = _vmta
-
-  def vmta_=(value: String): Unit = {
-    _vmta = value
+  /**
+    * Returns the name of the consolidated table of products
+    *
+    * @return String
+    */
+  def getConsolidatedTable: String = {
+    "%s.%s_%s".format(Database.CONSOLIDATED, this.consolidatedTable, this.channelName)
   }
 
-  def sendLimit: Int = _sendLimit
-
-  def sendLimit_=(value: Int): Unit = {
-    _sendLimit = value
+  /**
+    * Returns the name of the table of products
+    *
+    * @return
+    */
+  def getProductTable: String = {
+    "product_%d".format(this.allinId)
   }
 
-  def consolidatedTableName: String = _consolidatedTableName
-
-  def consolidatedTableName_=(value: String): Unit = {
-    _consolidatedTableName = value
-  }
-
-  def status: Int = _status
-
-  def status_=(value: Int): Unit = {
-    _status = value
-  }
-
-  def priority: Int = _priority
-
-  def priority_=(value: Int): Unit = {
-    _priority = value
-  }
-
-  def isPeal: Int = _isPeal
-
-  def isPeal_=(value: Int): Unit = {
-    _isPeal = value
-  }
-
-  def ruleActionName: Int = _ruleActionName
-
-  def ruleActionName_=(value: Int): Unit = {
-    _ruleActionName = value
-  }
-
-  def ruleTypeId: Int = _ruleTypeId
-
-  def ruleTypeId_=(value: Int): Unit = {
-    _ruleTypeId = value
-  }
-
-  def groupId: Int = _groupId
-
-  def groupId_=(value: Int): Unit = {
-    _groupId = value
-  }
-
-  def userId: Int = _userId
-
-  def userId_=(value: Int): Unit = {
-    _userId = value
-  }
-
-  def userRuleId: Int = _userRuleId
-
-  def userRuleId_=(value: Int): Unit = {
-    _userRuleId = value
-  }
 }
