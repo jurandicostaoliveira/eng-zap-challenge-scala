@@ -28,5 +28,7 @@ libraryDependencies ++= Seq(
     "org.apache.logging.log4j" % "log4j-scala" % log4jVersion,
 
     //https://github.com/debasishg/scala-redis
-    "net.debasishg" %% "redisclient" % redisVersion
+    "net.debasishg" %% "redisclient" % redisVersion,
+
+    //"com.google.code.gson" % "gson" % "2.8.5"
  )

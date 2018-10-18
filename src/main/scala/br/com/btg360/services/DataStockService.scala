@@ -1,31 +1,12 @@
 package br.com.btg360.services
 
+import br.com.btg360.constants.Channel
 import br.com.btg360.entities._
 import br.com.btg360.repositories.{ConsolidatedRepository, ProductRepository}
+import br.com.btg360.spark.SparkCoreSingleton
 import org.apache.spark.rdd.RDD
-import scala.collection.mutable.Map
 
-class DataStockService {
-
-  private var _queue: QueueEntity = _
-
-  /**
-    * Getter
-    *
-    * @return QueueEntity
-    */
-  def queue: QueueEntity = this._queue
-
-  /**
-    * Setter
-    *
-    * @param QueueEntity value
-    * @return this
-    */
-  def queue(value: QueueEntity): DataStockService = {
-    this._queue = value
-    this
-  }
+class DataStockService(queue: QueueEntity) {
 
   /**
     * Return all consolidated data
@@ -65,9 +46,8 @@ class DataStockService {
     *
     * @return
     */
-  def groupData: RDD[Map[String, ItemEntity]] = {
+  private def groupData: RDD[(String, ItemEntity)] = {
     this.joinData.groupByKey().map(rows => {
-      val data: Map[String, ItemEntity] = Map()
       val entity: ItemEntity = new ItemEntity()
 
       rows._2.foreach(row => {
@@ -78,35 +58,35 @@ class DataStockService {
         }
       })
 
-      data(rows._1) = entity
-      (data)
+      (rows._1, entity)
     })
   }
 
-
-  def get: RDD[(String, ConsolidatedProductEntity)] = {
+  /**
+    * Return filtered data
+    *
+    * @return RDD
+    */
+  def get: RDD[(String, ItemEntity)] = {
     try {
-      val groupData = this.groupData
-//      val rddKeys: RDD[String] = groupData.map(row => {
-//        var list: List[String] = List()
-//        for ((key, value) <- row) {
-//          list ::= key
-//        }
-//        list
-//      })
-
-      //LOG TOTAL
-      val dailyUnlimitedData = new DailySendLimitService().filter(RDD[String])
+      val data = this.groupData
       //LOG TOTAL
 
-      dailyUnlimitedData.foreach(row => println(row))
+      var filters = new DailySendLimitService(this.queue).filter(groupData.keys)
+      //LOG TOTAL
 
-      null
+      if (Channel.isEmailChannel(this.queue.channelName)) {
+        filters = new OptoutService(this.queue).filter(filters)
+        //LOG TOTAL
+      }
+
+      filters.map(key => (key, 0)).join(data).map(row => {
+        (row._1, row._2._2)
+      })
     } catch {
       case e: Exception => println(e.getLocalizedMessage)
-        null
+        SparkCoreSingleton.getContext.emptyRDD
     }
   }
-
 
 }

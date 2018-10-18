@@ -44,12 +44,16 @@ object ConsolidatedRun extends App {
   //    println(row._1 + " -> "+ row._2.subCategory)
   //  })
 
-  val dataStockService = new DataStockService()
+
   val queue = new QueueEntity()
+  queue.userId = 17
   queue.allinId = 9176
   queue.consolidatedTable = "navigation_daily_8232_2975_2018_09_04"
   queue.channelName = "email"
-  val rdd = dataStockService.queue(queue).groupData
 
+  val rdd = new DataStockService(queue).get
+  rdd.foreach(row => {
+    println(row._1 + " -> Products: " + row._2.products.size + " Recomendations: " + row._2.recommendations.size)
+  })
 
 }

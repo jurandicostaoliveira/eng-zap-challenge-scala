@@ -59,7 +59,7 @@ class QueueEntity extends Entity {
   var channelUrlScheme: String = _
   var utmChannels: String = _
 
-  // Internal ####
+  // Internal
   var ruleLabel: String = _
   var deliveryAt: String = _
   var deliveryTimestamp: Int = 0

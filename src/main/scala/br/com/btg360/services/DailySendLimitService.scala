@@ -1,62 +1,22 @@
 package br.com.btg360.services
 
-import br.com.btg360.application.Service
+import br.com.btg360.entities.QueueEntity
 import br.com.btg360.spark.SparkCoreSingleton
 import org.apache.spark.rdd.RDD
 
 
-class DailySendLimitService extends Service {
+class DailySendLimitService(queue: QueueEntity) {
 
   private val sc = SparkCoreSingleton.getContext
 
-  private val redis = this.redisClientService.connect
+  private val redis = new RedisClientService().connect
 
-  private val today = this.periodService("yyyy_MM_dd").now
-
-  private var _userId: Int = _
-
-  private var _limit: Int = 1
-
-  /**
-    * Getter
-    *
-    * @return Int
-    */
-  def userId: Int = _userId
-
-  /**
-    * Setter
-    *
-    * @param Int value
-    * @return this
-    */
-  def userId_=(value: Int): DailySendLimitService = {
-    this._userId = value
-    this
-  }
-
-  /**
-    * Getter
-    *
-    * @return Int
-    */
-  def limit: Int = this._limit
-
-  /**
-    * Setter
-    *
-    * @param Int value
-    * @return this
-    */
-  def limit_=(value: Int): DailySendLimitService = {
-    this._limit = value
-    this
-  }
+  private val today = new PeriodService("yyyy_MM_dd").now
 
   /**
     * @return String
     */
-  private def createEntityName: String = "send_limit_%d_%s".format(this._userId, this.today)
+  private def createEntityName: String = "send_limit_%d_%s".format(this.queue.userId, this.today)
 
   /**
     * Filtering to start the defined limit
@@ -66,9 +26,10 @@ class DailySendLimitService extends Service {
     */
   private def pluck(entityName: String): List[String] = {
     var keys: List[String] = List()
+
     this.redis.hgetall(entityName).foreach(row => {
       for ((key, value) <- row) {
-        if (value.toInt <= this._limit) {
+        if (value.toInt <= this.queue.sendLimit) {
           keys ::= key
         }
       }
@@ -86,6 +47,7 @@ class DailySendLimitService extends Service {
   def filter(users: RDD[String]): RDD[String] = {
     val entityName: String = this.createEntityName
     val usersList = users.collect().toList
+
     this.redis.pipeline(row => {
       for (key <- usersList) {
         row.hincrby(entityName, key, 1)

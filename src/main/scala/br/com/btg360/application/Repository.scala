@@ -4,10 +4,11 @@ import java.sql.{Connection, ResultSet, Statement}
 
 abstract class Repository extends Model {
 
-  val mySqlBtg360Connection: Connection = mySqlBtg360.open
+  val dbBtg360: Connection = mySqlBtg360.open
 
   def queryExecutor(query: String): ResultSet = {
-    val stmt: Statement = mySqlBtg360Connection.createStatement()
+    val stmt: Statement = this.dbBtg360.createStatement()
     stmt.executeQuery(query)
   }
+
 }
