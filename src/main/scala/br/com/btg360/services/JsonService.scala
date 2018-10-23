@@ -17,7 +17,6 @@ class JsonService() {
     * @return T
     */
   def decode[T: Manifest](jsonString: String): T = {
-    //parse(jsonString).extract[T]
     read[T](jsonString)
   }
 

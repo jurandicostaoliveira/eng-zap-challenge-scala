@@ -1,13 +1,11 @@
 package br.com.btg360.run
 
+import br.com.btg360.entities.RuleDataEntity
 import br.com.btg360.services.JsonService
 
 //case class Children(name: String, age: Int, birthdate: Option[java.util.Date])
 //case class Address(street: String, city: String)
 //case class Person(name: String, address: Address, children: List[Children])
-
-
-import br.com.btg360.entities.RawRuleEntity
 
 object JsonRun extends App {
 
@@ -102,9 +100,8 @@ object JsonRun extends App {
  }
        """
 
-  val data = new JsonService().decode[RawRuleEntity](jsonString)
-
-
+  val data = new JsonService().decode[RuleDataEntity](jsonString)
+  //val data = new JsonService().decode[List[String]]("""["email", "facebook"]""")
 
 
 //  for(i <- 0 to 5) {

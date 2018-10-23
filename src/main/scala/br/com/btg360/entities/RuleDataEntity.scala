@@ -1,6 +1,6 @@
 package br.com.btg360.entities
 
-object RawRuleObject {
+object RuleDataRaw {
 
   case class Configs(
                       ruleName: Any,
@@ -27,7 +27,7 @@ object RawRuleObject {
                            )
 
   case class Module(
-                     selected: RawRuleObject.ModuleSelected,
+                     selected: RuleDataRaw.ModuleSelected,
                      quantity: Any,
                      to: Any,
                      from: Any,
@@ -49,19 +49,19 @@ object RawRuleObject {
 
   case class Channel(
                       status: Any,
-                      utms: List[RawRuleObject.ChannelUtms],
+                      utms: List[RuleDataRaw.ChannelUtms],
                       subject: Any,
                       message: Any,
                       urlScheme: Any
                     )
 
   case class Channels(
-                       email: RawRuleObject.Channel,
-                       sms: RawRuleObject.Channel,
-                       facebook: RawRuleObject.Channel,
-                       webpush: RawRuleObject.Channel,
-                       push_android: RawRuleObject.Channel,
-                       push_ios: RawRuleObject.Channel
+                       email: RuleDataRaw.Channel,
+                       sms: RuleDataRaw.Channel,
+                       facebook: RuleDataRaw.Channel,
+                       webpush: RuleDataRaw.Channel,
+                       push_android: RuleDataRaw.Channel,
+                       push_ios: RuleDataRaw.Channel
                      )
 
   case class Automatics(
@@ -109,12 +109,12 @@ object RawRuleObject {
   * @param rule
   * @param account
   */
-case class RawRuleEntity(
-                          configs: RawRuleObject.Configs,
-                          module: RawRuleObject.Module,
-                          html: RawRuleObject.Html,
-                          channels: RawRuleObject.Channels,
-                          automatics: RawRuleObject.Automatics,
-                          rule: RawRuleObject.Rule,
-                          account: RawRuleObject.Account
-                        )
+case class RuleDataEntity(
+                           configs: RuleDataRaw.Configs,
+                           module: RuleDataRaw.Module,
+                           html: RuleDataRaw.Html,
+                           channels: RuleDataRaw.Channels,
+                           automatics: RuleDataRaw.Automatics,
+                           rule: RuleDataRaw.Rule,
+                           account: RuleDataRaw.Account
+                         )

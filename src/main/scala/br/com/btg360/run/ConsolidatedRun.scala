@@ -48,7 +48,7 @@ object ConsolidatedRun extends App {
   val queue = new QueueEntity()
   queue.userId = 17
   queue.allinId = 9176
-  queue.consolidatedTable = "navigation_daily_8232_2975_2018_09_04"
+  queue.consolidatedTableName = "navigation_daily_8232_2975_2018_09_04"
   queue.channelName = "email"
 
   val rdd = new DataStockService(queue).get
