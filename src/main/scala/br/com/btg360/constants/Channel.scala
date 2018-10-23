@@ -32,4 +32,19 @@ object Channel {
     channelName == this.EMAIL
   }
 
+  /**
+    *
+    * @return
+    */
+  def all: Map[String, Int] = {
+    Map(
+      this.EMAIL -> this.EMAIL_ID,
+      this.SMS -> this.SMS_ID,
+      this.FACEBOOK -> this.FACEBOOK_ID,
+      this.WEBPUSH -> this.WEBPUSH_ID,
+      this.PUSH_ANDROID -> this.PUSH_ANDROID_ID,
+      this.PUSH_IOS -> this.PUSH_IOS_ID
+    )
+  }
+
 }

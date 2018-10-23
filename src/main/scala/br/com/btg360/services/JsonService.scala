@@ -1,7 +1,9 @@
 package br.com.btg360.services
 
 import org.json4s._
-import org.json4s.native.JsonMethods._
+import org.json4s.native.Serialization.read
+import org.json4s.native.Serialization.write
+
 
 class JsonService() {
 
@@ -15,11 +17,20 @@ class JsonService() {
     * @return T
     */
   def decode[T: Manifest](jsonString: String): T = {
-    parse(jsonString).extract[T]
+    //parse(jsonString).extract[T]
+    read[T](jsonString)
   }
 
-  def encode[T: Manifest](value: T): String = {
-    null
+  /**
+    * Json encoder
+    *
+    * To encode it is necessary to be a case class
+    *
+    * @param AnyRef caseClass
+    * @return String
+    */
+  def encode(caseClass: AnyRef): String = {
+    write(caseClass)
   }
 
 }
