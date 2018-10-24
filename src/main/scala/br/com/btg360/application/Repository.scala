@@ -1,11 +1,14 @@
 package br.com.btg360.application
 
 import java.sql.{Connection, ResultSet}
+
+import br.com.btg360.jdbc.MySqlBtg360
+
 import scala.collection.immutable.List
 
 abstract class Repository extends Model {
 
-  private var dbConnection: Connection = mySqlBtg360.open
+  private var dbConnection: Connection = this.invoke(classOf[MySqlBtg360]).open
 
   /**
     *

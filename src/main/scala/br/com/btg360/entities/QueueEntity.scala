@@ -1,14 +1,19 @@
 package br.com.btg360.entities
 
+import java.util.Date
+
 import br.com.btg360.application.Entity
 import br.com.btg360.constants.Database
+import br.com.btg360.services.TypeConverterService
 
 
 class QueueEntity extends Entity {
 
+  val tcs = this.invoke(classOf[TypeConverterService])
+
   //Queue
   var userRuleId: Int = _
-  var today: String = _
+  var today: Date = _
   var userId: Int = 0
   var groupId: Int = 0
   var ruleTypeId: Int = 0
@@ -19,17 +24,16 @@ class QueueEntity extends Entity {
   var consolidatedTableName: String = _
   var channels: String = _
   var recommendationModule: String = _
-  var createdIn: String = _
-  var startedIn: String = _
-  var preparedIn: String = _
-  var recommendationStartedIn: String = _
-  var recommendationPreparedIn: String = _
-  var processedIn: String = _
-  var finalizedIn: String = _
-
-  //Queue  2
-  @transient var sendLimit: Int = 1
-  @transient var vmta: String = _
+  var createdIn: Date = _
+  var startedIn: Date = _
+  var preparedIn: Date = _
+  var recommendationStartedIn: Date = _
+  var recommendationPreparedIn: Date = _
+  var processedIn: Date = _
+  var finalizedIn: Date = _
+  //Queue Configs
+  var sendLimit: Int = 1
+  var vmta: String = _
 
   //Account
   @transient var btgId: Int = 0
@@ -83,39 +87,39 @@ class QueueEntity extends Entity {
     //    this.vmta = _
 
     //Rule
-    this.ruleName = this.anyToString(data.configs.ruleName)
-//    this.subject = this.anyToString(data.configs.subject)
-//    this.hour = this.anyToString(data.configs.hour)
-//    this.senderEmail = this.anyToString(data.configs.senderEmail)
-//    this.senderName = this.anyToString(data.configs.senderName)
-//    this.replyEmail = this.anyToString(data.configs.replyEmail)
-//    if (this.replyEmail.isEmpty) {
-//      this.replyEmail = this.senderEmail
-//    }
-//    this.referenceListId = this.anyToInt(data.configs.list)
-//    //this.interval = this.anyToInt(data.configs.interval)
-//    this.frequency = this.anyToInt(data.configs.frequency)
-//    this.dayWeek = this.anyToInt(data.configs.dayWeek)
-//    this.dayMonth = this.anyToInt(data.configs.dayMonth)
-//
-//    //Automatics
-//    this.listId = this.anyToInt(data.automatics.list)
-//    this.listExclusionId = this.anyToInt(data.automatics.exclusion)
-//    this.field = this.anyToString(data.automatics.field)
-//    this.formatField = this.anyToString(data.automatics.format)
-//    this.filterId = this.anyToInt(data.automatics.filter)
-//
-//    //HTML
-//    this.templateId = this.anyToInt(data.html.template)
-//    this.themeId = this.anyToInt(data.html.theme)
-//    this.layoutId = this.anyToInt(data.html.layout)
-//    this.content = this.anyToString(data.html.content)
-//
-//    //Account
-//    this.btgId = this.anyToInt(data.account.btgId)
-//    this.allinId = this.anyToInt(data.account.allinId)
-//    this.transactionalId = this.anyToInt(data.account.transId)
-//    this.token = this.anyToString(data.account.token)
+    this.ruleName = this.tcs.toString(data.configs.ruleName)
+    this.subject = this.tcs.toString(data.configs.subject)
+    this.hour = this.tcs.toString(data.configs.hour)
+    this.senderEmail = this.tcs.toString(data.configs.senderEmail)
+    this.senderName = this.tcs.toString(data.configs.senderName)
+    this.replyEmail = this.tcs.toString(data.configs.replyEmail)
+    if (this.replyEmail.isEmpty) {
+      this.replyEmail = this.senderEmail
+    }
+    this.referenceListId = this.tcs.toInt(data.configs.list)
+    this.interval = this.tcs.toInt(data.configs.interval)
+    this.frequency = this.tcs.toInt(data.configs.frequency)
+    this.dayWeek = this.tcs.toInt(data.configs.dayWeek)
+    this.dayMonth = this.tcs.toInt(data.configs.dayMonth)
+
+    //Automatics
+    this.listId = this.tcs.toInt(data.automatics.list)
+    this.listExclusionId = this.tcs.toInt(data.automatics.exclusion)
+    this.field = this.tcs.toString(data.automatics.field)
+    this.formatField = this.tcs.toString(data.automatics.format)
+    this.filterId = this.tcs.toInt(data.automatics.filter)
+
+    //HTML
+    this.templateId = this.tcs.toInt(data.html.template)
+    this.themeId = this.tcs.toInt(data.html.theme)
+    this.layoutId = this.tcs.toInt(data.html.layout)
+    this.content = this.tcs.toString(data.html.content)
+
+    //Account
+    this.btgId = this.tcs.toInt(data.account.btgId)
+    this.allinId = this.tcs.toInt(data.account.allinId)
+    this.transactionalId = this.tcs.toInt(data.account.transId)
+    this.token = this.tcs.toString(data.account.token)
 
     // : Internal
     //    this.ruleLabel = _

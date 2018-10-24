@@ -39,6 +39,8 @@ class RuleRepository extends Repository {
         ORDER BY userRuleTable.priority ASC;
       """.format(this.userRuleTable, this.ruleTable, this.consolidatedRuleTable, userId, strIsPeal)
 
+    println(query)
+
     this.fetch(query, classOf[RuleEntity])
   }
 

@@ -3,8 +3,11 @@ package br.com.btg360.repositories
 import java.sql.{Connection, ResultSet, Statement}
 
 import br.com.btg360.application.Repository
+import br.com.btg360.jdbc.MySqlBtg360
 
 class SchemaRepository extends Repository {
+
+  val connection: Connection = this.invoke(classOf[MySqlBtg360]).open
 
   def findTablesByLikeExpression(dataBase: String, tableNameLikeExpr: String)
   : ResultSet = {
@@ -19,8 +22,7 @@ class SchemaRepository extends Repository {
         s"TABLE_NAME NOT LIKE '%_webpush' AND " +
         s"TABLE_NAME NOT LIKE '%_mobile';"
 
-      val connection: Connection = mySqlBtg360.open
-      val stmt: Statement = connection.createStatement()
+      val stmt: Statement = this.connection.createStatement()
       val resultSet: ResultSet = stmt.executeQuery(query)
       resultSet
     } catch {
@@ -37,8 +39,7 @@ class SchemaRepository extends Repository {
         "CHANGE email userSent text," +
         "ADD platformId int(11) NOT NULL;"
 
-      val connection: Connection = mySqlBtg360.open
-      val stmt: Statement = connection.createStatement()
+      val stmt: Statement = this.connection.createStatement()
       stmt.executeUpdate(query)
       true
     } catch {
@@ -50,8 +51,7 @@ class SchemaRepository extends Repository {
   def renameTableWithSuffix(tableName: String, suffix: String): Boolean = {
     try {
       val query: String = s"RENAME TABLE btg_consolidated.$tableName TO btg_consolidated.$tableName" + s"_$suffix;"
-      val connection: Connection = mySqlBtg360.open
-      val stmt: Statement = connection.createStatement()
+      val stmt: Statement = this.connection.createStatement()
       stmt.executeUpdate(query)
       true
     } catch {
