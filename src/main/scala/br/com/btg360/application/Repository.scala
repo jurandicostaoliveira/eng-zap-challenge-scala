@@ -1,9 +1,7 @@
 package br.com.btg360.application
 
 import java.sql.{Connection, ResultSet}
-
 import br.com.btg360.jdbc.MySqlBtg360
-
 import scala.collection.immutable.List
 
 abstract class Repository extends Model {
@@ -46,11 +44,11 @@ abstract class Repository extends Model {
       val total = metaData.getColumnCount
       var columns: List[String] = List()
       for (i <- 1 to total) {
-        columns ::= metaData.getColumnName(i)
+        columns ::= metaData.getColumnLabel(i)
       }
 
-      var entity = entityClass.newInstance()
       while (resultSet.next()) {
+        val entity = entityClass.newInstance()
         for (attribute <- attributes) {
           if (columns.contains(attribute)) {
             val field = entity.getClass.getDeclaredField(attribute)
@@ -58,7 +56,7 @@ abstract class Repository extends Model {
             field.set(entity, resultSet.getObject(attribute))
           }
         }
-        list ::= entity
+        list = list :+ entity
       }
 
       list

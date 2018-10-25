@@ -23,7 +23,7 @@ class PeriodService {
     * @param String value
     * @return PeriodService
     */
-  def format_=(value: String): PeriodService = {
+  def format(value: String): PeriodService = {
     this._format = value
     this
   }

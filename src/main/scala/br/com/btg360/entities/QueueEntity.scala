@@ -4,22 +4,21 @@ import java.util.Date
 
 import br.com.btg360.application.Entity
 import br.com.btg360.constants.Database
-import br.com.btg360.services.TypeConverterService
-
+import br.com.btg360.services.{JsonService, TypeConverterService => TCS}
 
 class QueueEntity extends Entity {
 
-  val tcs = this.invoke(classOf[TypeConverterService])
+  private val jsonService = new JsonService()
 
   //Queue
-  var userRuleId: Int = _
+  var userRuleId: Long = 0
   var today: Date = _
-  var userId: Int = 0
-  var groupId: Int = 0
+  var userId: Long = 0
+  var groupId: Long = 0
   var ruleTypeId: Int = 0
   var ruleName: String = _
   var isPeal: Int = 0
-  var priority: Int = 0
+  var priority: Long = 0
   var status: Int = 0
   var consolidatedTableName: String = _
   var channels: String = _
@@ -34,6 +33,7 @@ class QueueEntity extends Entity {
   //Queue Configs
   var sendLimit: Int = 1
   var vmta: String = _
+  var dataStringJson: String = _
 
   //Account
   @transient var btgId: Int = 0
@@ -68,6 +68,7 @@ class QueueEntity extends Entity {
   @transient var content: String = _
 
   //Channels
+  @transient var channelsList: List[String] = List()
   @transient var channelId: Int = 0
   @transient var channelName: String = _
   @transient var channelReference: String = _
@@ -81,51 +82,53 @@ class QueueEntity extends Entity {
   @transient var deliveryAt: String = _
   @transient var deliveryTimestamp: Int = 0
 
-  def setRule(data: RuleDataEntity): QueueEntity = {
-    //Queue
-    //    this.sendLimit = 1
-    //    this.vmta = _
+  def parse(): QueueEntity = {
+    val dataRule = this.jsonService.decode[RuleDataEntity](this.dataStringJson)
 
     //Rule
-    this.ruleName = this.tcs.toString(data.configs.ruleName)
-    this.subject = this.tcs.toString(data.configs.subject)
-    this.hour = this.tcs.toString(data.configs.hour)
-    this.senderEmail = this.tcs.toString(data.configs.senderEmail)
-    this.senderName = this.tcs.toString(data.configs.senderName)
-    this.replyEmail = this.tcs.toString(data.configs.replyEmail)
+    this.ruleName = TCS.toString(dataRule.configs.ruleName)
+    this.subject = TCS.toString(dataRule.configs.subject)
+    this.hour = TCS.toString(dataRule.configs.hour)
+    this.senderEmail = TCS.toString(dataRule.configs.senderEmail)
+    this.senderName = TCS.toString(dataRule.configs.senderName)
+    this.replyEmail = TCS.toString(dataRule.configs.replyEmail)
     if (this.replyEmail.isEmpty) {
       this.replyEmail = this.senderEmail
     }
-    this.referenceListId = this.tcs.toInt(data.configs.list)
-    this.interval = this.tcs.toInt(data.configs.interval)
-    this.frequency = this.tcs.toInt(data.configs.frequency)
-    this.dayWeek = this.tcs.toInt(data.configs.dayWeek)
-    this.dayMonth = this.tcs.toInt(data.configs.dayMonth)
+    this.referenceListId = TCS.toInt(dataRule.configs.list)
+    this.interval = TCS.toInt(dataRule.configs.interval)
+    this.frequency = TCS.toInt(dataRule.configs.frequency)
+    this.dayWeek = TCS.toInt(dataRule.configs.dayWeek)
+    this.dayMonth = TCS.toInt(dataRule.configs.dayMonth)
 
     //Automatics
-    this.listId = this.tcs.toInt(data.automatics.list)
-    this.listExclusionId = this.tcs.toInt(data.automatics.exclusion)
-    this.field = this.tcs.toString(data.automatics.field)
-    this.formatField = this.tcs.toString(data.automatics.format)
-    this.filterId = this.tcs.toInt(data.automatics.filter)
+    this.listId = TCS.toInt(dataRule.automatics.list)
+    this.listExclusionId = TCS.toInt(dataRule.automatics.exclusion)
+    this.field = TCS.toString(dataRule.automatics.field)
+    this.formatField = TCS.toString(dataRule.automatics.format)
+    this.filterId = TCS.toInt(dataRule.automatics.filter)
 
     //HTML
-    this.templateId = this.tcs.toInt(data.html.template)
-    this.themeId = this.tcs.toInt(data.html.theme)
-    this.layoutId = this.tcs.toInt(data.html.layout)
-    this.content = this.tcs.toString(data.html.content)
+    this.templateId = TCS.toInt(dataRule.html.template)
+    this.themeId = TCS.toInt(dataRule.html.theme)
+    this.layoutId = TCS.toInt(dataRule.html.layout)
+    this.content = TCS.toString(dataRule.html.content)
 
     //Account
-    this.btgId = this.tcs.toInt(data.account.btgId)
-    this.allinId = this.tcs.toInt(data.account.allinId)
-    this.transactionalId = this.tcs.toInt(data.account.transId)
-    this.token = this.tcs.toString(data.account.token)
+    this.btgId = TCS.toInt(dataRule.account.btgId)
+    this.allinId = TCS.toInt(dataRule.account.allinId)
+    this.transactionalId = TCS.toInt(dataRule.account.transId)
+    this.token = TCS.toString(dataRule.account.token)
+
+    //Channels
+    if (this.channels != null) {
+      this.channelsList = this.jsonService.decode[List[String]](this.channels)
+    }
 
     // : Internal
     //    this.ruleLabel = _
     //    this.deliveryAt = _
     //    this.deliveryTimestamp = 0
-
     this
   }
 

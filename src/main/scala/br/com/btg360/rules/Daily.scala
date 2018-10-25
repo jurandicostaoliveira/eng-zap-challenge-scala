@@ -1,9 +1,12 @@
 package br.com.btg360.rules
 
 import br.com.btg360.traits.RuleTrait
+import br.com.btg360.constants.Rule
 
 class Daily extends RuleTrait {
-  override def configuration: String = {
-    "Hello String"
+
+  override def shouldUseRuleTypes: List[Int] = {
+    List(Rule.DAILY_ID, Rule.AUTOMATIC_ID)
   }
+
 }

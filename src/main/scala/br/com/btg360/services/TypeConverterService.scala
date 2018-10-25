@@ -1,6 +1,6 @@
 package br.com.btg360.services
 
-class TypeConverterService {
+object TypeConverterService {
 
   /**
     * Validate field cases comes with none and returns the default value
@@ -10,7 +10,7 @@ class TypeConverterService {
     * @return String
     */
   private def noneTo(value: Any, defaultValue: Any): String = {
-    if (value == None) {
+    if (value == None || value.toString.isEmpty) {
       return defaultValue.toString
     }
 

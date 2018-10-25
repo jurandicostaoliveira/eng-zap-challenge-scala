@@ -30,7 +30,7 @@ class DailySendLimitService(queue: QueueEntity) {
     this.redis.hgetall(entityName).foreach(row => {
       for ((key, value) <- row) {
         if (value.toInt <= this.queue.sendLimit) {
-          keys ::= key
+          keys = keys :+ key
         }
       }
     })
