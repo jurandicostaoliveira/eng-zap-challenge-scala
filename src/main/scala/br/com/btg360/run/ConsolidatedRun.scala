@@ -3,7 +3,7 @@ package br.com.btg360.run
 import br.com.btg360.application.Entity
 import br.com.btg360.entities.{ConsolidatedEntity, QueueEntity}
 import br.com.btg360.repositories.{ConsolidatedRepository, ProductRepository}
-import br.com.btg360.rules.Daily
+import br.com.btg360.worker.Daily
 import org.apache.spark.rdd.RDD
 import br.com.btg360.services.DataStockService
 import br.com.btg360.spark.SparkCoreSingleton
@@ -45,15 +45,15 @@ object ConsolidatedRun extends App {
   //  })
 
 
-  val queue = new QueueEntity()
-  queue.userId = 17
-  queue.allinId = 9176
-  queue.consolidatedTableName = "navigation_daily_8232_2975_2018_09_04"
-  queue.channelName = "email"
-
-  val rdd = new DataStockService(queue).get
-  rdd.foreach(row => {
-    println(row._1 + " -> Products: " + row._2.products.size + " Recomendations: " + row._2.recommendations.size)
-  })
+//  val queue = new QueueEntity()
+//  queue.userId = 17
+//  queue.allinId = 9176
+//  queue.consolidatedTableName = "navigation_daily_8232_2975_2018_09_04"
+//  queue.channelName = "email"
+//
+//  val rdd = new DataStockService(queue).get
+//  rdd.foreach(row => {
+//    println(row._1 + " -> Products: " + row._2.products.size + " Recomendations: " + row._2.recommendations.size)
+//  })
 
 }

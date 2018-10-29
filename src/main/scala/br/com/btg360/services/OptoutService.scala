@@ -19,7 +19,7 @@ class OptoutService(queue: QueueEntity) {
     */
   def filter(users: RDD[String]): RDD[String] = {
     try {
-      val usersOptout = this.repository.allinId(this.queue.allinId).getEmails
+      val usersOptout = this.repository.allinId(this.queue.rule.allinId).getEmails
       users.subtract(usersOptout)
     } catch {
       case e: Exception => println(e.getLocalizedMessage)

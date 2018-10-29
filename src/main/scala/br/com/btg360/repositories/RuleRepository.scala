@@ -12,35 +12,36 @@ class RuleRepository extends Repository {
 
   private val consolidatedRuleTable = "%s.%s".format(Database.PANEL, Table.CONSOLIDATED_RULES)
 
+  private val configsTable = "%s.%s".format(Database.PANEL, Table.CONFIGS)
+
   def findActiveByUserId(userId: Int, isPeal: Boolean = false): List[RuleEntity] = {
-    val strIsPeal: String = if (isPeal == true) ">=1" else "=0"
+    val strToPeal: String = if (isPeal == true) ">=1" else "=0"
     val query: String =
-      """
+      s"""
         SELECT
-          userRuleTable.id AS userRuleId,
+          userRuleTable.id,
           userRuleTable.priority,
-          ruleTable.ruleTypeId,
+          ruleTable.ruleTypeId AS typeId,
           ruleTable.periodId,
           ruleTable.groupId,
-          ruleTable.alias AS ruleName,
-          consolidatedRuleTable.data
-        FROM %s AS userRuleTable
-        JOIN %s AS ruleTable
+          consolidatedRuleTable.data AS dataStringJson
+        FROM ${this.userRuleTable} AS userRuleTable
+        JOIN ${this.configsTable} AS configs
+         	ON configs.userId = userRuleTable.userId
+        JOIN ${this.ruleTable} AS ruleTable
           ON ruleTable.id = userRuleTable.ruleId
-        JOIN %s AS consolidatedRuleTable
+        JOIN ${this.consolidatedRuleTable} AS consolidatedRuleTable
           ON consolidatedRuleTable.userRuleId = userRuleTable.id
         WHERE
-          userRuleTable.userId = %d
+          userRuleTable.userId = $userId
+          AND configs.btg = 1
           AND userRuleTable.isDeleted = 0
           AND userRuleTable.status = 1
-          AND userRuleTable.pealFrom %s
+          AND userRuleTable.pealFrom $strToPeal
           AND ruleTable.status = 1
           AND consolidatedRuleTable.status = 1
         ORDER BY userRuleTable.priority ASC;
-      """.format(this.userRuleTable, this.ruleTable, this.consolidatedRuleTable, userId, strIsPeal)
-
-    println(query)
-
+      """
     this.fetch(query, classOf[RuleEntity])
   }
 

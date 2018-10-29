@@ -1,6 +1,7 @@
 package br.com.btg360.services
 
 import br.com.btg360.entities.QueueEntity
+import br.com.btg360.redis.Connection
 import br.com.btg360.spark.SparkCoreSingleton
 import org.apache.spark.rdd.RDD
 
@@ -9,7 +10,7 @@ class DailySendLimitService(queue: QueueEntity) {
 
   private val sc = SparkCoreSingleton.getContext
 
-  private val redis = new RedisClientService().connect
+  private val redis = new Connection().get
 
   private val today = new PeriodService("yyyy_MM_dd").now
 

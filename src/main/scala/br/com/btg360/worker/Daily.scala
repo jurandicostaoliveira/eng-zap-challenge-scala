@@ -1,4 +1,4 @@
-package br.com.btg360.rules
+package br.com.btg360.worker
 
 import br.com.btg360.traits.RuleTrait
 import br.com.btg360.constants.Rule

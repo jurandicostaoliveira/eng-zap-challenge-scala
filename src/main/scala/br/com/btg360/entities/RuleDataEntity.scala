@@ -1,5 +1,9 @@
 package br.com.btg360.entities
 
+import br.com.btg360.constants.Channel
+import br.com.btg360.services.{TypeConverterService => TCS}
+import scala.collection.mutable.Map
+
 object RuleDataRaw {
 
   case class Configs(
@@ -117,4 +121,69 @@ case class RuleDataEntity(
                            automatics: RuleDataRaw.Automatics,
                            rule: RuleDataRaw.Rule,
                            account: RuleDataRaw.Account
-                         )
+                         ) {
+
+  var name = TCS.toString(rule.alias)
+  var latinName = TCS.toString(configs.ruleName)
+  var subject = TCS.toString(configs.subject)
+  var hour = TCS.toString(configs.hour)
+  var senderEmail = TCS.toString(configs.senderEmail)
+  var senderName = TCS.toString(configs.senderName)
+  var replyEmail = this.toReplyEmail()
+  var referenceListId = TCS.toInt(configs.list)
+  var interval = TCS.toInt(configs.interval)
+  var frequency = TCS.toInt(configs.frequency)
+  var dayWeek = TCS.toInt(configs.dayWeek)
+  var dayMonth = TCS.toInt(configs.dayMonth)
+
+  //Automatics
+  var listId = TCS.toInt(automatics.list)
+  var listExclusionId = TCS.toInt(automatics.exclusion)
+  var field = TCS.toString(automatics.field)
+  var formatField = TCS.toString(automatics.format)
+  var filterId = TCS.toInt(automatics.filter)
+
+  //HTML
+  var templateId = TCS.toInt(html.template)
+  var themeId = TCS.toInt(html.theme)
+  var layoutId = TCS.toInt(html.layout)
+  var content = TCS.toString(html.content)
+
+  //Account
+  var btgId = TCS.toInt(account.btgId)
+  var allinId = TCS.toInt(account.allinId)
+  var transactionalId = TCS.toInt(account.transId)
+  var token = TCS.toString(account.token)
+
+  //Channel
+  var channelMap: Map[String, RuleDataRaw.Channel] = toChannelMap()
+
+  /**
+    * @return String
+    */
+  private def toReplyEmail(): String = {
+    var replyEmail = TCS.toString(configs.replyEmail)
+    if (replyEmail.isEmpty) {
+      replyEmail = this.senderEmail
+    }
+    replyEmail
+  }
+
+  /**
+    *
+    * @return
+    */
+  private def toChannelMap(): Map[String, RuleDataRaw.Channel] = {
+    val channelMap: Map[String, RuleDataRaw.Channel] = Map()
+    if (TCS.toBoolean(channels.email.status)) channelMap(Channel.EMAIL) = channels.email
+    if (TCS.toBoolean(channels.sms.status)) channelMap(Channel.SMS) = channels.sms
+    if (TCS.toBoolean(channels.facebook.status)) channelMap(Channel.FACEBOOK) = channels.facebook
+    if (TCS.toBoolean(channels.webpush.status)) channelMap(Channel.WEBPUSH) = channels.webpush
+    if (TCS.toBoolean(channels.push_android.status)) channelMap(Channel.PUSH_ANDROID) = channels.push_android
+    if (TCS.toBoolean(channels.push_ios.status)) channelMap(Channel.PUSH_IOS) = channels.push_ios
+
+    channelMap
+  }
+
+}
+
