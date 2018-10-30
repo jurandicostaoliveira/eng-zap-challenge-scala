@@ -3,14 +3,19 @@ package br.com.btg360.repositories
 import br.com.btg360.application.Repository
 import br.com.btg360.constants.{Database, QueueStatus, Table}
 import br.com.btg360.entities.QueueEntity
-import br.com.btg360.jdbc.{MySqlBtg360}
-import br.com.btg360.services.PeriodService
+import br.com.btg360.jdbc.MySqlBtg360
+import br.com.btg360.services.{PeriodService, TypeConverterService => TCS}
+
 
 class QueueRepository extends Repository {
 
   val periodService = new PeriodService()
 
-  val dbBtg360 = this.connection(new MySqlBtg360().open)
+  val today = this.periodService.format("yyyy-MM-dd").now
+
+  val dbBtg360 = new MySqlBtg360().open
+
+  //TABLES
 
   val rulesQueueTable = "%s.%s".format(Database.JOBS, Table.RULES_QUEUE)
 
@@ -23,7 +28,6 @@ class QueueRepository extends Repository {
   val consolidatedRulesTable = "%s.%s".format(Database.PANEL, Table.CONSOLIDATED_RULES)
 
   def findAll(userId: Int, ruleTypes: List[Int]): List[QueueEntity] = {
-    val today = this.periodService.format("yyyy-MM-dd").now
     val query =
       s"""
         SELECT
@@ -42,7 +46,7 @@ class QueueRepository extends Repository {
                 INNER JOIN
             ${this.consolidatedRulesTable} AS consolidated_rules ON consolidated_rules.userRuleId = users_rules.id
         WHERE rules_queue.userId = $userId
-            AND rules_queue.today = '$today'
+            AND rules_queue.today = '${this.today}'
             AND rules_queue.ruleTypeId IN (${ruleTypes.mkString(",")})
             AND rules_queue.status < ${QueueStatus.PROCESSED}
             AND configs.btg = 1
@@ -52,8 +56,49 @@ class QueueRepository extends Repository {
             AND consolidated_rules.status = 1
         ORDER BY rules_queue.priority ASC;
       """
-    this.dbBtg360.fetch(query, classOf[QueueEntity])
+    this.connection(this.dbBtg360).fetch(query, classOf[QueueEntity])
   }
 
+  /**
+    * Create queue to client
+    *
+    * @param QueueEntity entity
+    */
+  def create(entity: QueueEntity): Unit = {
+    this.insertOrUpdate(this.rulesQueueTable, entity, List(
+      "userRuleId",
+      "today",
+      "userId",
+      "groupId",
+      "ruleTypeId",
+      "ruleName",
+      "isPeal",
+      "priority",
+      "status",
+      "consolidatedTableName",
+      "channels",
+      "recommendationModule",
+      "createdIn",
+      "startedIn",
+      "preparedIn",
+      "recommendationStartedIn",
+      "recommendationPreparedIn",
+      "processedIn",
+      "finalizedIn"), List("channels"))
+  }
+
+  /**
+    * @param Int userId
+    * @return Int
+    */
+  def lastPriority(userId: Int): Int = {
+    val query =
+      s"""
+        SELECT COUNT(userRuleId) AS total
+        FROM ${this.rulesQueueTable}
+        WHERE userId = $userId AND today = '${this.today}';
+      """
+    this.countByColumnName(this.connection(this.dbBtg360).queryExecutor(query), "total")
+  }
 
 }

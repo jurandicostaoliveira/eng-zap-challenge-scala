@@ -10,7 +10,7 @@ object TypeConverterService {
     * @return String
     */
   private def noneTo(value: Any, defaultValue: Any): String = {
-    if (value == None || value.toString.isEmpty) {
+    if (value == None || value == null || value.toString.isEmpty) {
       return defaultValue.toString
     }
 

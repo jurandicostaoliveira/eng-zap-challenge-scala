@@ -13,7 +13,7 @@ class QueueEntity extends Entity {
 
   //Queue
   var userRuleId: Long = 0
-  var today: Date = _
+  var today: Any = _ //Date or String
   var userId: Long = 0
   var groupId: Long = 0
   var ruleTypeId: Int = 0
@@ -24,13 +24,13 @@ class QueueEntity extends Entity {
   var consolidatedTableName: String = _
   var channels: String = _
   var recommendationModule: String = _
-  var createdIn: Date = _
-  var startedIn: Date = _
-  var preparedIn: Date = _
-  var recommendationStartedIn: Date = _
-  var recommendationPreparedIn: Date = _
-  var processedIn: Date = _
-  var finalizedIn: Date = _
+  var createdIn: Any = _ //Date or String
+  var startedIn: Any = _ //Date or String
+  var preparedIn: Any = _ //Date or String
+  var recommendationStartedIn: Any = _ //Date or String
+  var recommendationPreparedIn: Any = _ //Date or String
+  var processedIn: Any = _ //Date or String
+  var finalizedIn: Any = _ //Date or String
   //Queue Configs
   var sendLimit: Int = 1
   var vmta: String = _
@@ -40,7 +40,10 @@ class QueueEntity extends Entity {
   var channelName: String = _
 
   def parse: QueueEntity = {
-    this.rule = this.jsonService.decode[RuleDataEntity](this.dataStringJson)
+    if (this.rule == null) {
+      this.rule = this.jsonService.decode[RuleDataEntity](this.dataStringJson)
+    }
+
     this
   }
 

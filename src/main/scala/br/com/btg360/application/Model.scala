@@ -1,4 +1,5 @@
 package br.com.btg360.application
+
 import java.sql.ResultSet
 
 abstract class Model extends Application {

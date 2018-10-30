@@ -170,8 +170,7 @@ case class RuleDataEntity(
   }
 
   /**
-    *
-    * @return
+    * @return Map
     */
   private def toChannelMap(): Map[String, RuleDataRaw.Channel] = {
     val channelMap: Map[String, RuleDataRaw.Channel] = Map()
@@ -181,7 +180,6 @@ case class RuleDataEntity(
     if (TCS.toBoolean(channels.webpush.status)) channelMap(Channel.WEBPUSH) = channels.webpush
     if (TCS.toBoolean(channels.push_android.status)) channelMap(Channel.PUSH_ANDROID) = channels.push_android
     if (TCS.toBoolean(channels.push_ios.status)) channelMap(Channel.PUSH_IOS) = channels.push_ios
-
     channelMap
   }
 

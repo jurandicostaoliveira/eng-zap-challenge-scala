@@ -13,10 +13,13 @@ class RuleEntity extends Entity {
   var periodId: Int = 0
   var groupId: Int = 0
   var dataStringJson: String = _
-  var json: RuleDataEntity = _
+  var data: RuleDataEntity = _
 
   def parse: RuleEntity = {
-    this.json = this.jsonService.decode[RuleDataEntity](this.dataStringJson)
+    if (this.data == null) {
+      this.data = this.jsonService.decode[RuleDataEntity](this.dataStringJson)
+    }
+
     this
   }
 

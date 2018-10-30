@@ -88,4 +88,24 @@ class PeriodService {
     compare
   }
 
+  /**
+    * Return string to date
+    *
+    * @param String stringDate
+    * @return Date
+    */
+  def toDate(stringDate: String): Date = {
+    this.simpleDateFormat.parse(stringDate)
+  }
+
+  /**
+    * Return date to string
+    *
+    * @param Date date
+    * @return String
+    */
+  def toString(date: Date): String = {
+    this.simpleDateFormat.format(date)
+  }
+
 }
