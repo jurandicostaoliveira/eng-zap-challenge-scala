@@ -10,7 +10,7 @@ class RuleEntity extends Entity {
   var id: Int = 0
   var priority: Int = 0
   var typeId: Int = 0
-  var periodId: Int = 0
+  var periodId: Int = 1
   var groupId: Int = 0
   var dataStringJson: String = _
   var data: RuleDataEntity = _

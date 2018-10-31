@@ -155,6 +155,13 @@ case class RuleDataEntity(
   var transactionalId = TCS.toInt(account.transId)
   var token = TCS.toString(account.token)
 
+  //Module
+  var moduleId: Int = TCS.toInt(module.selected.id)
+  var moduleName: String = TCS.toString(module.selected.name)
+  var moduleLimit: Int = TCS.toInt(module.quantity)
+  var modulePercentMin: Int = TCS.toInt(module.percentMin)
+  var modulePercentMax: Int = TCS.toInt(module.percentMax)
+
   //Channel
   var channelMap: Map[String, RuleDataRaw.Channel] = toChannelMap()
 

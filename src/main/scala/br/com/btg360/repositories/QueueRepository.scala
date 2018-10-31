@@ -82,9 +82,7 @@ class QueueRepository extends Repository {
       "startedIn",
       "preparedIn",
       "recommendationStartedIn",
-      "recommendationPreparedIn",
-      "processedIn",
-      "finalizedIn"), List("channels"))
+      "recommendationPreparedIn"), List("channels"))
   }
 
   /**

@@ -108,4 +108,22 @@ class PeriodService {
     this.simpleDateFormat.format(date)
   }
 
+  /**
+    * Return day of week
+    *
+    * @return Int
+    */
+  def dayOfWeek: Int = {
+    this.calendar.get(Calendar.DAY_OF_WEEK)
+  }
+
+  /**
+    * Return day of month
+    *
+    * @return Int
+    */
+  def dayOfMonth: Int = {
+    this.calendar.get(Calendar.DAY_OF_MONTH)
+  }
+
 }
