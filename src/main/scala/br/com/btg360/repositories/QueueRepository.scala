@@ -4,28 +4,27 @@ import br.com.btg360.application.Repository
 import br.com.btg360.constants.{Database, QueueStatus, Table}
 import br.com.btg360.entities.QueueEntity
 import br.com.btg360.jdbc.MySqlBtg360
-import br.com.btg360.services.{PeriodService, TypeConverterService => TCS}
+import br.com.btg360.services.PeriodService
 
 
 class QueueRepository extends Repository {
 
-  val periodService = new PeriodService()
+  private val periodService = new PeriodService()
 
-  val today = this.periodService.format("yyyy-MM-dd").now
+  private val today = this.periodService.format("yyyy-MM-dd").now
 
-  val dbBtg360 = new MySqlBtg360().open
+  private val dbBtg360 = new MySqlBtg360().open
 
   //TABLES
+  private val rulesQueueTable = "%s.%s".format(Database.JOBS, Table.RULES_QUEUE)
 
-  val rulesQueueTable = "%s.%s".format(Database.JOBS, Table.RULES_QUEUE)
+  private val configsTable = "%s.%s".format(Database.PANEL, Table.CONFIGS)
 
-  val configsTable = "%s.%s".format(Database.PANEL, Table.CONFIGS)
+  private val usersRulesTable = "%s.%s".format(Database.PANEL, Table.USERS_RULES)
 
-  val usersRulesTable = "%s.%s".format(Database.PANEL, Table.USERS_RULES)
+  private val rulesTable = "%s.%s".format(Database.PANEL, Table.RULES)
 
-  val rulesTable = "%s.%s".format(Database.PANEL, Table.RULES)
-
-  val consolidatedRulesTable = "%s.%s".format(Database.PANEL, Table.CONSOLIDATED_RULES)
+  private val consolidatedRulesTable = "%s.%s".format(Database.PANEL, Table.CONSOLIDATED_RULES)
 
   def findAll(userId: Int, ruleTypes: List[Int]): List[QueueEntity] = {
     val query =

@@ -1,10 +1,7 @@
 package br.com.btg360.entities
 
-import br.com.btg360.constants.Channel
-import java.util.Date
-
 import br.com.btg360.application.Entity
-import br.com.btg360.constants.Database
+import br.com.btg360.constants.{Channel, Database}
 import br.com.btg360.services.JsonService
 
 class QueueEntity extends Entity {

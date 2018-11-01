@@ -16,7 +16,7 @@ object ProductTableCounter {
 
     System.setProperty("LOG_CUSTOM_NAME", tableName)
     val LOG = Logger.getRootLogger()
-    PrintLogger.create(LOG)
+    //PrintLogger.create(LOG)
 
     val sc = SparkCoreSingleton.getContext
     val total = sc.cassandraTable(Keyspace.BTG360, tableName).count()
