@@ -34,7 +34,7 @@ class ConsolidatedRepository {
     * @return RDD
     */
   def findAll: RDD[ConsolidatedEntity] = {
-    this.db.sparkRead(this.table).rdd.map(row => {
+    this.db.sparkRead(this.table, "isSent = 0").rdd.map(row => {
       new ConsolidatedEntity().setRow(row)
     })
   }

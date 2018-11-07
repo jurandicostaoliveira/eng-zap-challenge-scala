@@ -3,6 +3,7 @@ package br.com.btg360.entities
 import br.com.btg360.application.Entity
 import br.com.btg360.constants.{Channel, Database}
 import br.com.btg360.services.JsonService
+import org.apache.log4j.Logger
 
 class QueueEntity extends Entity {
 
@@ -35,6 +36,7 @@ class QueueEntity extends Entity {
   var rule: RuleDataEntity = _
   //Channel
   var channelName: String = _
+  var logger: Logger = _
 
   def parse: QueueEntity = {
     if (this.rule == null) {

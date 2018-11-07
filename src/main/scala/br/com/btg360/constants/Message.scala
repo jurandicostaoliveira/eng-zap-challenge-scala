@@ -1,7 +1,8 @@
 package br.com.btg360.constants
 
-class Message {
+object Message {
 
-
+  val START_LOG: String = "START LOG ================================================================================"
+  val END_LOG: String = "END LOG =================================================================================="
 
 }

@@ -1,7 +1,7 @@
 package br.com.btg360.run
 
 import br.com.btg360.constants.Keyspace
-import br.com.btg360.logger.PrintLogger
+import br.com.btg360.logger.Printer
 import br.com.btg360.spark.SparkCoreSingleton
 import com.datastax.spark.connector.toSparkContextFunctions
 import org.apache.log4j.Logger

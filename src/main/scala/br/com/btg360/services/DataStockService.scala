@@ -70,15 +70,21 @@ class DataStockService(queue: QueueEntity) {
   def get: RDD[(String, ItemEntity)] = {
     try {
       val data = this.groupData
+
+      println("TOTAL 1 >>>>>> "+ data.count())
       //LOG TOTAL
 
       var filters = new DailySendLimitService(this.queue).filter(groupData.keys)
       //LOG TOTAL
 
+      println("TOTAL 2 >>>>>> "+ filters.count())
+
       if (Channel.isEmailChannel(this.queue.channelName)) {
         filters = new OptoutService(this.queue).filter(filters)
         //LOG TOTAL
       }
+
+      println("TOTAL 3 >>>>>> "+ filters.count())
 
       filters.map(key => (key, 0)).join(data).map(row => {
         (row._1, row._2._2)

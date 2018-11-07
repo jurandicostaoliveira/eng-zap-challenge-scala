@@ -1,6 +1,5 @@
 package br.com.btg360.application
 
-
 abstract class Application extends Serializable {
 
   /**
