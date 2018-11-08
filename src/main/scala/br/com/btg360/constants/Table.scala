@@ -14,4 +14,10 @@ object Table {
 
   val RULES_QUEUE: String = "rules_queue"
 
+  //ALLIN
+
+  val OPTOUT: String = "cor_optout"
+
+  val BASE: String = "base"
+
 }

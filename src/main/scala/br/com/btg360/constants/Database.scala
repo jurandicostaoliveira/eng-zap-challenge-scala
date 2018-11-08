@@ -2,12 +2,18 @@ package br.com.btg360.constants
 
 object Database {
 
-  val MASTER : String = "master"
+  val MASTER: String = "master"
 
-  val PANEL : String = "btg_panel"
+  val PANEL: String = "btg_panel"
 
-  val JOBS : String = "btg_jobs"
+  val JOBS: String = "btg_jobs"
 
-  val CONSOLIDATED : String = "btg_consolidated"
+  val CONSOLIDATED: String = "btg_consolidated"
+
+  //ALLIN
+
+  val OPTOUT: String = "emailpro_optout"
+
+  val LIST: String = "emailpro_lista"
 
 }

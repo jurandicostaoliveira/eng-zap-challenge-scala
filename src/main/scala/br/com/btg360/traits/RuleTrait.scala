@@ -3,9 +3,12 @@ package br.com.btg360.traits
 import br.com.btg360.constants.{Message, Path, QueueStatus, Rule}
 import br.com.btg360.entities.{ItemEntity, QueueEntity}
 import br.com.btg360.logger.Printer
-import br.com.btg360.repositories.QueueRepository
+import br.com.btg360.repositories.{QueueRepository, ReferenceListRepository}
 import br.com.btg360.services.{JsonService, PeriodService}
 import org.apache.spark.rdd.RDD
+import br.com.btg360.services.Port25Service
+
+import scala.collection.immutable.Map
 
 import scala.util.control.Breaks._
 
@@ -20,6 +23,8 @@ trait RuleTrait {
   private val periodService = new PeriodService()
 
   private val jsonService = new JsonService()
+
+  private val port25Service = new Port25Service()
 
   /**
     * @return List[Int]
@@ -109,7 +114,7 @@ trait RuleTrait {
     val channels = this.jsonService.decode[List[String]](this.queue.channels)
     println(this.queue.dataStringJson)
     channels.foreach(channel => {
-      println("***** Channel running: %s *****".format(channel))
+      println(Message.CHANNEL_RUNNING.format(channel.toUpperCase))
       this.queue.channelName = channel
       this.all
     })
@@ -120,12 +125,39 @@ trait RuleTrait {
     *
     */
   private def all: Unit = {
-    val data = this.getData
+    //UPDATE STATUS
+    var data = this.getData
 
-    println("TOTAL DATA >>>>> " + data.count())
-    data.foreach(row => {
-      println(row._1 + " -> " + row._2.products.size)
+    if (data.count() <= 0) {
+      //UPDATE STATUS
+      println(Message.ITEMS_NOT_FOUND)
+      return
+    }
+
+    val referenceList: RDD[(String, Map[String, String])] = new ReferenceListRepository().allinId(1410).listId(2251344).getAll.map(row => {
+      (row("nm_email"), row.toMap)
     })
+
+    val a = data.leftOuterJoin(referenceList)
+
+    val b = a.map(row => {
+      val entity = row._2._1
+      if (row._2._2.isDefined) {
+        entity.addReferences(row._2._2.get)
+      }
+      (row._1, entity)
+    })
+
+
+    //data = this.port25Service.add(data)
+    b.foreach(row => {
+      println(row._1 + " : "+ row._2.products.size +" -> REF " + row._2.references)
+    })
+
+
+    //    data.foreach(row => {
+    //      println(row._1 + " -> " + row._2.products.size)
+    //    })
   }
 
 }

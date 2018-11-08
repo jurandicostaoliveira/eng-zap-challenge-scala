@@ -1,7 +1,7 @@
 package br.com.btg360.entities
 
 import br.com.btg360.application.Entity
-import scala.collection.mutable.Map
+import scala.collection.Map
 
 class ItemEntity extends Entity {
 

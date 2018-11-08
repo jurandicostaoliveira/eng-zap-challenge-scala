@@ -1,6 +1,6 @@
 package br.com.btg360.services
 
-import br.com.btg360.constants.Channel
+import br.com.btg360.constants.{Channel, Message}
 import br.com.btg360.entities._
 import br.com.btg360.repositories.{ConsolidatedRepository, ProductRepository}
 import br.com.btg360.spark.SparkCoreSingleton
@@ -70,21 +70,15 @@ class DataStockService(queue: QueueEntity) {
   def get: RDD[(String, ItemEntity)] = {
     try {
       val data = this.groupData
-
-      println("TOTAL 1 >>>>>> "+ data.count())
-      //LOG TOTAL
+      println(Message.TOTAL_ITEMS_FOUND.format(data.count()))
 
       var filters = new DailySendLimitService(this.queue).filter(groupData.keys)
-      //LOG TOTAL
-
-      println("TOTAL 2 >>>>>> "+ filters.count())
+      println(Message.TOTAL_DAILY_LIMIT_REMOVED.format(filters.count()))
 
       if (Channel.isEmailChannel(this.queue.channelName)) {
         filters = new OptoutService(this.queue).filter(filters)
-        //LOG TOTAL
+        println(Message.TOTAL_OPTOUT_REMOVED.format(filters.count()))
       }
-
-      println("TOTAL 3 >>>>>> "+ filters.count())
 
       filters.map(key => (key, 0)).join(data).map(row => {
         (row._1, row._2._2)

@@ -38,7 +38,6 @@ class Daily extends RuleTrait with Serializable {
     * @return
     */
   private def test: RDD[(String, ItemEntity)] = {
-
     val p1 = new ConsolidatedProductEntity()
     p1.userSent = "paula@hotmail.com"
     p1.productId = "000001"
@@ -60,20 +59,16 @@ class Daily extends RuleTrait with Serializable {
     p5.productId = "000005"
 
     val p6 = new ConsolidatedProductEntity()
-    p6.userSent = "carla@hotmail.com"
-    p6.productId = "000004"
+    p6.userSent = "marciaribeiroportugal@hotmail.com"
+    p6.productId = "000006"
 
-    val list: List[ConsolidatedProductEntity] = List(p1, p2, p3, p4, p5, p6)
-    val map: Map[String, ItemEntity] = Map()
-    for (p <- list) {
+    val list: List[ConsolidatedProductEntity] = List(p1, p2, p3, p4, p6, p5)
+    //val list: List[ConsolidatedProductEntity] = List()
+
+    val data: RDD[(String, ItemEntity)] = SparkCoreSingleton.getContext.parallelize(list).map(row => {
       val item = new ItemEntity()
-      item.addProducts(p)
-      map(p.userSent) = item
-    }
-
-    val sc = SparkCoreSingleton.getContext
-    val data: RDD[(String, ItemEntity)] = sc.parallelize(map.toSeq).map(row => {
-      row
+      item.addProducts(row)
+      (row.userSent, item)
     })
 
     data
