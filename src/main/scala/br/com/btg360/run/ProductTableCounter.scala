@@ -1,7 +1,6 @@
 package br.com.btg360.run
 
 import br.com.btg360.constants.Keyspace
-import br.com.btg360.logger.Printer
 import br.com.btg360.spark.SparkCoreSingleton
 import com.datastax.spark.connector.toSparkContextFunctions
 import org.apache.log4j.Logger
@@ -16,7 +15,6 @@ object ProductTableCounter {
 
     System.setProperty("LOG_CUSTOM_NAME", tableName)
     val LOG = Logger.getRootLogger()
-    //PrintLogger.create(LOG)
 
     val sc = SparkCoreSingleton.getContext
     val total = sc.cassandraTable(Keyspace.BTG360, tableName).count()

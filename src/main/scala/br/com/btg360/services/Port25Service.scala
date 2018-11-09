@@ -1,10 +1,11 @@
 package br.com.btg360.services
 
+import br.com.btg360.application.Service
 import br.com.btg360.entities.ItemEntity
 import br.com.btg360.spark.SparkCoreSingleton
 import org.apache.spark.rdd.RDD
 
-class Port25Service {
+class Port25Service extends Service {
 
   private val sc = SparkCoreSingleton.getContext
 

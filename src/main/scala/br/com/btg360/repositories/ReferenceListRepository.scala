@@ -58,24 +58,50 @@ class ReferenceListRepository extends Repository {
   }
 
   /**
-    * @return
+    * @return String
     */
-  private def generateTableName: String = "%s.%s_%d_%d".format(Database.LIST, Table.BASE, this._allinId, this._listId)
+  private def generateListTable: String = {
+    "%s.%s".format(Database.LIST, Table.COR_LIST)
+  }
+
+  /**
+    * @return String
+    */
+  private def generateReferenceListTable: String = {
+    "%s.%s_%d_%d".format(Database.LIST, Table.BASE, this._allinId, this._listId)
+  }
 
   /**
     * @return ResultSet
     */
-  def describe: ResultSet = {
+  def findSettings: ResultSet = {
     try {
-      this.connection(this.db.open).queryExecutor(s"DESCRIBE ${this.generateTableName};")
+      val query = s"SELECT * FROM ${this.generateListTable} WHERE id_lista = ${this._listId};"
+      this.connection(this.db.open).queryExecutor(query)
     } catch {
       case e: Exception => println(e.printStackTrace())
         null
     }
   }
 
+  /**
+    * @return ResultSet
+    */
+  private def describe: ResultSet = {
+    try {
+      this.connection(this.db.open).queryExecutor(s"DESCRIBE ${this.generateReferenceListTable};")
+    } catch {
+      case e: Exception => println(e.printStackTrace())
+        null
+    }
+  }
 
-  def getAll: RDD[Map[String, String]] = {
+  /**
+    * Return all reference list
+    *
+    * @return RDD
+    */
+  def findAll: RDD[Map[String, String]] = {
     try {
       val describe = this.describe
       var columns: List[String] = List()
@@ -83,7 +109,7 @@ class ReferenceListRepository extends Repository {
         columns ::= describe.getString("Field")
       }
 
-      val rows: RDD[Map[String, String]] = this.db.sparkRead(this.generateTableName).rdd.map(row => {
+      val rows: RDD[Map[String, String]] = this.db.sparkRead(this.generateReferenceListTable).rdd.map(row => {
         row.getValuesMap(columns)
       })
 

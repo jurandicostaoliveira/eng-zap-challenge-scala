@@ -20,4 +20,6 @@ object Table {
 
   val BASE: String = "base"
 
+  val COR_LIST: String = "cor_lista"
+
 }

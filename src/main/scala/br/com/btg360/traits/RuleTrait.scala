@@ -1,18 +1,16 @@
 package br.com.btg360.traits
 
-import br.com.btg360.constants.{Message, Path, QueueStatus, Rule}
+import br.com.btg360.constants._
 import br.com.btg360.entities.{ItemEntity, QueueEntity}
 import br.com.btg360.logger.Printer
-import br.com.btg360.repositories.{QueueRepository, ReferenceListRepository}
-import br.com.btg360.services.{JsonService, PeriodService}
+import br.com.btg360.repositories.QueueRepository
+import br.com.btg360.services.{JsonService, PeriodService, Port25Service}
 import org.apache.spark.rdd.RDD
-import br.com.btg360.services.Port25Service
-
-import scala.collection.immutable.Map
+import scala.util.parsing.json.JSON
 
 import scala.util.control.Breaks._
 
-trait RuleTrait {
+trait RuleTrait extends Serializable {
 
   protected var queue: QueueEntity = _
 
@@ -134,30 +132,30 @@ trait RuleTrait {
       return
     }
 
-    val referenceList: RDD[(String, Map[String, String])] = new ReferenceListRepository().allinId(1410).listId(2251344).getAll.map(row => {
-      (row("nm_email"), row.toMap)
+    //REMOVER
+    this.queue.rule.allinId = 1410
+    this.queue.rule.referenceListId = 2251344
+    //FIM REMOVER
+
+    if (Channel.isEmailChannel(this.queue.channelName)) {
+      //data = new ReferenceListService().add(this.queue, data)
+      //data = this.port25Service.add(data)
+    }
+
+
+
+    data.foreach(row => {
+//       row._2.products.foreach(a => {
+//         println(a)
+//       })
+
+      val test = new Test()
+      val a = new JsonService().encode(test)
+      println(a)
+      println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     })
-
-    val a = data.leftOuterJoin(referenceList)
-
-    val b = a.map(row => {
-      val entity = row._2._1
-      if (row._2._2.isDefined) {
-        entity.addReferences(row._2._2.get)
-      }
-      (row._1, entity)
-    })
-
-
-    //data = this.port25Service.add(data)
-    b.foreach(row => {
-      println(row._1 + " : "+ row._2.products.size +" -> REF " + row._2.references)
-    })
-
-
-    //    data.foreach(row => {
-    //      println(row._1 + " -> " + row._2.products.size)
-    //    })
   }
 
 }
+
+case class Test(products: List[String] = List())
