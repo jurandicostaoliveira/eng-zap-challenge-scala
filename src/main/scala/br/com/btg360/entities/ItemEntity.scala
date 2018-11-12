@@ -1,13 +1,15 @@
 package br.com.btg360.entities
 
 import br.com.btg360.application.Entity
+
 import scala.collection.Map
+import scala.collection.mutable.ListBuffer
 
 class ItemEntity extends Entity {
 
-  var products: List[ConsolidatedProductEntity] = List()
+  var products: ListBuffer[ConsolidatedProductEntity] = ListBuffer()
 
-  var recommendations: List[ConsolidatedProductEntity] = List()
+  var recommendations: ListBuffer[ConsolidatedProductEntity] = ListBuffer()
 
   var references: Map[String, String] = Map()
 
@@ -17,7 +19,7 @@ class ItemEntity extends Entity {
     * @param ConsolidatedProductEntity value
     */
   def addProducts(value: ConsolidatedProductEntity): Unit = {
-    this.products ::= value
+    this.products.append(value)
   }
 
   /**
@@ -26,7 +28,7 @@ class ItemEntity extends Entity {
     * @param ConsolidatedProductEntity value
     */
   def addRecommendations(value: ConsolidatedProductEntity): Unit = {
-    this.recommendations ::= value
+    this.recommendations.append(value)
   }
 
   /**

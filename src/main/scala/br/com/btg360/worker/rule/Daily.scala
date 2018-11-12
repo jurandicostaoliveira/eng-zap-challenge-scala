@@ -1,7 +1,7 @@
 package br.com.btg360.worker.rule
 
 import br.com.btg360.constants.{QueueStatus, Rule}
-import br.com.btg360.entities.{ConsolidatedProductEntity, ItemEntity}
+import br.com.btg360.entities.{CaseItemEntity, ConsolidatedProductEntity, ItemEntity, ProductEntity}
 import br.com.btg360.traits.RuleTrait
 import org.apache.spark.rdd.RDD
 import br.com.btg360.services.DataStockService
@@ -18,7 +18,7 @@ class Daily extends RuleTrait with Serializable {
   /**
     * @return RDD
     */
-  override def getData: RDD[(String, ItemEntity)] = {
+  override def getData: RDD[(String, CaseItemEntity)] = {
     if (this.queue.ruleTypeId == Rule.AUTOMATIC_ID) {
       return this.automatic
     }
@@ -28,7 +28,7 @@ class Daily extends RuleTrait with Serializable {
     this.test
   }
 
-  private def automatic: RDD[(String, ItemEntity)] = {
+  private def automatic: RDD[(String, CaseItemEntity)] = {
     null
   }
 
@@ -37,7 +37,7 @@ class Daily extends RuleTrait with Serializable {
     *
     * @return
     */
-  private def test: RDD[(String, ItemEntity)] = {
+  private def test: RDD[(String, CaseItemEntity)] = {
     val p1 = new ConsolidatedProductEntity()
     p1.userSent = "paula@hotmail.com"
     p1.productId = "000001"
@@ -62,12 +62,23 @@ class Daily extends RuleTrait with Serializable {
     p6.userSent = "marciaribeiroportugal@hotmail.com"
     p6.productId = "000006"
 
-    val list: List[ConsolidatedProductEntity] = List(p1, p2, p3, p4, p6, p5)
-    //val list: List[ConsolidatedProductEntity] = List()
+    //val list: List[ConsolidatedProductEntity] = List(p1, p2, p3, p4, p6, p5)
 
-    val data: RDD[(String, ItemEntity)] = SparkCoreSingleton.getContext.parallelize(list).map(row => {
-      val item = new ItemEntity()
-      item.addProducts(row)
+
+    val p7 = new ProductEntity()
+    p6.userSent = "marciaribeiroportugal@hotmail.com"
+    p6.productId = "000006"
+    val list: List[ConsolidatedProductEntity] = List()
+
+    val data: RDD[(String, CaseItemEntity)] = SparkCoreSingleton.getContext.parallelize(list).map(row => {
+      val map: Map[String, Any] = Map()
+
+//      map("productId") = row.productId
+//      map("userSent") = row.userSent
+//      val list: List[Map[String, Any]] = List(map)
+
+
+      val item = new CaseItemEntity(list)
       (row.userSent, item)
     })
 

@@ -21,5 +21,6 @@ libraryDependencies ++= Seq(
   "mysql" % "mysql-connector-java" % mysqlConnectorVersion,
   "org.apache.logging.log4j" % "log4j-scala" % log4jVersion,
   "net.debasishg" %% "redisclient" % redisVersion, //https://github.com/debasishg/scala-redis
-  "org.json4s" %% "json4s-native" % json4sVersion //https://github.com/json4s/json4s
+  "org.json4s" %% "json4s-native" % json4sVersion, //https://github.com/json4s/json4s
+  "com.google.code.gson" % "gson" % "1.7.1"
 )

@@ -7,3 +7,5 @@ object DailyRuleRun extends App {
   new Daily().dispatch(14)
 
 }
+
+

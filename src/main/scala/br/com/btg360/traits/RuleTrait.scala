@@ -1,12 +1,12 @@
 package br.com.btg360.traits
 
 import br.com.btg360.constants._
-import br.com.btg360.entities.{ItemEntity, QueueEntity}
+import br.com.btg360.entities.{CaseItemEntity, ItemEntity, QueueEntity}
 import br.com.btg360.logger.Printer
 import br.com.btg360.repositories.QueueRepository
-import br.com.btg360.services.{JsonService, PeriodService, Port25Service}
+import br.com.btg360.services.{JsonService, PeriodService, Port25Service, ReferenceListService}
+import com.google.gson.Gson
 import org.apache.spark.rdd.RDD
-import scala.util.parsing.json.JSON
 
 import scala.util.control.Breaks._
 
@@ -24,6 +24,8 @@ trait RuleTrait extends Serializable {
 
   private val port25Service = new Port25Service()
 
+  private val referenceListService = new ReferenceListService()
+
   /**
     * @return List[Int]
     */
@@ -37,7 +39,7 @@ trait RuleTrait extends Serializable {
   /**
     * @return RDD
     */
-  def getData: RDD[(String, ItemEntity)]
+  def getData: RDD[(String, CaseItemEntity)]
 
   /**
     * Run application
@@ -138,19 +140,12 @@ trait RuleTrait extends Serializable {
     //FIM REMOVER
 
     if (Channel.isEmailChannel(this.queue.channelName)) {
-      //data = new ReferenceListService().add(this.queue, data)
+      //data = this.referenceListService.add(this.queue, data)
       //data = this.port25Service.add(data)
     }
 
-
-
     data.foreach(row => {
-//       row._2.products.foreach(a => {
-//         println(a)
-//       })
-
-      val test = new Test()
-      val a = new JsonService().encode(test)
+      val a: String = new JsonService().encode(row._2)
       println(a)
       println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     })
@@ -158,4 +153,6 @@ trait RuleTrait extends Serializable {
 
 }
 
-case class Test(products: List[String] = List())
+
+//case class Test(products: ListBuffer[ConsolidatedProductEntity] = ListBuffer()) extends Serializable {
+//}
