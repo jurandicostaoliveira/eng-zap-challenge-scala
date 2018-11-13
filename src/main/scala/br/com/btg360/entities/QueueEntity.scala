@@ -65,4 +65,8 @@ class QueueEntity extends Entity {
     "product_%d".format(this.rule.allinId)
   }
 
+  def getDeliveryTimestamp: Int = {
+    0
+  }
+
 }

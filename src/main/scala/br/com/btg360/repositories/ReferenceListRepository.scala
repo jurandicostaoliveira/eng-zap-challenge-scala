@@ -101,7 +101,7 @@ class ReferenceListRepository extends Repository {
     *
     * @return RDD
     */
-  def findAll: RDD[Map[String, String]] = {
+  def findAll: RDD[Map[String, Any]] = {
     try {
       val describe = this.describe
       var columns: List[String] = List()
@@ -109,11 +109,9 @@ class ReferenceListRepository extends Repository {
         columns ::= describe.getString("Field")
       }
 
-      val rows: RDD[Map[String, String]] = this.db.sparkRead(this.generateReferenceListTable).rdd.map(row => {
+      this.db.sparkRead(this.generateReferenceListTable).rdd.map(row => {
         row.getValuesMap(columns)
       })
-
-      rows
     } catch {
       case e: Exception => println(e.printStackTrace())
         this.sc.emptyRDD

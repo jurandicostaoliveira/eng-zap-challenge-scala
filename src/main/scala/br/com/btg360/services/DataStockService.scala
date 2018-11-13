@@ -6,6 +6,8 @@ import br.com.btg360.repositories.{ConsolidatedRepository, ProductRepository}
 import br.com.btg360.spark.SparkCoreSingleton
 import org.apache.spark.rdd.RDD
 
+import scala.collection.mutable.HashMap
+
 class DataStockService(queue: QueueEntity) {
 
   /**
@@ -35,9 +37,9 @@ class DataStockService(queue: QueueEntity) {
     *
     * @return
     */
-  private def joinData: RDD[(String, ConsolidatedProductEntity)] = {
+  private def joinData: RDD[(String, HashMap[String, Any])] = {
     this.consolidatedData.join(this.productData).map(row => {
-      (row._2._1.userSent, new ConsolidatedProductEntity().setRow(row._2._1, row._2._2))
+      (row._2._1.userSent, new ItemEntity().toMap(row._2._1, row._2._2, this.queue))
     })
   }
 
@@ -48,17 +50,18 @@ class DataStockService(queue: QueueEntity) {
     */
   private def groupData: RDD[(String, ItemEntity)] = {
     this.joinData.groupByKey().map(rows => {
-      val entity: ItemEntity = new ItemEntity()
+      var products: List[HashMap[String, Any]] = List()
+      var recommendations: List[HashMap[String, Any]] = List()
 
       rows._2.foreach(row => {
-        if (row.isRecommendation.equals(1)) {
-          entity.addRecommendations(row)
+        if (row("isRecommendation").equals(1)) {
+          recommendations = recommendations :+ row
         } else {
-          entity.addProducts(row)
+          products = products :+ row
         }
       })
 
-      (rows._1, entity)
+      (rows._1, new ItemEntity(products, recommendations))
     })
   }
 
@@ -81,7 +84,9 @@ class DataStockService(queue: QueueEntity) {
       }
 
       filters.map(key => (key, 0)).join(data).map(row => {
-        (row._1, row._2._2)
+        val products = new UtmService().addLink(this.queue, row._2._2.products)
+        val recommendations = new UtmService().addLink(this.queue, row._2._2.recommendations)
+        (row._1, new ItemEntity(products, recommendations))
       })
     } catch {
       case e: Exception => println(e.getLocalizedMessage)

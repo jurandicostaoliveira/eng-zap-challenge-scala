@@ -1,7 +1,7 @@
 package br.com.btg360.traits
 
 import br.com.btg360.constants._
-import br.com.btg360.entities.{CaseItemEntity, ItemEntity, QueueEntity}
+import br.com.btg360.entities.{ItemEntity, QueueEntity}
 import br.com.btg360.logger.Printer
 import br.com.btg360.repositories.QueueRepository
 import br.com.btg360.services.{JsonService, PeriodService, Port25Service, ReferenceListService}
@@ -39,7 +39,7 @@ trait RuleTrait extends Serializable {
   /**
     * @return RDD
     */
-  def getData: RDD[(String, CaseItemEntity)]
+  def getData: RDD[(String, ItemEntity)]
 
   /**
     * Run application
@@ -140,13 +140,13 @@ trait RuleTrait extends Serializable {
     //FIM REMOVER
 
     if (Channel.isEmailChannel(this.queue.channelName)) {
-      //data = this.referenceListService.add(this.queue, data)
-      //data = this.port25Service.add(data)
+      data = this.referenceListService.add(this.queue, data)
+      data = this.port25Service.add(data)
     }
 
     data.foreach(row => {
       val a: String = new JsonService().encode(row._2)
-      println(a)
+      println(row._1 + " -> " + a)
       println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     })
   }

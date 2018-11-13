@@ -5,7 +5,7 @@ import br.com.btg360.entities.{ItemEntity, QueueEntity}
 import br.com.btg360.repositories.ReferenceListRepository
 import org.apache.spark.rdd.RDD
 
-import scala.collection.immutable.Map
+import scala.collection.Map
 
 class ReferenceListService extends Service {
 
@@ -46,18 +46,18 @@ class ReferenceListService extends Service {
         return data
       }
 
-      val list: RDD[(String, Map[String, String])] = this.repository.allinId(queue.rule.allinId)
-        .listId(queue.rule.referenceListId).findAll.map(row => (row("nm_email"), row.toMap))
+      val list: RDD[(String, Map[String, Any])] = this.repository
+        .allinId(queue.rule.allinId)
+        .listId(queue.rule.referenceListId)
+        .findAll.map(row => (row("nm_email").toString, row))
 
-      val join = data.leftOuterJoin(list).map(row => {
-        val entity = row._2._1
+      data.leftOuterJoin(list).map(row => {
+        var item = row._2._1
         if (row._2._2.isDefined) {
-          entity.addReferences(row._2._2.get)
+          item = new ItemEntity(item.products, item.recommendations, row._2._2.get)
         }
-        (row._1, entity)
+        (row._1, item)
       })
-
-      join
     } catch {
       case e: Exception => println(e.printStackTrace)
         data
