@@ -1,11 +1,10 @@
 package br.com.btg360.traits
 
 import br.com.btg360.constants._
-import br.com.btg360.entities.{ItemEntity, QueueEntity}
+import br.com.btg360.entities.{QueueEntity, StockEntity}
 import br.com.btg360.logger.Printer
 import br.com.btg360.repositories.QueueRepository
-import br.com.btg360.services.{JsonService, PeriodService, Port25Service, ReferenceListService}
-import com.google.gson.Gson
+import br.com.btg360.services._
 import org.apache.spark.rdd.RDD
 
 import scala.util.control.Breaks._
@@ -39,7 +38,7 @@ trait RuleTrait extends Serializable {
   /**
     * @return RDD
     */
-  def getData: RDD[(String, ItemEntity)]
+  def getData: RDD[(String, StockEntity)]
 
   /**
     * Run application
@@ -139,20 +138,26 @@ trait RuleTrait extends Serializable {
     this.queue.rule.referenceListId = 2251344
     //FIM REMOVER
 
-    if (Channel.isEmailChannel(this.queue.channelName)) {
-      data = this.referenceListService.add(this.queue, data)
-      data = this.port25Service.add(data)
-    }
 
-    data.foreach(row => {
-      val a: String = new JsonService().encode(row._2)
-      println(row._1 + " -> " + a)
-      println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-    })
+    var html: String =
+      """
+          <html><a href ='http://google.com.br'>Google</a>
+          \n
+          <a href=   \n   "http://yahoo.com.br">Yahoo</a></html>
+        """
+
+    println(new UrlService().parse(this.queue, html))
+
+//    if (Channel.isEmailChannel(this.queue.channelName)) {
+//      data = this.referenceListService.add(this.queue, data)
+//      data = this.port25Service.add(data)
+//    }
+//
+//    data.foreach(row => {
+//      val a: String = new JsonService().encode(row._2)
+//      println(row._1 + " -> " + a)
+//      println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+//    })
   }
 
 }
-
-
-//case class Test(products: ListBuffer[ConsolidatedProductEntity] = ListBuffer()) extends Serializable {
-//}

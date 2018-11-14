@@ -1,8 +1,8 @@
 package br.com.btg360.entities
 
 import br.com.btg360.constants.Channel
-import br.com.btg360.services.{TypeConverterService => TCS}
 import scala.collection.mutable.Map
+import br.com.btg360.constants.{TypeConverter => TC}
 
 object RuleDataRaw {
 
@@ -123,44 +123,44 @@ case class RuleDataEntity(
                            account: RuleDataRaw.Account
                          ) {
 
-  var name = TCS.toString(rule.alias)
-  var latinName = TCS.toString(configs.ruleName)
-  var subject = TCS.toString(configs.subject)
-  var hour = TCS.toString(configs.hour)
-  var senderEmail = TCS.toString(configs.senderEmail)
-  var senderName = TCS.toString(configs.senderName)
+  var name = TC.toString(rule.alias)
+  var latinName = TC.toString(configs.ruleName)
+  var subject = TC.toString(configs.subject)
+  var hour = TC.toString(configs.hour)
+  var senderEmail = TC.toString(configs.senderEmail)
+  var senderName = TC.toString(configs.senderName)
   var replyEmail = this.toReplyEmail()
-  var referenceListId = TCS.toInt(configs.list)
-  var interval = TCS.toInt(configs.interval)
-  var frequency = TCS.toInt(configs.frequency)
-  var dayWeek = TCS.toInt(configs.dayWeek)
-  var dayMonth = TCS.toInt(configs.dayMonth)
+  var referenceListId = TC.toInt(configs.list)
+  var interval = TC.toInt(configs.interval)
+  var frequency = TC.toInt(configs.frequency)
+  var dayWeek = TC.toInt(configs.dayWeek)
+  var dayMonth = TC.toInt(configs.dayMonth)
 
   //Automatics
-  var listId = TCS.toInt(automatics.list)
-  var listExclusionId = TCS.toInt(automatics.exclusion)
-  var field = TCS.toString(automatics.field)
-  var formatField = TCS.toString(automatics.format)
-  var filterId = TCS.toInt(automatics.filter)
+  var listId = TC.toInt(automatics.list)
+  var listExclusionId = TC.toInt(automatics.exclusion)
+  var field = TC.toString(automatics.field)
+  var formatField = TC.toString(automatics.format)
+  var filterId = TC.toInt(automatics.filter)
 
   //HTML
-  var templateId = TCS.toInt(html.template)
-  var themeId = TCS.toInt(html.theme)
-  var layoutId = TCS.toInt(html.layout)
-  var content = TCS.toString(html.content)
+  var templateId = TC.toInt(html.template)
+  var themeId = TC.toInt(html.theme)
+  var layoutId = TC.toInt(html.layout)
+  var content = TC.toString(html.content)
 
   //Account
-  var btgId = TCS.toInt(account.btgId)
-  var allinId = TCS.toInt(account.allinId)
-  var transactionalId = TCS.toInt(account.transId)
-  var token = TCS.toString(account.token)
+  var btgId = TC.toInt(account.btgId)
+  var allinId = TC.toInt(account.allinId)
+  var transactionalId = TC.toInt(account.transId)
+  var token = TC.toString(account.token)
 
   //Module
-  var moduleId: Int = TCS.toInt(module.selected.id)
-  var moduleName: String = TCS.toString(module.selected.name)
-  var moduleLimit: Int = TCS.toInt(module.quantity)
-  var modulePercentMin: Int = TCS.toInt(module.percentMin)
-  var modulePercentMax: Int = TCS.toInt(module.percentMax)
+  var moduleId: Int = TC.toInt(module.selected.id)
+  var moduleName: String = TC.toString(module.selected.name)
+  var moduleLimit: Int = TC.toInt(module.quantity)
+  var modulePercentMin: Int = TC.toInt(module.percentMin)
+  var modulePercentMax: Int = TC.toInt(module.percentMax)
 
   //Channel
   var channelMap: Map[String, RuleDataRaw.Channel] = toChannelMap()
@@ -169,7 +169,7 @@ case class RuleDataEntity(
     * @return String
     */
   private def toReplyEmail(): String = {
-    var replyEmail = TCS.toString(configs.replyEmail)
+    var replyEmail = TC.toString(configs.replyEmail)
     if (replyEmail.isEmpty) {
       replyEmail = this.senderEmail
     }
@@ -181,12 +181,12 @@ case class RuleDataEntity(
     */
   private def toChannelMap(): Map[String, RuleDataRaw.Channel] = {
     val channelMap: Map[String, RuleDataRaw.Channel] = Map()
-    if (TCS.toBoolean(channels.email.status)) channelMap(Channel.EMAIL) = channels.email
-    if (TCS.toBoolean(channels.sms.status)) channelMap(Channel.SMS) = channels.sms
-    if (TCS.toBoolean(channels.facebook.status)) channelMap(Channel.FACEBOOK) = channels.facebook
-    if (TCS.toBoolean(channels.webpush.status)) channelMap(Channel.WEBPUSH) = channels.webpush
-    if (TCS.toBoolean(channels.push_android.status)) channelMap(Channel.PUSH_ANDROID) = channels.push_android
-    if (TCS.toBoolean(channels.push_ios.status)) channelMap(Channel.PUSH_IOS) = channels.push_ios
+    if (TC.toBoolean(channels.email.status)) channelMap(Channel.EMAIL) = channels.email
+    if (TC.toBoolean(channels.sms.status)) channelMap(Channel.SMS) = channels.sms
+    if (TC.toBoolean(channels.facebook.status)) channelMap(Channel.FACEBOOK) = channels.facebook
+    if (TC.toBoolean(channels.webpush.status)) channelMap(Channel.WEBPUSH) = channels.webpush
+    if (TC.toBoolean(channels.push_android.status)) channelMap(Channel.PUSH_ANDROID) = channels.push_android
+    if (TC.toBoolean(channels.push_ios.status)) channelMap(Channel.PUSH_IOS) = channels.push_ios
     channelMap
   }
 

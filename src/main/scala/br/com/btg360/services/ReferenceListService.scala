@@ -1,7 +1,7 @@
 package br.com.btg360.services
 
 import br.com.btg360.application.Service
-import br.com.btg360.entities.{ItemEntity, QueueEntity}
+import br.com.btg360.entities.{StockEntity, QueueEntity}
 import br.com.btg360.repositories.ReferenceListRepository
 import org.apache.spark.rdd.RDD
 
@@ -40,7 +40,7 @@ class ReferenceListService extends Service {
     * @param RDD         data
     * @return RDD
     */
-  def add(queue: QueueEntity, data: RDD[(String, ItemEntity)]): RDD[(String, ItemEntity)] = {
+  def add(queue: QueueEntity, data: RDD[(String, StockEntity)]): RDD[(String, StockEntity)] = {
     try {
       if (!this.exists(queue.rule.referenceListId)) {
         return data
@@ -54,7 +54,7 @@ class ReferenceListService extends Service {
       data.leftOuterJoin(list).map(row => {
         var item = row._2._1
         if (row._2._2.isDefined) {
-          item = new ItemEntity(item.products, item.recommendations, row._2._2.get)
+          item = new StockEntity(item.products, item.recommendations, row._2._2.get)
         }
         (row._1, item)
       })

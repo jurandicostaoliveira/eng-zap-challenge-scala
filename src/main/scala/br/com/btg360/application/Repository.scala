@@ -3,9 +3,10 @@ package br.com.btg360.application
 import java.sql.{Connection, ResultSet}
 
 import br.com.btg360.jdbc.MySqlBtg360
-import br.com.btg360.services.{TypeConverterService => TCS}
 
 import scala.collection.immutable.List
+import br.com.btg360.constants.{TypeConverter => TC}
+
 
 
 abstract class Repository extends Model {
@@ -78,7 +79,7 @@ abstract class Repository extends Model {
   def countByColumnName(rs: ResultSet, columnName: String): Int = {
     try {
       rs.next()
-      val total: Int = TCS.toInt(rs.getObject(columnName))
+      val total: Int = TC.toInt(rs.getObject(columnName))
       rs.close()
       total
     } catch {

@@ -3,7 +3,7 @@ package br.com.btg360.services
 import br.com.btg360.constants.{Period, QueueStatus, Rule}
 import br.com.btg360.entities.{QueueEntity, RuleEntity}
 import br.com.btg360.repositories.{QueueRepository, RuleRepository}
-import br.com.btg360.services.{TypeConverterService => TCS}
+import br.com.btg360.constants.{TypeConverter => TC}
 
 
 class QueueManagerService {
@@ -39,14 +39,14 @@ class QueueManagerService {
         entity.today = this.today
         entity.userId = userId
         entity.groupId = rule.groupId
-        entity.ruleTypeId = TCS.toInt(settings("ruleTypeId"))
-        entity.ruleName = TCS.toString(settings("ruleName"))
-        entity.isPeal = TCS.toInt(settings("isPeal"))
+        entity.ruleTypeId = TC.toInt(settings("ruleTypeId"))
+        entity.ruleName = TC.toString(settings("ruleName"))
+        entity.isPeal = TC.toInt(settings("isPeal"))
         entity.priority = priority
-        entity.status = TCS.toInt(settings("status"))
-        entity.consolidatedTableName = TCS.toString(settings("consolidatedTableName"))
+        entity.status = TC.toInt(settings("status"))
+        entity.consolidatedTableName = TC.toString(settings("consolidatedTableName"))
         entity.channels = this.jsonService.encode(rule.data.channelMap.keys)
-        entity.recommendationModule = TCS.toString(settings("recommendationModule"))
+        entity.recommendationModule = TC.toString(settings("recommendationModule"))
         entity.createdIn = this.now
         entity.startedIn = settings("startedIn")
         entity.preparedIn = settings("preparedIn")
@@ -101,7 +101,7 @@ class QueueManagerService {
     */
   private def generateConsolidatedTableName(rule: RuleEntity, isPeal: Boolean): String = {
     "%s_%d_%d_%s".format(
-      if (isPeal) "peal" else rule.data.name.replace("-", "_"),
+      if (isPeal) "peal" else TC.toString(rule.data.name).replace("-", "_"),
       rule.data.btgId,
       rule.id,
       this.periodService.format("yyyy_MM_dd").now

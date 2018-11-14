@@ -1,6 +1,6 @@
-package br.com.btg360.services
+package br.com.btg360.constants
 
-object TypeConverterService {
+object TypeConverter {
 
   /**
     * Validate field cases comes with none and returns the default value

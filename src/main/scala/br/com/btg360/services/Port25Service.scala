@@ -1,7 +1,7 @@
 package br.com.btg360.services
 
 import br.com.btg360.application.Service
-import br.com.btg360.entities.ItemEntity
+import br.com.btg360.entities.StockEntity
 import br.com.btg360.spark.SparkCoreSingleton
 import org.apache.spark.rdd.RDD
 
@@ -17,7 +17,7 @@ class Port25Service extends Service {
     * @param RDD data
     * @return RDD
     */
-  def add(data: RDD[(String, ItemEntity)]): RDD[(String, ItemEntity)] = {
+  def add(data: RDD[(String, StockEntity)]): RDD[(String, StockEntity)] = {
     data.union(this.sc.parallelize(Seq((this.email, data.first()._2))))
   }
 

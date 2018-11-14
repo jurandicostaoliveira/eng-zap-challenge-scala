@@ -1,8 +1,8 @@
-package br.com.btg360.services
+package br.com.btg360.constants
 
 import java.util.Base64
 
-object Base64Service {
+object Base64Converter {
 
   val US_ASCII: String = "US-ASCII"
   val ISO_8859_1: String = "ISO-8859-1"
@@ -16,7 +16,7 @@ object Base64Service {
     * @param String charset
     * @return String
     */
-  def encode(value: String, charset: String = Base64Service.UTF_8): String = {
+  def encode(value: String, charset: String = Base64Converter.UTF_8): String = {
     Base64.getEncoder.encodeToString(value.getBytes(charset))
   }
 
@@ -25,7 +25,7 @@ object Base64Service {
     * @param String charset
     * @return
     */
-  def decode(value: String, charset: String = Base64Service.UTF_8): String = {
+  def decode(value: String, charset: String = Base64Converter.UTF_8): String = {
     new String(Base64.getDecoder.decode(value), charset)
   }
 

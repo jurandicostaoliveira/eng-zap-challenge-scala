@@ -1,10 +1,10 @@
 package br.com.btg360.worker.rule
 
 import br.com.btg360.constants.{QueueStatus, Rule}
-import br.com.btg360.entities.{ConsolidatedEntity, ItemEntity, ProductEntity, QueueEntity}
+import br.com.btg360.entities.{ConsolidatedEntity, StockEntity, ProductEntity, QueueEntity}
 import br.com.btg360.traits.RuleTrait
 import org.apache.spark.rdd.RDD
-import br.com.btg360.services.{DataStockService, UtmService}
+import br.com.btg360.services.{DataMapperService, UrlService}
 import br.com.btg360.spark.SparkCoreSingleton
 
 import scala.collection.mutable.HashMap
@@ -18,7 +18,7 @@ class Daily extends RuleTrait with Serializable {
   /**
     * @return RDD
     */
-  override def getData: RDD[(String, ItemEntity)] = {
+  override def getData: RDD[(String, StockEntity)] = {
     if (this.queue.ruleTypeId == Rule.AUTOMATIC_ID) {
       return this.automatic
     }
@@ -28,7 +28,7 @@ class Daily extends RuleTrait with Serializable {
     this.test
   }
 
-  private def automatic: RDD[(String, ItemEntity)] = {
+  private def automatic: RDD[(String, StockEntity)] = {
     null
   }
 
@@ -37,7 +37,7 @@ class Daily extends RuleTrait with Serializable {
     *
     * @return
     */
-  private def test: RDD[(String, ItemEntity)] = {
+  private def test: RDD[(String, StockEntity)] = {
 
     val c1 = new ConsolidatedEntity()
     c1.userSent = "paula@hotmail.com"
@@ -77,25 +77,25 @@ class Daily extends RuleTrait with Serializable {
     p6.productLink = "http://google.com"
 
     val list: List[HashMap[String, Any]] = List(
-      new ItemEntity().toMap(c1, p1, this.queue),
-      new ItemEntity().toMap(c2, p2, this.queue),
-      new ItemEntity().toMap(c3, p3, this.queue),
-      new ItemEntity().toMap(c4, p4, this.queue),
-      new ItemEntity().toMap(c5, p5, this.queue),
-      new ItemEntity().toMap(c6, p6, this.queue)
+      new StockEntity().toMap(this.queue, c1, p1, c1.isRecommendation),
+      new StockEntity().toMap(this.queue, c2, p2, c2.isRecommendation),
+      new StockEntity().toMap(this.queue, c3, p3, c3.isRecommendation),
+      new StockEntity().toMap(this.queue, c4, p4, c4.isRecommendation),
+      new StockEntity().toMap(this.queue, c5, p5, c5.isRecommendation),
+      new StockEntity().toMap(this.queue, c6, p6, c6.isRecommendation)
     )
 
-
-    val data: RDD[(String, ItemEntity)] = SparkCoreSingleton.getContext.parallelize(list).map(row => {
+    val data: RDD[(String, StockEntity)] = SparkCoreSingleton.getContext.parallelize(list).map(row => {
       var products: List[HashMap[String, Any]] = List()
       var recommendations: List[HashMap[String, Any]] = List()
+
       if (row("isRecommendation").equals(1)) {
         recommendations ::= row
       } else {
         products ::= row
       }
 
-      (row("userSent").toString, new ItemEntity(
+      (row("userSent").toString, new StockEntity(
         products,
         recommendations
       ))

@@ -1,13 +1,11 @@
 package br.com.btg360.entities
 
 import br.com.btg360.application.Entity
-import br.com.btg360.constants.{Channel, Database}
-import br.com.btg360.services.JsonService
+import br.com.btg360.constants.{Channel, Database, Rule, TypeConverter => TC}
+import br.com.btg360.services.{JsonService, PeriodService}
 import org.apache.log4j.Logger
 
 class QueueEntity extends Entity {
-
-  private val jsonService = new JsonService()
 
   //Queue
   var userRuleId: Long = 0
@@ -35,12 +33,24 @@ class QueueEntity extends Entity {
   var dataStringJson: String = _
   var rule: RuleDataEntity = _
   //Channel
-  var channelName: String = _
+  var channelName: String = Channel.EMAIL
+  var deliveryAt: String = _
+  var deliveryTimestamp: Long = 0
+  var utmLink: String = _
+
   var logger: Logger = _
 
+  /**
+    * Parsed the rule configuration data
+    *
+    * @return this
+    */
   def parse: QueueEntity = {
     if (this.rule == null) {
-      this.rule = this.jsonService.decode[RuleDataEntity](this.dataStringJson)
+      this.rule = new JsonService().decode[RuleDataEntity](this.dataStringJson)
+      this.deliveryAt = this.generateDeliveryAt
+      this.deliveryTimestamp = this.generateDeliveryTimestamp
+      this.utmLink = this.generateUtmLink
     }
 
     this
@@ -52,8 +62,7 @@ class QueueEntity extends Entity {
     * @return String
     */
   def getConsolidatedTable: String = {
-    val channelName = if (this.channelName.isEmpty) Channel.EMAIL else this.channelName
-    "%s.%s_%s".format(Database.CONSOLIDATED, this.consolidatedTableName, channelName)
+    "%s.%s_%s".format(Database.CONSOLIDATED, this.consolidatedTableName, this.channelName)
   }
 
   /**
@@ -65,8 +74,40 @@ class QueueEntity extends Entity {
     "product_%d".format(this.rule.allinId)
   }
 
-  def getDeliveryTimestamp: Int = {
-    0
+  /**
+    * Returns the time to exit sending
+    *
+    * @return String
+    */
+  private def generateDeliveryAt: String = {
+    var hour = this.rule.hour
+    if (this.ruleTypeId == Rule.HOURLY_ID) {
+      hour = "%d:00:00".format(TC.toInt(new PeriodService("HH").now) + 1)
+    }
+
+    "%s %s".format(this.today, hour)
+  }
+
+  /**
+    * Returns timestamp to exit sending
+    *
+    * @return Long
+    */
+  private def generateDeliveryTimestamp: Long = {
+    new PeriodService().toDate(this.deliveryAt).getTime / 1000 //Hack to PHP
+  }
+
+  /**
+    * Return the query string umts from google analytics
+    *
+    * @return String
+    */
+  private def generateUtmLink: String = {
+    var list: List[String] = List()
+    this.rule.channelMap(this.channelName).utms.foreach(row => {
+      list = list :+ "%s=%s".format(row.key, row.value)
+    })
+    list.mkString("&")
   }
 
 }
