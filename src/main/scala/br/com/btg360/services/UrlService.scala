@@ -6,6 +6,13 @@ import br.com.btg360.entities.QueueEntity
 
 class UrlService extends Service {
 
+  private val exceptLinks = List("##optout##", "##preview##", "#")
+
+  private val replacePatterns: Map[String, String] = Map(
+    "[\\\\n]" -> "",
+    "href[\\s]+\\=[\\s]+|href[\\s]+\\=|href=[\\s]+" -> "href="
+  )
+
   /**
     * Generating the link to the redirector
     *
@@ -50,18 +57,17 @@ class UrlService extends Service {
     */
   def parse(queue: QueueEntity, html: String): String = {
     try {
-      val patterns: Map[String, String] = Map(
-        "[\\\\n]" -> "",
-        "href[\\s]+\\=[\\s]+|href[\\s]+\\=|href=[\\s]+" -> "href="
-      )
-
-      var textHtml = html.trim
-      for ((key, value) <- patterns) {
-        textHtml = key.r.replaceAllIn(textHtml, value)
+      var content = html.trim
+      for ((key, value) <- this.replacePatterns) {
+        content = key.r.replaceAllIn(content, value)
       }
 
-      "(href=[\"|\'](.*?)[\"|\'])".r.replaceAllIn(textHtml, row => {
-        """href="%s"""".format(this.redirect(queue, row.group(2)))
+      "(href=[\"|\'](.*?)[\"|\'])".r.replaceAllIn(content, row => {
+        var href = row.group(2)
+        if (!this.exceptLinks.contains(href)) {
+          href = this.redirect(queue, href)
+        }
+        """href="%s"""".format(href)
       })
     } catch {
       case e: Exception => println(e.printStackTrace())

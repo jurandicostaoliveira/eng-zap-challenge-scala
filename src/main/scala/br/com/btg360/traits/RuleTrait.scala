@@ -138,26 +138,16 @@ trait RuleTrait extends Serializable {
     this.queue.rule.referenceListId = 2251344
     //FIM REMOVER
 
+    if (Channel.isEmailChannel(this.queue.channelName)) {
+      data = this.referenceListService.add(this.queue, data)
+      data = this.port25Service.add(data)
+    }
 
-    var html: String =
-      """
-          <html><a href ='http://google.com.br'>Google</a>
-          \n
-          <a href=   \n   "http://yahoo.com.br">Yahoo</a></html>
-        """
-
-    println(new UrlService().parse(this.queue, html))
-
-//    if (Channel.isEmailChannel(this.queue.channelName)) {
-//      data = this.referenceListService.add(this.queue, data)
-//      data = this.port25Service.add(data)
-//    }
-//
-//    data.foreach(row => {
-//      val a: String = new JsonService().encode(row._2)
-//      println(row._1 + " -> " + a)
-//      println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-//    })
+    data.foreach(row => {
+      val a: String = new JsonService().encode(row._2)
+      println(row._1 + " -> " + a)
+      println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+    })
   }
 
 }

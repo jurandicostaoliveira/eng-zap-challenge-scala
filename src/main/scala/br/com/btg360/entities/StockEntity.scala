@@ -7,9 +7,14 @@ import scala.collection.mutable.HashMap
 import scala.collection.Map
 
 case class StockEntity(
+                        client: String = "",
+                        configs: String = "",
+                        email: String = "",
+                        pixel: String = "",
                         products: List[HashMap[String, Any]] = List(),
                         recommendations: List[HashMap[String, Any]] = List(),
-                        references: Map[String, Any] = Map()
+                        references: Map[String, Any] = Map(),
+                        virtual_mta: String = ""
                       ) extends Entity {
 
   /**
