@@ -121,7 +121,7 @@ trait RuleTrait extends Serializable {
   }
 
   /**
-    *
+    * Processing of rules
     */
   private def all: Unit = {
     //UPDATE STATUS
@@ -139,7 +139,10 @@ trait RuleTrait extends Serializable {
     //FIM REMOVER
 
     if (Channel.isEmailChannel(this.queue.channelName)) {
-      data = this.referenceListService.add(this.queue, data)
+      if (this.queue.ruleTypeId != Rule.AUTOMATIC_ID) {
+        data = this.referenceListService.add(this.queue, data)
+      }
+
       data = this.port25Service.add(data)
     }
 
