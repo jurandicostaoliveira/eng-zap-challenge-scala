@@ -127,13 +127,13 @@ trait RuleTrait extends Serializable {
     //UPDATE STATUS
     var data = this.getData
 
-    if (data.count() <= 0) {
+    if (data == null || data.count() <= 0) {
       //UPDATE STATUS
       println(Message.ITEMS_NOT_FOUND)
       return
     }
 
-    if (Channel.isEmailChannel(this.queue.channelName)) {
+    if (Channel.isEmail(this.queue.channelName)) {
       if (this.queue.ruleTypeId != Rule.AUTOMATIC_ID) {
         data = this.referenceListService.add(this.queue, data)
       }
