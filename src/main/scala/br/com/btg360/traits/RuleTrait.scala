@@ -133,11 +133,6 @@ trait RuleTrait extends Serializable {
       return
     }
 
-    //REMOVER
-    this.queue.rule.allinId = 1410
-    this.queue.rule.referenceListId = 2251344
-    //FIM REMOVER
-
     if (Channel.isEmailChannel(this.queue.channelName)) {
       if (this.queue.ruleTypeId != Rule.AUTOMATIC_ID) {
         data = this.referenceListService.add(this.queue, data)
@@ -147,8 +142,7 @@ trait RuleTrait extends Serializable {
     }
 
     data.foreach(row => {
-      val a: String = new JsonService().encode(row._2)
-      println(row._1 + " -> " + a)
+      println(row._1 + " -> " + new JsonService().encode(row._2))
       println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     })
   }

@@ -1,7 +1,6 @@
 package br.com.btg360.repositories
 
 import br.com.btg360.application.Repository
-import javax.validation.OverridesAttribute
 
 import scala.collection.immutable.List
 import scala.collection.mutable.HashMap
@@ -36,26 +35,5 @@ class TransactionalRepository extends Repository {
       }
     }
   }
-
-
-  //  def insertQueryBatch2(table: String, values: List[HashMap[String, Any]]): Unit = {
-  //
-  //    if (values.size <= 0) {
-  //      return
-  //    }
-  //
-  //    val strFields: String = "(" + values.head.keys.mkString(",") + ")"
-  //    val stmt = this.dbConnection.createStatement()
-  //
-  //    for (item <- values) {
-  //      val strValues = "('" + item.values.mkString("','") + "')"
-  //      val query = s"INSERT INTO ${table} ${strFields} VALUES ${strValues};"
-  //      println(query)
-  //      stmt.addBatch(query)
-  //      stmt.executeBatch()
-  //    }
-  //
-  //
-  //  }
 
 }
