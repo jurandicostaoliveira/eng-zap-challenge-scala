@@ -75,7 +75,7 @@ class DataMapperService(queue: QueueEntity) {
         }
       })
 
-      (rows._1, new StockEntity(products, recommendations))
+      (rows._1, new StockEntity(products = products, recommendations = recommendations))
     })
   }
 

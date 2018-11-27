@@ -1,6 +1,6 @@
 package br.com.btg360.worker.rule
 
-import br.com.btg360.constants.{QueueStatus, Rule}
+import br.com.btg360.constants.{QueueStatus, Rule, Automatic}
 import br.com.btg360.entities.{ConsolidatedEntity, StockEntity, ProductEntity, QueueEntity}
 import br.com.btg360.traits.RuleTrait
 import org.apache.spark.rdd.RDD
@@ -29,6 +29,17 @@ class Daily extends RuleTrait with Serializable {
   }
 
   private def automatic: RDD[(String, StockEntity)] = {
+
+    this.queue.ruleName match {
+      case Automatic.BIRTHDAY =>
+        println("REGRA AUTOMATICA: " + this.queue.ruleName)
+      case Automatic.SENDING_DATE =>
+        println("REGRA AUTOMATICA: " + this.queue.ruleName)
+      case Automatic.SENDING_DATE =>
+        println("REGRA AUTOMATICA: " + this.queue.ruleName)
+    }
+
+
     null
   }
 
@@ -96,8 +107,8 @@ class Daily extends RuleTrait with Serializable {
       }
 
       (row("userSent").toString, new StockEntity(
-        products,
-        recommendations
+        products = products,
+        recommendations = recommendations
       ))
     })
 
