@@ -121,31 +121,28 @@ trait RuleTrait extends Serializable {
   }
 
   /**
-    *
+    * Processing of rules
     */
   private def all: Unit = {
     //UPDATE STATUS
     var data = this.getData
 
-    if (data.count() <= 0) {
+    if (data == null || data.count() <= 0) {
       //UPDATE STATUS
       println(Message.ITEMS_NOT_FOUND)
       return
     }
 
-    //REMOVER
-    this.queue.rule.allinId = 1410
-    this.queue.rule.referenceListId = 2251344
-    //FIM REMOVER
+    if (Channel.isEmail(this.queue.channelName)) {
+      if (this.queue.ruleTypeId != Rule.AUTOMATIC_ID) {
+        data = this.referenceListService.add(this.queue, data)
+      }
 
-    if (Channel.isEmailChannel(this.queue.channelName)) {
-      data = this.referenceListService.add(this.queue, data)
       data = this.port25Service.add(data)
     }
 
     data.foreach(row => {
-      val a: String = new JsonService().encode(row._2)
-      println(row._1 + " -> " + a)
+      println(row._1 + " -> " + new JsonService().encode(row._2))
       println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     })
   }

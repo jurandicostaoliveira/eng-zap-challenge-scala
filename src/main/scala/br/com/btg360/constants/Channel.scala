@@ -28,7 +28,7 @@ object Channel {
     *
     * @return
     */
-  def isEmailChannel(channelName: String): Boolean = {
+  def isEmail(channelName: String): Boolean = {
     channelName == this.EMAIL
   }
 

@@ -92,7 +92,7 @@ class DataMapperService(queue: QueueEntity) {
       var filters = new DailySendLimitService(this.queue).filter(data.keys)
       println(Message.TOTAL_DAILY_LIMIT_REMOVED.format(filters.count()))
 
-      if (Channel.isEmailChannel(this.queue.channelName)) {
+      if (Channel.isEmail(this.queue.channelName)) {
         filters = new OptoutService(this.queue).filter(filters)
         println(Message.TOTAL_OPTOUT_REMOVED.format(filters.count()))
       }

@@ -9,9 +9,10 @@ import br.com.btg360.spark.SparkCoreSingleton
 
 import scala.collection.mutable.HashMap
 
-class Daily extends RuleTrait with Serializable {
+class Daily extends RuleTrait {
 
-  override def getTypes: List[Int] = List(Rule.DAILY_ID, Rule.AUTOMATIC_ID)
+  //override def getTypes: List[Int] = List(Rule.DAILY_ID, Rule.AUTOMATIC_ID)
+  override def getTypes: List[Int] = List(Rule.DAILY_ID)
 
   override def getCompletedStatus: Int = QueueStatus.FINALIZED
 

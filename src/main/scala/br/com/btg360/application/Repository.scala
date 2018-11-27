@@ -2,11 +2,10 @@ package br.com.btg360.application
 
 import java.sql.{Connection, ResultSet}
 
+import br.com.btg360.constants.{TypeConverter => TC}
 import br.com.btg360.jdbc.MySqlBtg360
 
 import scala.collection.immutable.List
-import br.com.btg360.constants.{TypeConverter => TC}
-
 
 
 abstract class Repository extends Model {
@@ -64,6 +63,7 @@ abstract class Repository extends Model {
         list = list :+ entity
       }
 
+      resultSet.close()
       list
     } catch {
       case e: Exception => println(e.printStackTrace())
@@ -76,11 +76,11 @@ abstract class Repository extends Model {
     * @param String    columnName
     * @return Int
     */
-  def countByColumnName(rs: ResultSet, columnName: String): Int = {
+  def countByColumnName(resultSet: ResultSet, columnName: String): Int = {
     try {
-      rs.next()
-      val total: Int = TC.toInt(rs.getObject(columnName))
-      rs.close()
+      resultSet.next()
+      val total: Int = TC.toInt(resultSet.getObject(columnName))
+      resultSet.close()
       total
     } catch {
       case e: Exception => println(e.printStackTrace())
@@ -158,6 +158,26 @@ abstract class Repository extends Model {
       }
 
       stmt.executeUpdate()
+      stmt.close()
+    } catch {
+      case e: Exception => println(e.printStackTrace())
+    }
+  }
+
+  /**
+    * Insert multiple queries
+    *
+    * @param List queries
+    */
+  def insertQueryBatch(queries: List[String]): Unit = {
+    try {
+      val stmt = this.dbConnection.createStatement()
+      for (query <- queries) {
+        stmt.addBatch(query)
+      }
+
+      stmt.executeBatch()
+      stmt.close()
     } catch {
       case e: Exception => println(e.printStackTrace())
     }
