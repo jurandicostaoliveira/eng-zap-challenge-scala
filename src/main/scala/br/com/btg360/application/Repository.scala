@@ -1,6 +1,6 @@
 package br.com.btg360.application
 
-import java.sql.{Connection, ResultSet}
+import java.sql.{Connection, DatabaseMetaData, ResultSet, SQLException}
 
 import br.com.btg360.constants.{TypeConverter => TC}
 import br.com.btg360.jdbc.MySqlBtg360
@@ -23,12 +23,27 @@ abstract class Repository extends Model {
   }
 
   /**
-    *
     * @param query
     * @return
     */
   def queryExecutor(query: String): ResultSet = {
-    this.dbConnection.createStatement().executeQuery(query)
+    try {
+      this.dbConnection.createStatement().executeQuery(query)
+    } catch {
+      case e: SQLException => println(e.getErrorCode + ": " + e.getMessage)
+        null
+    }
+  }
+
+  /**
+    * @param String query
+    */
+  def ddlExecutor(query: String): Unit = {
+    try {
+      this.dbConnection.createStatement().executeUpdate(query)
+    } catch {
+      case e: SQLException => println(e.getStackTrace)
+    }
   }
 
   /**
@@ -181,6 +196,28 @@ abstract class Repository extends Model {
     } catch {
       case e: Exception => println(e.printStackTrace())
     }
+  }
+
+  /**
+    * Check if a table exists
+    *
+    * @param String table
+    * @return boolean
+    */
+  def tableExists(database: String, table: String): Boolean = {
+    this.dbConnection.getMetaData.getTables(database, null, table, null).next()
+  }
+
+  /**
+    * Check if a column exists in table
+    *
+    * @param String database
+    * @param String table
+    * @param String column
+    * @return Boolean
+    */
+  def columnExists(database: String, table: String, column: String): Boolean = {
+    this.dbConnection.getMetaData.getColumns(database, null, table, column).next()
   }
 
 }

@@ -16,4 +16,6 @@ object Database {
 
   val LIST: String = "emailpro_lista"
 
+  val POSTMATIC: String = "postmatic"
+
 }
