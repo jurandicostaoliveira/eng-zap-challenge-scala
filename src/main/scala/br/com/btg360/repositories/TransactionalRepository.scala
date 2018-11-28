@@ -2,7 +2,9 @@ package br.com.btg360.repositories
 
 import br.com.btg360.application.Repository
 import br.com.btg360.constants.Database
+import br.com.btg360.entities.QueueEntity
 import br.com.btg360.jdbc.MySqlBtg360
+import scala.util.Random
 import br.com.btg360.services.PeriodService
 
 import scala.collection.mutable.HashMap
@@ -20,6 +22,8 @@ class TransactionalRepository extends Repository {
   private var _transactionalId: Int = 0
 
   private var _data: List[HashMap[String, Any]] = List(HashMap("id" -> 1, "name" -> "lala"), HashMap("id" -> 2, "name" -> "lele"))
+
+  private var queue: QueueEntity = _
 
   /**
     * Getter
@@ -267,8 +271,31 @@ class TransactionalRepository extends Repository {
     }
   }
 
+  /**
+    *
+    */
+  def updateLastSend: Unit = {
+    this.connection(this.db)
+      .whereAnd("id_allinmail", "=", this.allinId)
+      .update(this.generateLoginTable, HashMap("dt_ult_envio" -> new PeriodService().now))
+  }
 
-  def save: Unit = {
+
+  def saveTemplate: Int = {
+
+    val number: Long = new Random().nextInt((50000 - 1000) * 40)
+    this.insertGetId(this.generateTemplateTable, HashMap(
+      "nm_template" -> "BTG_template_%s_%d".format(new PeriodService("yyyy_MM_dd_HH_mm").now, number),
+      "nm_html" -> "", //template
+      "fl_descartar" -> 0,
+      "dt_cadastro" -> new PeriodService().now,
+      "fl_twig" -> 1
+    ))
+
+    //
+  }
+
+  def saveSend: Unit = {
     val table = this.generateSendTable
     var limiter: Int = 0
     var totalizator: Int = 0
