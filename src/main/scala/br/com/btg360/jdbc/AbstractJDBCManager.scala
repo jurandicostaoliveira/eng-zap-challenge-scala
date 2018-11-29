@@ -161,5 +161,4 @@ abstract class AbstractJDBCManager {
         null
     }
   }
-
 }
