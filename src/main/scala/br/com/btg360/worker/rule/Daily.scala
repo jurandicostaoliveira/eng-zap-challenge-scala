@@ -24,9 +24,9 @@ class Daily extends RuleTrait {
       return this.automatic
     }
 
-    //    val dataStockService = new DataStockService(this.queue)
-    //    dataStockService.get
-    this.test
+    val dataMapperService = new DataMapperService(this.queue)
+    dataMapperService.get
+    //this.test
   }
 
   private def automatic: RDD[(String, StockEntity)] = {

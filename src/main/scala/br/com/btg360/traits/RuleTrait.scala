@@ -124,11 +124,11 @@ trait RuleTrait extends Serializable {
     * Processing of rules
     */
   private def all: Unit = {
-    //UPDATE STATUS
+    this.queueRepository.updateStatus(this.queue.userRuleId.toInt, QueueStatus.PROCESSED)
     var data = this.getData
 
     if (data == null || data.count() <= 0) {
-      //UPDATE STATUS
+      this.queueRepository.updateStatus(this.queue.userRuleId.toInt, this.getCompletedStatus)
       println(Message.ITEMS_NOT_FOUND)
       return
     }
@@ -138,13 +138,15 @@ trait RuleTrait extends Serializable {
         data = this.referenceListService.add(this.queue, data)
       }
 
-      data = this.port25Service.add(data)
+      //data = this.port25Service.add(data)
     }
 
     data.foreach(row => {
       println(row._1 + " -> " + new JsonService().encode(row._2))
       println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     })
+
+    this.queueRepository.updateStatus(this.queue.userRuleId.toInt, this.getCompletedStatus)
   }
 
 }

@@ -1,10 +1,11 @@
 package br.com.btg360.repositories
 
+import br.com.btg360.application.Repository
 import br.com.btg360.entities.ConsolidatedEntity
 import br.com.btg360.jdbc.MySqlBtg360
 import org.apache.spark.rdd.RDD
 
-class ConsolidatedRepository {
+class ConsolidatedRepository extends Repository {
 
   private val db = new MySqlBtg360()
 

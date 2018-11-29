@@ -16,7 +16,14 @@ class DataMapperService(queue: QueueEntity) {
     * @return RDD
     */
   private def consolidatedData: RDD[(Any, ConsolidatedEntity)] = {
-    new ConsolidatedRepository().table(this.queue.getConsolidatedTable).findAllKeyBy(
+    val repository = new ConsolidatedRepository()
+    val table = this.queue.getConsolidatedTable
+
+    if (!repository.tableExists(table)) {
+      return repository.sparkContext.emptyRDD[(Any, ConsolidatedEntity)]
+    }
+
+    repository.table(table).findAllKeyBy(
       entity => (entity.productId, entity)
     )
   }

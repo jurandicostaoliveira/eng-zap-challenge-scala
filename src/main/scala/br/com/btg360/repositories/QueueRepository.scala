@@ -1,10 +1,12 @@
 package br.com.btg360.repositories
 
 import br.com.btg360.application.Repository
-import br.com.btg360.constants.{Database, QueueStatus, Table}
+import br.com.btg360.constants.{Database, QueueStatus, Table, TypeConverter => TC}
 import br.com.btg360.entities.QueueEntity
 import br.com.btg360.jdbc.MySqlBtg360
 import br.com.btg360.services.PeriodService
+
+import scala.collection.mutable.HashMap
 
 
 class QueueRepository extends Repository {
@@ -13,7 +15,7 @@ class QueueRepository extends Repository {
 
   private val today = this.periodService.format("yyyy-MM-dd").now
 
-  private val dbBtg360 = new MySqlBtg360().open
+  private val db = new MySqlBtg360().open
 
   //TABLES
   private val rulesQueueTable = "%s.%s".format(Database.JOBS, Table.RULES_QUEUE)
@@ -55,7 +57,7 @@ class QueueRepository extends Repository {
             AND consolidated_rules.status = 1
         ORDER BY rules_queue.priority ASC;
       """
-    this.connection(this.dbBtg360).fetch(query, classOf[QueueEntity])
+    this.connection(this.db).fetch(query, classOf[QueueEntity])
   }
 
   /**
@@ -95,7 +97,30 @@ class QueueRepository extends Repository {
         FROM ${this.rulesQueueTable}
         WHERE userId = $userId AND today = '${this.today}';
       """
-    this.countByColumnName(this.connection(this.dbBtg360).queryExecutor(query), "total")
+    this.countByColumnName(this.connection(this.db).queryExecutor(query), "total")
+  }
+
+  /**
+    * @param Int userRuleId
+    * @param Int status
+    */
+  def updateStatus(userRuleId: Int, status: Int): Unit = {
+    val now = new PeriodService().now
+    val data: HashMap[String, Any] = status match {
+      case QueueStatus.CREATED => HashMap("createdIn" -> now, "status" -> status)
+      case QueueStatus.STARTED => HashMap("startedIn" -> now, "status" -> status)
+      case QueueStatus.PREPARED => HashMap("preparedIn" -> now, "status" -> status)
+      case QueueStatus.RECOMMENDATION_STARTED => HashMap("recommendationStartedIn" -> now, "status" -> status)
+      case QueueStatus.RECOMMENDATION_PREPARED => HashMap("recommendationPreparedIn" -> now, "status" -> status)
+      case QueueStatus.PROCESSED => HashMap("processedIn" -> now, "status" -> status)
+      case QueueStatus.FINALIZED => HashMap("finalizedIn" -> now, "status" -> status)
+      case _ => HashMap("status" -> status)
+    }
+
+    this.connection(this.db)
+      .whereAnd("userRuleId", "=", userRuleId)
+      .whereAnd("today", "=", new PeriodService("yyyy-MM-dd").now)
+      .update(this.rulesQueueTable, data)
   }
 
 }

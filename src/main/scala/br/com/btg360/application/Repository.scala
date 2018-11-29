@@ -265,14 +265,28 @@ abstract class Repository extends Model {
   }
 
   /**
+    * @param String value
+    * @return HashMap
+    */
+  private def databaseSplit(value: String): HashMap[String, String] = {
+    if (value.contains(".")) {
+      val a = value.split("\\.")
+      return HashMap("database" -> a(0), "table" -> a(1))
+    }
+
+    HashMap("database" -> null, "table" -> value)
+  }
+
+  /**
     * Check if a table exists
     *
     * @param String database
     * @param String table
     * @return Boolean
     */
-  def tableExists(database: String, table: String): Boolean = {
-    this.dbConnection.getMetaData.getTables(database, null, table, null).next()
+  def tableExists(table: String): Boolean = {
+    val row = this.databaseSplit(table)
+    this.dbConnection.getMetaData.getTables(row("database"), null, row("table"), null).next()
   }
 
   /**
@@ -283,8 +297,9 @@ abstract class Repository extends Model {
     * @param String column
     * @return Boolean
     */
-  def columnExists(database: String, table: String, column: String): Boolean = {
-    this.dbConnection.getMetaData.getColumns(database, null, table, column).next()
+  def columnExists(table: String, column: String): Boolean = {
+    val row = this.databaseSplit(table)
+    this.dbConnection.getMetaData.getColumns(row("database"), null, row("table"), column).next()
   }
 
   /**
@@ -343,7 +358,7 @@ abstract class Repository extends Model {
       val stmt = this.dbConnection.prepareStatement(query.concat(";"))
       var index = 1
       for (value <- data.values) {
-        stmt.setObject(index, value)
+        if (value == null) stmt.setNull(index, 0) else stmt.setObject(index, value)
         index += 1
       }
       stmt.executeUpdate()

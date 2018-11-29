@@ -116,9 +116,15 @@ class TransactionalRepository extends Repository {
   }
 
   /**
+    * @param String format
     * @return String
     */
-  private def currentMonth: String = new PeriodService("MM").now
+  private def now(format: String = "yyyy-MM-dd HH:mm:ss") = new PeriodService(format).now
+
+  /**
+    * @return String
+    */
+  private def currentMonth: String = this.now("MM")
 
   /**
     * @return String
@@ -264,10 +270,10 @@ class TransactionalRepository extends Repository {
     *
     */
   def alterSendTable: Unit = {
-    val tableName: String = this.generateSendTable
-    val Array(database, table, column) = "%s.btg_user_rule_id".format(tableName).split("\\.")
-    if (!this.columnExists(database, table, column)) {
-      this.ddlExecutor(s"ALTER TABLE ${tableName} ADD COLUMN ${column} int(11) DEFAULT NULL;")
+    val table: String = this.generateSendTable
+    val column = "btg_user_rule_id"
+    if (!this.columnExists(table, column)) {
+      this.ddlExecutor(s"ALTER TABLE ${table} ADD COLUMN ${column} int(11) DEFAULT NULL;")
     }
   }
 
@@ -277,34 +283,38 @@ class TransactionalRepository extends Repository {
   def updateLastSend: Unit = {
     this.connection(this.db)
       .whereAnd("id_allinmail", "=", this.allinId)
-      .update(this.generateLoginTable, HashMap("dt_ult_envio" -> new PeriodService().now))
+      .update(this.generateLoginTable, HashMap("dt_ult_envio" -> this.now()))
   }
 
-
+  /**
+    * Persist template
+    *
+    * @return Int
+    */
   def saveTemplate: Int = {
-
-    val number: Long = new Random().nextInt((50000 - 1000) * 40)
+    val rand: Long = new Random().nextInt((50000 - 1000) * 38)
     this.insertGetId(this.generateTemplateTable, HashMap(
-      "nm_template" -> "BTG_template_%s_%d".format(new PeriodService("yyyy_MM_dd_HH_mm").now, number),
+      "nm_template" -> "BTG_template_%s_%d".format(this.now("yyyy_MM_dd_HH_mm"), rand),
       "nm_html" -> "", //template
       "fl_descartar" -> 0,
-      "dt_cadastro" -> new PeriodService().now,
+      "dt_cadastro" -> this.now(),
       "fl_twig" -> 1
     ))
-
-    //
   }
 
+  /**
+    * Persist send data
+    */
   def saveSend: Unit = {
     val table = this.generateSendTable
     var limiter: Int = 0
     var totalizator: Int = 0
-    var queries: List[String] = List()
     val total: Int = data.size
+    var queries: List[String] = List()
 
-    for (item <- data) {
-      val strValues = "'%s'".format(item.values.mkString("','"))
-      val query = s"INSERT IGNORE INTO ${table} (${item.keys.mkString(",")}) VALUES (${strValues});"
+    data.foreach(row => {
+      val strValues = "'%s'".format(row.values.mkString("','"))
+      val query = s"INSERT IGNORE INTO ${table} (${row.keys.mkString(",")}) VALUES (${strValues});"
       queries = queries :+ query
       limiter += 1
       totalizator += 1
@@ -314,7 +324,7 @@ class TransactionalRepository extends Repository {
         queries = List()
         limiter = 0
       }
-    }
+    })
   }
 
 }
