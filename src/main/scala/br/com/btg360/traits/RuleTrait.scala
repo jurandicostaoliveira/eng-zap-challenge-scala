@@ -65,6 +65,7 @@ trait RuleTrait extends Serializable {
       })
     } catch {
       case e: Exception => println(e.printStackTrace())
+        this.queueRepository.updateStatus(this.queue.userRuleId.toInt, QueueStatus.CREATED)
     }
   }
 
@@ -135,10 +136,10 @@ trait RuleTrait extends Serializable {
 
     if (Channel.isEmail(this.queue.channelName)) {
       if (this.queue.ruleTypeId != Rule.AUTOMATIC_ID) {
-        data = this.referenceListService.add(this.queue, data)
+        //data = this.referenceListService.add(this.queue, data)
       }
 
-      //data = this.port25Service.add(data)
+      data = this.port25Service.add(data)
     }
 
     data.foreach(row => {

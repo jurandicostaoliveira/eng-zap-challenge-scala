@@ -333,7 +333,7 @@ abstract class Repository extends Model {
     */
   private def onWhere(column: String, condition: String, value: Any, clause: String) = {
     val onClause = if (this.where.isEmpty) "" else clause
-    this.where += s""" ${onClause} ${column} ${condition} ${value}"""
+    this.where += s""" ${onClause} ${column} ${condition} '${value}'"""
   }
 
   /**

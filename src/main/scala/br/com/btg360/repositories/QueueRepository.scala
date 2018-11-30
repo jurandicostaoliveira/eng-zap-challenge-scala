@@ -114,13 +114,16 @@ class QueueRepository extends Repository {
       case QueueStatus.RECOMMENDATION_PREPARED => HashMap("recommendationPreparedIn" -> now, "status" -> status)
       case QueueStatus.PROCESSED => HashMap("processedIn" -> now, "status" -> status)
       case QueueStatus.FINALIZED => HashMap("finalizedIn" -> now, "status" -> status)
-      case _ => HashMap("status" -> status)
+      case _ => null
     }
 
-    this.connection(this.db)
-      .whereAnd("userRuleId", "=", userRuleId)
-      .whereAnd("today", "=", new PeriodService("yyyy-MM-dd").now)
-      .update(this.rulesQueueTable, data)
+    if (data != null) {
+      this.connection(this.db)
+        .whereAnd("userRuleId", "=", userRuleId)
+        .whereAnd("today", "=", new PeriodService("yyyy-MM-dd").now)
+        .update(this.rulesQueueTable, data)
+    }
+
   }
 
 }
