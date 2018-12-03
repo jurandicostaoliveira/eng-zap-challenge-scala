@@ -3,7 +3,7 @@ package br.com.btg360.traits
 import br.com.btg360.constants._
 import br.com.btg360.entities.{QueueEntity, StockEntity}
 import br.com.btg360.logger.Printer
-import br.com.btg360.repositories.QueueRepository
+import br.com.btg360.repositories.{ConsolidatedRepository, QueueRepository}
 import br.com.btg360.services._
 import org.apache.spark.rdd.RDD
 
@@ -16,6 +16,8 @@ trait RuleTrait extends Serializable {
   private var userId: Int = 0
 
   private val queueRepository = new QueueRepository()
+
+  private val consolidatedRepository = new ConsolidatedRepository()
 
   private val periodService = new PeriodService()
 
@@ -65,7 +67,19 @@ trait RuleTrait extends Serializable {
       })
     } catch {
       case e: Exception => println(e.printStackTrace())
-        this.queueRepository.updateStatus(this.queue.userRuleId.toInt, QueueStatus.CREATED)
+        this.toException
+    }
+  }
+
+  /**
+    * When there is an exception in the middle of the routine
+    */
+  private def toException: Unit = {
+    if (this.queue.ruleTypeId == Rule.HOURLY_ID) {
+      this.queueRepository.updateStatus(this.queue.userRuleId.toInt, QueueStatus.CREATED)
+    } else {
+      this.queueRepository.updateStatus(this.queue.userRuleId.toInt, QueueStatus.RECOMMENDATION_PREPARED)
+      this.consolidatedRepository.table(this.queue.getConsolidatedTable).updateSubmitted(0)
     }
   }
 
