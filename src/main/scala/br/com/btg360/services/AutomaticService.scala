@@ -4,12 +4,12 @@ import br.com.btg360.application.Service
 import br.com.btg360.entities.{FilterEntity, QueueEntity}
 import br.com.btg360.repositories.AutomaticRepository
 
-import scala.collection.mutable.ListMap
+import scala.util.control.Breaks._
 
 class AutomaticService extends Service {
   import String_._
 
-  val filters: Map[String, Function1[FilterEntity, Unit]] = Map(
+  val filters: Map[String, Function1[FilterEntity, String]] = Map(
     "=" -> {(data: FilterEntity) => this.toOperator(data)},
     "!=" -> {(data: FilterEntity) => this.toOperator(data)},
     ">" -> {(data: FilterEntity) => this.toOperator(data)},
@@ -86,28 +86,55 @@ class AutomaticService extends Service {
     String.format("%s = CURDATE()", data.field)
   }
 
-  def find(allinId: Int, filterId: Int): ListMap[String, Unit] = {
+  def find(allinId: Int, filterId: Int): Map[Int, List[Map[String, String]]] = {
     val automaticRepository: AutomaticRepository = new AutomaticRepository
     val data = automaticRepository.setAllinId(allinId).setFilterId(filterId).findFilters
 
-    var groups: ListMap[String, Unit] = ListMap.empty[String, Unit]
+    var mapGroups: Map[Int, List[Map[String, String]]] = Map.empty[Int, List[Map[String, String]]]
+    var groups: Map[String, String] = Map.empty[String, String]
+    var listGroups: List[Map[String, String]] = List.empty[Map[String, String]]
+
     data.foreach(row => {
       row.comparator = row.comparator.toLowerCase
-
       groups += (
         "condition" -> this.filters(row.comparator).apply(row),
         "operator" -> row.operator,
         "groupOperator" -> row.groupOperator
         )
+      listGroups :+= groups
+      mapGroups += (row.groupId -> listGroups)
+      listGroups = List.empty[Map[String, String]]
     })
-    groups
+    mapGroups
   }
 
   def filter(queue: QueueEntity): String = {
-    val groups: ListMap[String, Unit] = this.find(queue.rule.allinId, queue.rule.filterId)
+    val groups: Map[Int, List[Map[String, String]]] = this.find(queue.rule.allinId, queue.rule.filterId)
+    var filter: String = ""
 
-    groups.foreach(row => println(row._2))
+    groups.foreach(group => {
+      var condition = ""
+      var groupOperator = ""
+      var last: Int = group._2.size - 1
+      var index: Int = 0
 
-    null
+      group._2.foreach(item => {
+        var operator = if(index < last) item.get("operator").get else ""
+        condition = condition.concat(String.format("%s %s", item.get("condition").get, operator))
+        groupOperator = String.format(" %s ", item.get("groupOperator").get)
+        index += index + 1
+      })
+      filter = filter.concat(if(condition != "") String.format("(%s)", condition.trim) else "")
+
+      breakable {
+        if (groupOperator.trim == "") {
+          return filter
+        }
+      }
+      filter += filter.concat(groupOperator)
+
+    })
+    filter
+
   }
 }

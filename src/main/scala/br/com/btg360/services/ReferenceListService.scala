@@ -15,7 +15,7 @@ class ReferenceListService extends Service {
     * @param QueueEntity queue
     * @return Boolean
     */
-  private def exists(listId: Int): Boolean = {
+  def exists(listId: Int): Boolean = {
     try {
       val data = this.repository.listId(listId).findSettings
       if (data == null || !data.next()) {
