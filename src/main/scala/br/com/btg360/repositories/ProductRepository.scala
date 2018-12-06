@@ -3,6 +3,7 @@ package br.com.btg360.repositories
 import br.com.btg360.application.Repository
 import br.com.btg360.constants.Keyspace
 import br.com.btg360.entities.ProductEntity
+import br.com.btg360.spark.SparkCoreSingleton
 import com.datastax.spark.connector.toSparkContextFunctions
 import org.apache.spark.rdd.RDD
 
@@ -34,7 +35,7 @@ class ProductRepository extends Repository {
     * @return RDD
     */
   def findAll: RDD[ProductEntity] = {
-    this.sparkContext.cassandraTable[ProductEntity](Keyspace.BTG360, this.table)
+    SparkCoreSingleton.getContext.cassandraTable[ProductEntity](Keyspace.BTG360, this.table)
   }
 
   /**

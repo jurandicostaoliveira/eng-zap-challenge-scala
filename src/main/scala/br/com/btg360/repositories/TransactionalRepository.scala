@@ -25,6 +25,20 @@ class TransactionalRepository extends Repository {
 
   private var queue: QueueEntity = _
 
+  //
+  private var userRuleId: Long = 0
+  private var name: String = _
+  private var template: String = _
+  private var configs: HashMap[String, Any] = HashMap()
+  private var subject: String = _
+  private var date: String = _
+  private var senderEmail: String = _
+  private var replyEmail: String = _
+  private var senderName: String = _
+  private var title: String = _
+  private var message: String = _
+  private var urlScheme: String = _
+
   /**
     * Getter
     *
@@ -273,7 +287,8 @@ class TransactionalRepository extends Repository {
     val table: String = this.generateSendTable
     val column = "btg_user_rule_id"
     if (!this.columnExists(table, column)) {
-      this.ddlExecutor(s"ALTER TABLE ${table} ADD COLUMN ${column} int(11) DEFAULT NULL;")
+      this.connection(this.db)
+        .ddlExecutor(s"ALTER TABLE ${table} ADD COLUMN ${column} int(11) DEFAULT NULL;")
     }
   }
 
@@ -293,7 +308,7 @@ class TransactionalRepository extends Repository {
     */
   def saveTemplate: Int = {
     val rand: Long = new Random().nextInt((50000 - 1000) * 38)
-    this.insertGetId(this.generateTemplateTable, HashMap(
+    this.connection(this.db).insertGetId(this.generateTemplateTable, HashMap(
       "nm_template" -> "BTG_template_%s_%d".format(this.now("yyyy_MM_dd_HH_mm"), rand),
       "nm_html" -> "", //template
       "fl_descartar" -> 0,
@@ -320,7 +335,7 @@ class TransactionalRepository extends Repository {
       totalizator += 1
 
       if (limiter >= this.batchLimit || totalizator >= total) {
-        this.insertQueryBatch(queries)
+        this.connection(this.db).insertQueryBatch(queries)
         queries = List()
         limiter = 0
       }

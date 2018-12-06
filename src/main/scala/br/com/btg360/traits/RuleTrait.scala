@@ -2,9 +2,9 @@ package br.com.btg360.traits
 
 import br.com.btg360.constants._
 import br.com.btg360.entities.{QueueEntity, StockEntity}
-import br.com.btg360.logger.Printer
+import br.com.btg360.logger.{Log4jPrinter, Printer}
 import br.com.btg360.repositories.{ConsolidatedRepository, QueueRepository}
-import br.com.btg360.services._
+import br.com.btg360.services.{Port25Service, _}
 import org.apache.spark.rdd.RDD
 
 import scala.util.control.Breaks._
@@ -22,10 +22,6 @@ trait RuleTrait extends Serializable {
   private val periodService = new PeriodService()
 
   private val jsonService = new JsonService()
-
-  private val port25Service = new Port25Service()
-
-  private val referenceListService = new ReferenceListService()
 
   /**
     * @return List[Int]
@@ -101,7 +97,7 @@ trait RuleTrait extends Serializable {
     * @return this
     */
   private def startLog: RuleTrait = {
-    this.queue.logger = new Printer().inFile("%s/rules/%s/%d/%s/%d/%s.log".format(
+    Log4jPrinter.configure("%s/rules/%s/%d/%s/%d/%s.log".format(
       Path.LOGS,
       this.periodService.format("yyyy/MM").now,
       this.queue.userId,
@@ -135,6 +131,32 @@ trait RuleTrait extends Serializable {
     this
   }
 
+  private def filter(data: RDD[(String, StockEntity)]): RDD[(String, StockEntity)] = {
+    var dataset = new DailySendLimitService(this.queue).filter(data.keys)
+    println(Message.TOTAL_DAILY_LIMIT_REMOVED.format(dataset.count()))
+
+    if (Channel.isEmail(this.queue.channelName)) {
+      dataset = new OptoutService(this.queue).filter(dataset)
+      println(Message.TOTAL_OPTOUT_REMOVED.format(dataset.count()))
+    }
+
+    dataset.map(key => (key, 0)).join(data).map(row => {
+      (row._1, row._2._2)
+    })
+  }
+
+  private def apply(data: RDD[(String, StockEntity)]): RDD[(String, StockEntity)] = {
+    var dataset = data
+    if (Channel.isEmail(this.queue.channelName)) {
+      //if (this.queue.ruleTypeId != Rule.AUTOMATIC_ID) {
+      //dataset = new ReferenceListService().add(this.queue, data)
+      //}
+
+      dataset = new Port25Service().add(dataset)
+    }
+    dataset
+  }
+
   /**
     * Processing of rules
     */
@@ -148,17 +170,13 @@ trait RuleTrait extends Serializable {
       return
     }
 
-    if (Channel.isEmail(this.queue.channelName)) {
-      if (this.queue.ruleTypeId != Rule.AUTOMATIC_ID) {
-        //data = this.referenceListService.add(this.queue, data)
-      }
-
-      data = this.port25Service.add(data)
-    }
-
+    data = this.filter(data)
+    data = this.apply(data)
     data.foreach(row => {
-      println(row._1 + " -> " + new JsonService().encode(row._2))
-      println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+//      println(row._1 + " -> " + new JsonService().encode(row._2))
+//      println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+      Log4jPrinter.get.warn(row._1 + " -> " + new JsonService().encode(row._2))
+      Log4jPrinter.get.warn(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     })
 
     this.queueRepository.updateStatus(this.queue.userRuleId.toInt, this.getCompletedStatus)

@@ -39,7 +39,7 @@ import org.apache.log4j.*;
  * @author <a href="mailto://Jim.Moore@rocketmail.com">Jim Moore</a>
  * @see Category
  */
-public class LoggingOutputStream extends OutputStream {
+public class LoggingOutputStream extends OutputStream implements Serializable {
     protected static final String LINE_SEPERATOR = System.getProperty("line.separator");
 
 

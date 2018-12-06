@@ -10,7 +10,7 @@ import org.apache.spark.sql.{DataFrame, SaveMode}
 import org.apache.spark.rdd.RDD
 
 
-abstract class AbstractJDBCManager {
+abstract class AbstractJDBCManager extends Serializable {
 
   protected var dbDriver: String = _
 

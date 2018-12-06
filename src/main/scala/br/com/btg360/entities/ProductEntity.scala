@@ -1,6 +1,8 @@
 package br.com.btg360.entities
 
-class ProductEntity extends Serializable {
+import br.com.btg360.application.Entity
+
+class ProductEntity extends Entity {
 
   var attribute1: String = _
   var attribute2: String = _

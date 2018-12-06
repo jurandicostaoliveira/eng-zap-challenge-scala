@@ -270,8 +270,8 @@ abstract class Repository extends Model {
     */
   private def databaseSplit(value: String): HashMap[String, String] = {
     if (value.contains(".")) {
-      val a = value.split("\\.")
-      return HashMap("database" -> a(0), "table" -> a(1))
+      val line = value.split("\\.")
+      return HashMap("database" -> line(0), "table" -> line(1))
     }
 
     HashMap("database" -> null, "table" -> value)
