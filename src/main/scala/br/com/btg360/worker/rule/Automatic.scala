@@ -38,38 +38,40 @@ class Automatic extends RuleTrait{
     * @return RDD
     */
   override def getData: RDD[(String, StockEntity)] = {
-
-    println("LIST_ID: " + this.queue.rule.automatics.list)
-    println("FILTER: " + this.queue.rule.automatics.filter)
-    println("FORMAT: " + this.queue.rule.automatics.format)
-    println("ALLIND: " + this.queue.rule.allinId)
-    println("FILTER_ID: " + this.queue.rule.filterId)
-    println("LIST_EXCLUSION_ID: " + this.queue.rule.listExclusionId)
+    var rdd: RDD[(String, StockEntity)] = this.getAutomaticRuleModel.sc.emptyRDD[(String, StockEntity)]
 
     this.queue.ruleName match {
       case Automatic.BIRTHDAY =>
         println("REGRA AUTOMATICA: " + this.queue.ruleName)
+        rdd = this.birthday
 
-        val rdd: RDD[(String, StockEntity)] = this.getAutomaticRuleModel.findBirthday
         rdd.foreach(row => {
-          println(row._1)
+          println("email: " + row._1)
         })
 
       case Automatic.SENDING_DATE =>
         println("REGRA AUTOMATICA: " + this.queue.ruleName)
+        rdd = this.getAutomaticRuleModel.findSendingDate
 
       case Automatic.SENDING_DATE =>
         println("REGRA AUTOMATICA: " + this.queue.ruleName)
+        rdd = this.getAutomaticRuleModel.findInactive
     }
+    rdd
+  }
 
-//    val autoRepository: AutomaticRepository = new AutomaticRepository
-//    autoRepository.testFilter
+  val emailRegex =
+    """^[a-zA-Z0-9\.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"""
+  def birthday: RDD[(String, StockEntity)] = {
+    this.getAutomaticRuleModel.findBirthday.filter(row => row._1.matches(emailRegex))
+  }
 
+  def sendingDate: RDD[(String, StockEntity)] = {
     null
   }
 
-  /**
-    * Other methods
-    */
+  def inactive: RDD[(String, StockEntity)] = {
+    null
+  }
 
 }

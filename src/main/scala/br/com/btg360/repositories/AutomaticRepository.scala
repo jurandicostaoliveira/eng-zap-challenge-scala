@@ -12,9 +12,9 @@ class AutomaticRepository extends Repository {
 
   import String_._
 
-  private val sc = SparkCoreSingleton.getContext
-
   private val db = new MySqlAllin()
+
+  val sc = SparkCoreSingleton.getContext
 
   val periodService: PeriodService = new PeriodService()
 
@@ -93,6 +93,10 @@ class AutomaticRepository extends Repository {
     "emailpro_lista.base_%d_%d".format(this.allinId, this.listExclusionId)
   }
 
+  def getActivityTable: String = {
+    "emailpro_atividade.atividade_%d".format(this.allinId)
+  }
+
   def hasExclusionList(query: String): String = {
     var whereNotIn: String = ""
     if (
@@ -120,7 +124,7 @@ class AutomaticRepository extends Repository {
       "m-d" -> "-MM-dd",
       "d-m" -> "dd-MM-",
       "d/m" -> "dd/MM/",
-      "j/n" -> "j/n/"
+      "j/n" -> "d/M/"
     )
     if (formats(this.formatField).hasValue) formats(this.formatField) else "-MM-dd"
   }
@@ -130,7 +134,7 @@ class AutomaticRepository extends Repository {
       "m-d" -> "yyyy-MM-dd",
       "d-m" -> "dd-MM-yyyy",
       "d/m" -> "dd/mm/yyyy",
-      "j/n" -> "j/n/Y"
+      "j/n" -> "d/M/yyyy"
     )
     if (formats(this.formatField).hasValue) formats(this.formatField) else "yyyy-MM-dd"
   }
@@ -203,8 +207,10 @@ class AutomaticRepository extends Repository {
       if (!this.hasReferenceList) {
         return sc.emptyRDD[(String, StockEntity)]
       }
-      val period = periodService.format(this.getFormatToLike).now
-      //            val period = "-12-07"
+//      val period = periodService.format(this.getFormatToLike).now
+
+        val period = "-12-08"
+
       var query: String =
         s"""
           (SELECT * FROM ${this.getListTable}
@@ -212,7 +218,7 @@ class AutomaticRepository extends Repository {
          """
       query = this.queryFilterAppend(query)
       val df: DataFrame = this.db.sparkRead(query)
-
+      df.show(20)
       this.dfToRDD(df)
     } catch {
       case e: Exception => e.getLocalizedMessage
@@ -245,7 +251,22 @@ class AutomaticRepository extends Repository {
       if (!this.hasReferenceList) {
         return sc.emptyRDD[(String, StockEntity)]
       }
-      null
+
+      val listTable: String = this.getListTable
+      val activityTable: String = this.getActivityTable
+      val period = periodService.format("yyyy-MM-dd").timeByDay(-this.interval)
+
+      var query =
+        s"""
+           (SELECT * FROM ${listTable} as lTable
+           INNER JOIN ${activityTable} as acTable
+           ON acTable.nm_email = lTable.nm_email
+           WHERE
+           acTable.dt_atividade = ${period}
+         """
+      query = this.queryFilterAppend(query)
+      val df: DataFrame = this.db.sparkRead(query)
+      this.dfToRDD(df)
     } catch {
       case e: Exception => e.getLocalizedMessage
         sc.emptyRDD[(String, StockEntity)]
