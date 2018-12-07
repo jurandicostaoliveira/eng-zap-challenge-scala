@@ -35,6 +35,6 @@ object Log4jPrinter extends Serializable {
     *
     * @return Logger
     */
-  def get: Logger = logger
+  def get: Logger = this.logger
 
 }

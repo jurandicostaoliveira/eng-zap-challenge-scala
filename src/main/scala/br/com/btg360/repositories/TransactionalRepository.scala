@@ -1,13 +1,15 @@
 package br.com.btg360.repositories
 
 import br.com.btg360.application.Repository
-import br.com.btg360.constants.Database
-import br.com.btg360.entities.QueueEntity
+import br.com.btg360.constants.{Base64Converter, Database}
+import br.com.btg360.entities.{QueueEntity, StockEntity}
 import br.com.btg360.jdbc.MySqlBtg360
-import scala.util.Random
-import br.com.btg360.services.PeriodService
+import br.com.btg360.services.{JsonService, PeriodService}
+import org.apache.spark.rdd.RDD
 
+import scala.collection.Map
 import scala.collection.mutable.HashMap
+import scala.util.Random
 
 class TransactionalRepository extends Repository {
 
@@ -21,23 +23,23 @@ class TransactionalRepository extends Repository {
 
   private var _transactionalId: Int = 0
 
-  private var _data: List[HashMap[String, Any]] = List(HashMap("id" -> 1, "name" -> "lala"), HashMap("id" -> 2, "name" -> "lele"))
+  private var _data: RDD[(String, StockEntity)] = _
 
   private var queue: QueueEntity = _
 
   //
-  private var userRuleId: Long = 0
-  private var name: String = _
-  private var template: String = _
-  private var configs: HashMap[String, Any] = HashMap()
-  private var subject: String = _
-  private var date: String = _
-  private var senderEmail: String = _
-  private var replyEmail: String = _
-  private var senderName: String = _
-  private var title: String = _
-  private var message: String = _
-  private var urlScheme: String = _
+  //  private var userRuleId: Long = 0
+  //  private var name: String = _
+  //  private var template: String = _
+  //  private var configs: HashMap[String, Any] = HashMap()
+  //  private var subject: String = _
+  //  private var date: String = _
+  //  private var senderEmail: String = _
+  //  private var replyEmail: String = _
+  //  private var senderName: String = _
+  //  private var title: String = _
+  //  private var message: String = _
+  //  private var urlScheme: String = _
 
   /**
     * Getter
@@ -116,7 +118,7 @@ class TransactionalRepository extends Repository {
     *
     * @return
     */
-  def data: List[HashMap[String, Any]] = this._data
+  def data: RDD[(String, StockEntity)] = this._data
 
   /**
     * Setter
@@ -318,28 +320,74 @@ class TransactionalRepository extends Repository {
   }
 
   /**
+    * @param Int templateId
+    * @return HashMap
+    */
+  private def createSendData(user: String, stockEntity: StockEntity, templateId: Int): Map[String, Any] = {
+
+    val entity = new StockEntity(
+      products = stockEntity.products,
+      recommendations = stockEntity.recommendations,
+      references = stockEntity.references,
+      configs = "",
+      email = "",
+      client = "",
+      pixel = "",
+      virtual_mta = ""
+    )
+    Map(
+      "nm_envio" -> "BTG:%s:%s".format(this.queue.ruleName, this.queue.rule.latinName),
+      "nm_subject" -> this.queue.rule.subject,
+      "nm_remetente" -> this.queue.rule.senderName,
+      "email_remetente" -> this.queue.rule.senderEmail,
+      "nm_reply" -> this.queue.rule.replyEmail,
+      "dt_envio" -> new PeriodService("yyyy-MM-dd").now,
+      "hr_envio" -> new PeriodService("HH:mm:ss").now,
+      "nm_titulo" -> this.queue.rule.channelMap(this.queue.channelName).subject,
+      "nm_mensagem" -> this.queue.rule.channelMap(this.queue.channelName).message,
+      "url_scheme" -> this.queue.rule.channelMap(this.queue.channelName).urlScheme,
+      "id_tipo_envio" -> this.typeSend,
+      "id_template" -> templateId,
+      "btg_user_rule_id" -> this.queue.userRuleId,
+
+      //
+      //      'nm_email' => isset($items['email']) ? $this->escape($items['email']) : null,
+      //      'nm_celular' => isset($items['cellPhone']) ? $this->escape($items['cellPhone']) : null,
+      //      'nm_push' => isset($items['pushId']) ? $this->escape($items['pushId']) : null,
+      //      'nm_facebook' => isset($items['facebookId']) ? $this->escape($items['facebookId']) : null,
+      "valor_json" -> new JsonService().encode(entity)
+    )
+  }
+
+  /**
     * Persist send data
     */
-  def saveSend: Unit = {
-    val table = this.generateSendTable
-    var limiter: Int = 0
-    var totalizator: Int = 0
-    val total: Int = data.size
-    var queries: List[String] = List()
+  def saveSend(templateId: Int): Unit = {
+    try {
+      val dataset = this.createSendData(templateId)
+      val table = this.generateSendTable
+      var limiter: Int = 0
+      var totalizator: Int = 0
+      val total: Long = this.data.count
+      var queries: List[String] = List()
 
-    data.foreach(row => {
-      val strValues = "'%s'".format(row.values.mkString("','"))
-      val query = s"INSERT IGNORE INTO ${table} (${row.keys.mkString(",")}) VALUES (${strValues});"
-      queries = queries :+ query
-      limiter += 1
-      totalizator += 1
-
-      if (limiter >= this.batchLimit || totalizator >= total) {
-        this.connection(this.db).insertQueryBatch(queries)
-        queries = List()
-        limiter = 0
-      }
-    })
+      this.data.foreach(row => {
+        println(row._1)
+        //        val strValues = "'%s'".format(row.values.mkString("','"))
+        //        val query = s"INSERT IGNORE INTO ${table} (${row.keys.mkString(",")}) VALUES (${strValues});"
+        //        queries = queries :+ query
+        //        limiter += 1
+        //        totalizator += 1
+        //
+        //        if (limiter >= this.batchLimit || totalizator >= total) {
+        //          this.connection(this.db).insertQueryBatch(queries)
+        //          queries = List()
+        //          limiter = 0
+        //        }
+      })
+    } catch {
+      case e: Exception => println(e.printStackTrace())
+    }
   }
 
 }

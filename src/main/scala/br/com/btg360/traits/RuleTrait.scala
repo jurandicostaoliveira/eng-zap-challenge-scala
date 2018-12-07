@@ -2,14 +2,14 @@ package br.com.btg360.traits
 
 import br.com.btg360.constants._
 import br.com.btg360.entities.{QueueEntity, StockEntity}
-import br.com.btg360.logger.{Log4jPrinter, Printer}
+import br.com.btg360.logger.Log4jPrinter
 import br.com.btg360.repositories.{ConsolidatedRepository, QueueRepository}
 import br.com.btg360.services.{Port25Service, _}
 import org.apache.spark.rdd.RDD
 
 import scala.util.control.Breaks._
 
-trait RuleTrait extends Serializable {
+trait RuleTrait extends Application {
 
   protected var queue: QueueEntity = _
 
@@ -170,15 +170,10 @@ trait RuleTrait extends Serializable {
       return
     }
 
-    data = this.filter(data)
-    data = this.apply(data)
-    data.foreach(row => {
-//      println(row._1 + " -> " + new JsonService().encode(row._2))
-//      println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-      Log4jPrinter.get.warn(row._1 + " -> " + new JsonService().encode(row._2))
-      Log4jPrinter.get.warn(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-    })
-
+    new TransactionalService(
+      this.queue,
+      this.apply(this.filter(data))
+    ).persist
     this.queueRepository.updateStatus(this.queue.userRuleId.toInt, this.getCompletedStatus)
   }
 
