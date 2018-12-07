@@ -9,7 +9,7 @@ import br.com.btg360.traits.RuleTrait
 import org.apache.commons.validator.EmailValidator
 import org.apache.spark.rdd.RDD
 
-class Automatic extends Application with RuleTrait {
+class Automatic extends RuleTrait {
   /**
     * @return List[Int]
     */
