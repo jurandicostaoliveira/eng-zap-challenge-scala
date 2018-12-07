@@ -8,7 +8,7 @@ import com.datastax.driver.core.Session
 import com.datastax.spark.connector.cql.CassandraConnector
 import org.apache.spark.{SparkConf, SparkContext}
 
-object SparkCoreSingleton {
+object SparkCoreSingleton extends Serializable {
 
   private var sparkContext: SparkContext = _
 

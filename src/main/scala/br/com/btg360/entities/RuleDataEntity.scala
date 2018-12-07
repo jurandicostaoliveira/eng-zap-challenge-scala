@@ -1,6 +1,8 @@
 package br.com.btg360.entities
 
+import br.com.btg360.application.Entity
 import br.com.btg360.constants.Channel
+
 import scala.collection.mutable.Map
 import br.com.btg360.constants.{TypeConverter => TC}
 
@@ -121,7 +123,7 @@ case class RuleDataEntity(
                            automatics: RuleDataRaw.Automatics,
                            rule: RuleDataRaw.Rule,
                            account: RuleDataRaw.Account
-                         ) {
+                         ) extends Entity {
 
   var name = TC.toString(rule.alias)
   var latinName = TC.toString(configs.ruleName)

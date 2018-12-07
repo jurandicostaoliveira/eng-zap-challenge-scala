@@ -3,8 +3,8 @@ package br.com.btg360.entities
 import br.com.btg360.application.Entity
 import br.com.btg360.services.UrlService
 
-import scala.collection.mutable.HashMap
 import scala.collection.Map
+import scala.collection.mutable.HashMap
 
 case class StockEntity(
                         products: List[HashMap[String, Any]] = List(),
@@ -27,10 +27,8 @@ case class StockEntity(
     * @return
     */
   def toMap(
-             queue: QueueEntity,
              consolidated: ConsolidatedEntity,
-             product: ProductEntity,
-             position: Int = 0
+             product: ProductEntity
            ): HashMap[String, Any] = {
     HashMap(
       "userId" -> consolidated.userId,
@@ -79,13 +77,7 @@ case class StockEntity(
       "priceByNum" -> product.priceByNum,
       "productDesc" -> product.productName, //Hack .: productDesc
       "productGroupId" -> product.productGroupId,
-      "productLink" -> new UrlService().redirect(
-        queue,
-        product.productLink,
-        product.productId,
-        consolidated.isRecommendation,
-        position
-      ),
+      "productLink" -> product.productLink,
       "productName" -> product.productName,
       "quantity" -> product.quantity,
       "state" -> product.state,

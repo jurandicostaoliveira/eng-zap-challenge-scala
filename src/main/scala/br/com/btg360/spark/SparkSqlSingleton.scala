@@ -2,7 +2,7 @@ package br.com.btg360.spark
 
 import org.apache.spark.sql.SQLContext
 
-object SparkSqlSingleton {
+object SparkSqlSingleton extends Serializable {
 
   private var sqlContext: SQLContext = _
 

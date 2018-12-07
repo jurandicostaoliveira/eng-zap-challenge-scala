@@ -6,9 +6,10 @@ import br.com.btg360.entities.StockEntity
 import br.com.btg360.repositories.AutomaticRepository
 import br.com.btg360.services.AutomaticService
 import br.com.btg360.traits.RuleTrait
+import org.apache.commons.validator.EmailValidator
 import org.apache.spark.rdd.RDD
 
-class Automatic extends RuleTrait{
+class Automatic extends Application with RuleTrait {
   /**
     * @return List[Int]
     */
@@ -45,33 +46,32 @@ class Automatic extends RuleTrait{
         println("REGRA AUTOMATICA: " + this.queue.ruleName)
         rdd = this.birthday
 
-        rdd.foreach(row => {
-          println("email: " + row._1)
-        })
+      case Automatic.SENDING_DATE =>
+        println("REGRA AUTOMATICA: " + this.queue.ruleName)
+        rdd = this.sendingDate
 
       case Automatic.SENDING_DATE =>
         println("REGRA AUTOMATICA: " + this.queue.ruleName)
-        rdd = this.getAutomaticRuleModel.findSendingDate
-
-      case Automatic.SENDING_DATE =>
-        println("REGRA AUTOMATICA: " + this.queue.ruleName)
-        rdd = this.getAutomaticRuleModel.findInactive
+        rdd = this.inactive
     }
     rdd
   }
 
-  val emailRegex =
-    """^[a-zA-Z0-9\.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"""
   def birthday: RDD[(String, StockEntity)] = {
-    this.getAutomaticRuleModel.findBirthday.filter(row => row._1.matches(emailRegex))
+    this.getAutomaticRuleModel.findBirthday.filter(row => {
+      EmailValidator.getInstance().isValid(row._1)
+    })
   }
 
   def sendingDate: RDD[(String, StockEntity)] = {
-    null
+    this.getAutomaticRuleModel.findSendingDate.filter(row => {
+      EmailValidator.getInstance().isValid(row._1)
+    })
   }
 
   def inactive: RDD[(String, StockEntity)] = {
-    null
+    this.getAutomaticRuleModel.findInactive.filter(row => {
+      EmailValidator.getInstance().isValid(row._1)
+    })
   }
-
 }

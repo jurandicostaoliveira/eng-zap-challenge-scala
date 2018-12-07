@@ -207,9 +207,7 @@ class AutomaticRepository extends Repository {
       if (!this.hasReferenceList) {
         return sc.emptyRDD[(String, StockEntity)]
       }
-//      val period = periodService.format(this.getFormatToLike).now
-
-        val period = "-12-08"
+      val period = periodService.format(this.getFormatToLike).now
 
       var query: String =
         s"""
@@ -277,7 +275,7 @@ class AutomaticRepository extends Repository {
     df.rdd.map(row => {
       val map = row.schema.fieldNames.map(field => field -> row.getAs[Any](field)).toMap
       val stockEntity = new StockEntity(references = map)
-      (row.getAs("nm_email"), stockEntity)
+      (row.getAs("nm_email").toString.trim, stockEntity)
     })
   }
 

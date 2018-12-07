@@ -1,6 +1,7 @@
 package br.com.btg360.services
 
-import br.com.btg360.constants.{Channel, Message}
+import br.com.btg360.application.Service
+import br.com.btg360.constants.{Message, TypeConverter => TC}
 import br.com.btg360.entities._
 import br.com.btg360.repositories.{ConsolidatedRepository, ProductRepository}
 import br.com.btg360.spark.SparkCoreSingleton
@@ -8,7 +9,7 @@ import org.apache.spark.rdd.RDD
 
 import scala.collection.mutable.HashMap
 
-class DataMapperService(queue: QueueEntity) {
+class DataMapperService(queue: QueueEntity) extends Service with Serializable {
 
   /**
     * Return all consolidated data
@@ -16,7 +17,16 @@ class DataMapperService(queue: QueueEntity) {
     * @return RDD
     */
   private def consolidatedData: RDD[(Any, ConsolidatedEntity)] = {
-    new ConsolidatedRepository().table(this.queue.getConsolidatedTable).findAllKeyBy(
+    val repository = new ConsolidatedRepository()
+    val table = this.queue.getConsolidatedTable
+    println(Message.CONSOLIDATED_TABLE_NAME.format(table))
+
+    if (!repository.tableExists(table)) {
+      println(Message.CONSOLIDATED_TABLE_NOT_FOUND.format(table))
+      return SparkCoreSingleton.getContext.emptyRDD[(Any, ConsolidatedEntity)]
+    }
+
+    repository.table(table).findAllKeyBy(
       entity => (entity.productId, entity)
     )
   }
@@ -27,7 +37,9 @@ class DataMapperService(queue: QueueEntity) {
     * @return RDD
     */
   private def productData: RDD[(Any, ProductEntity)] = {
-    new ProductRepository().table(this.queue.getProductTable).findAllKeyBy(
+    val table = this.queue.getProductTable
+    println(Message.PRODUCT_TABLE_NAME.format(table))
+    new ProductRepository().table(table).findAllKeyBy(
       entity => (entity.productId, entity)
     )
   }
@@ -38,23 +50,9 @@ class DataMapperService(queue: QueueEntity) {
     * @return
     */
   private def join: RDD[(String, HashMap[String, Any])] = {
-    val positions: HashMap[String, Int] = HashMap()
-    val data = this.consolidatedData.join(this.productData).map(row => {
-      val key = "%s-%d".format(row._2._1.userSent, row._2._1.isRecommendation)
-      positions(key) = if (positions.contains(key)) positions(key) else 0
-      val tuple = (row._2._1.userSent, new StockEntity().toMap(
-        this.queue,
-        row._2._1,
-        row._2._2,
-        positions(key)
-      ))
-
-      positions(key) += 1
-      tuple
+    this.consolidatedData.join(this.productData).map(row => {
+      (row._2._1.userSent, new StockEntity().toMap(row._2._1, row._2._2))
     })
-
-    positions.clear()
-    data
   }
 
   /**
@@ -62,47 +60,38 @@ class DataMapperService(queue: QueueEntity) {
     *
     * @return
     */
-  private def group: RDD[(String, StockEntity)] = {
-    this.join.groupByKey().map(rows => {
-      var products: List[HashMap[String, Any]] = List()
-      var recommendations: List[HashMap[String, Any]] = List()
-
-      rows._2.foreach(row => {
-        if (row("isRecommendation").equals(1)) {
-          recommendations = recommendations :+ row
-        } else {
-          products = products :+ row
-        }
-      })
-
-      (rows._1, new StockEntity(products = products, recommendations = recommendations))
-    })
-  }
-
-  /**
-    * Return filtered data
-    *
-    * @return RDD
-    */
   def get: RDD[(String, StockEntity)] = {
     try {
-      val data = this.group
-      println(Message.TOTAL_ITEMS_FOUND.format(data.count()))
+      val data = this.join.groupByKey().map(rows => {
+        var products: List[HashMap[String, Any]] = List()
+        var recommendations: List[HashMap[String, Any]] = List()
+        var position: Int = 0
 
-      var filters = new DailySendLimitService(this.queue).filter(data.keys)
-      println(Message.TOTAL_DAILY_LIMIT_REMOVED.format(filters.count()))
+        rows._2.foreach(row => {
+          row("productLink") = new UrlService().redirect(
+            this.queue,
+            TC.toString(row("productLink")),
+            TC.toString(row("productId")),
+            TC.toInt(row("isRecommendation")),
+            position
+          )
 
-      if (Channel.isEmail(this.queue.channelName)) {
-        filters = new OptoutService(this.queue).filter(filters)
-        println(Message.TOTAL_OPTOUT_REMOVED.format(filters.count()))
-      }
+          if (row("isRecommendation").equals(1)) {
+            recommendations = recommendations :+ row
+          } else {
+            products = products :+ row
+          }
+          position += 1
+        })
 
-      filters.map(key => (key, 0)).join(data).map(row => {
-        (row._1, row._2._2)
+        (rows._1, new StockEntity(products, recommendations))
       })
+
+      println(Message.TOTAL_ITEMS_FOUND.format(data.count()))
+      data
     } catch {
-      case e: Exception => println(e.getLocalizedMessage)
-        SparkCoreSingleton.getContext.emptyRDD
+      case e: Exception => println(e.printStackTrace())
+        SparkCoreSingleton.getContext.emptyRDD[(String, StockEntity)]
     }
   }
 

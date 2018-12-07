@@ -1,16 +1,19 @@
 package br.com.btg360.application
 
-import java.sql.{Connection, ResultSet}
+import java.sql.{Connection, ResultSet, SQLException}
 
 import br.com.btg360.constants.{TypeConverter => TC}
 import br.com.btg360.jdbc.MySqlBtg360
 
 import scala.collection.immutable.List
+import scala.collection.mutable.HashMap
 
 
 abstract class Repository extends Model {
 
   private var dbConnection: Connection = this.invoke(classOf[MySqlBtg360]).open
+
+  private var where: String = ""
 
   /**
     *
@@ -23,12 +26,27 @@ abstract class Repository extends Model {
   }
 
   /**
-    *
     * @param query
     * @return
     */
   def queryExecutor(query: String): ResultSet = {
-    this.dbConnection.createStatement().executeQuery(query)
+    try {
+      this.dbConnection.createStatement().executeQuery(query)
+    } catch {
+      case e: SQLException => println(e.getErrorCode + ": " + e.getMessage)
+        null
+    }
+  }
+
+  /**
+    * @param String query
+    */
+  def ddlExecutor(query: String): Unit = {
+    try {
+      this.dbConnection.createStatement().executeUpdate(query)
+    } catch {
+      case e: SQLException => println(e.getStackTrace)
+    }
   }
 
   /**
@@ -66,7 +84,7 @@ abstract class Repository extends Model {
       resultSet.close()
       list
     } catch {
-      case e: Exception => println(e.printStackTrace())
+      case e: SQLException => println(e.printStackTrace())
         list
     }
   }
@@ -83,7 +101,7 @@ abstract class Repository extends Model {
       resultSet.close()
       total
     } catch {
-      case e: Exception => println(e.printStackTrace())
+      case e: SQLException => println(e.printStackTrace())
         0
     }
   }
@@ -165,6 +183,69 @@ abstract class Repository extends Model {
   }
 
   /**
+    * @param table
+    * @param data
+    * @return
+    */
+  def insertGetId(table: String, data: HashMap[String, Any]): Int = {
+    try {
+      val strFields: String = data.keys.mkString(",")
+      val strValues: String = List.fill(data.size)("?").mkString(",")
+      val query = s"INSERT INTO $table ($strFields) VALUES ($strValues);"
+      val stmt = this.dbConnection.prepareStatement(query)
+      var index = 1
+
+      for (value <- data.values) {
+        if (value == null) stmt.setNull(index, 0) else stmt.setObject(index, value)
+        index += 1
+      }
+
+      stmt.executeUpdate()
+      val keys = stmt.getGeneratedKeys
+      keys.next()
+      val key = keys.getInt(1)
+      stmt.close()
+      key
+    } catch {
+      case e: SQLException => println(e.printStackTrace())
+        0
+    }
+  }
+
+  /**
+    * Insert multiple data
+    *
+    * @param String  table
+    * @param List    data
+    * @param Boolean ignore
+    */
+  def insertBatch(table: String, data: List[HashMap[String, Any]], ignore: Boolean = false): Unit = {
+    try {
+      if (data.size <= 0) return
+
+      val onIgnore = if (ignore) "IGNORE" else ""
+      val strValues: String = List.fill(data.head.size)("?").mkString(",")
+      val query = s"INSERT $onIgnore INTO $table (${data.head.keys.mkString(",")}) VALUES ($strValues);"
+      val stmt = this.dbConnection.prepareStatement(query)
+
+      data.foreach(row => {
+        var index = 1
+        for (value <- row.values) {
+          if (value == null) stmt.setNull(index, 0) else stmt.setObject(index, value)
+          index += 1
+        }
+        stmt.addBatch()
+      })
+
+      stmt.executeBatch()
+      stmt.close()
+    } catch {
+      case e: SQLException => println(e.printStackTrace())
+    }
+  }
+
+
+  /**
     * Insert multiple queries
     *
     * @param List queries
@@ -180,6 +261,110 @@ abstract class Repository extends Model {
       stmt.close()
     } catch {
       case e: Exception => println(e.printStackTrace())
+    }
+  }
+
+  /**
+    * @param String value
+    * @return HashMap
+    */
+  private def databaseSplit(value: String): HashMap[String, String] = {
+    if (value.contains(".")) {
+      val line = value.split("\\.")
+      return HashMap("database" -> line(0), "table" -> line(1))
+    }
+
+    HashMap("database" -> null, "table" -> value)
+  }
+
+  /**
+    * Check if a table exists
+    *
+    * @param String database
+    * @param String table
+    * @return Boolean
+    */
+  def tableExists(table: String): Boolean = {
+    val row = this.databaseSplit(table)
+    this.dbConnection.getMetaData.getTables(row("database"), null, row("table"), null).next()
+  }
+
+  /**
+    * Check if a column exists in table
+    *
+    * @param String database
+    * @param String table
+    * @param String column
+    * @return Boolean
+    */
+  def columnExists(table: String, column: String): Boolean = {
+    val row = this.databaseSplit(table)
+    this.dbConnection.getMetaData.getColumns(row("database"), null, row("table"), column).next()
+  }
+
+  /**
+    * @param String column
+    * @param String condition
+    * @param Any    value
+    * @return this
+    */
+  def whereAnd(column: String, condition: String, value: Any): Repository = {
+    this.onWhere(column, condition, value, "AND")
+    this
+  }
+
+  /**
+    * @param String column
+    * @param String condition
+    * @param Any    value
+    * @return this
+    */
+  def whereOr(column: String, condition: String, value: Any): Repository = {
+    this.onWhere(column, condition, value, "OR")
+    this
+  }
+
+  /**
+    * @param String column
+    * @param String condition
+    * @param Any    value
+    * @param String clause
+    * @return this
+    */
+  private def onWhere(column: String, condition: String, value: Any, clause: String) = {
+    val onClause = if (this.where.isEmpty) "" else clause
+    this.where += s""" ${onClause} ${column} ${condition} '${value}'"""
+  }
+
+  /**
+    * Update from collection data
+    *
+    * @param String  table
+    * @param HashMap collection
+    */
+  def update(table: String, data: HashMap[String, Any]): Unit = {
+    try {
+      var columns: List[String] = List()
+      for (key <- data.keys) {
+        columns = columns :+ "%s=?".format(key)
+      }
+
+      var query = s"""UPDATE ${table} SET ${columns.mkString(",")}"""
+      if (!this.where.isEmpty) {
+        query += " WHERE %s".format(this.where.trim)
+        this.where = ""
+      }
+
+      val stmt = this.dbConnection.prepareStatement(query.concat(";"))
+      var index = 1
+      for (value <- data.values) {
+        if (value == null) stmt.setNull(index, 0) else stmt.setObject(index, value)
+        index += 1
+      }
+      stmt.executeUpdate()
+      stmt.close()
+    } catch {
+      case e: SQLException => println(e.printStackTrace())
     }
   }
 

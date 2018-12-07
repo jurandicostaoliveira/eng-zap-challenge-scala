@@ -24,9 +24,8 @@ class Daily extends RuleTrait {
       return this.automatic
     }
 
-    //    val dataStockService = new DataStockService(this.queue)
-    //    dataStockService.get
-    this.test
+    val dataMapperService = new DataMapperService(this.queue)
+    dataMapperService.get
   }
 
   private def automatic: RDD[(String, StockEntity)] = {
@@ -49,7 +48,7 @@ class Daily extends RuleTrait {
     *
     * @return
     */
-  private def test: RDD[(String, StockEntity)] = {
+  /*private def test: RDD[(String, StockEntity)] = {
 
     val c1 = new ConsolidatedEntity()
     c1.userSent = "paula@hotmail.com"
@@ -114,6 +113,6 @@ class Daily extends RuleTrait {
     })
 
     data
-  }
+  }*/
 
 }
