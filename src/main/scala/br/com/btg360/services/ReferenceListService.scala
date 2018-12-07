@@ -15,7 +15,7 @@ class ReferenceListService extends Service {
     * @param QueueEntity queue
     * @return Boolean
     */
-  private def exists(listId: Int): Boolean = {
+  def exists(listId: Int): Boolean = {
     try {
       val data = this.repository.listId(listId).findSettings
       if (data == null || !data.next()) {
@@ -54,7 +54,10 @@ class ReferenceListService extends Service {
       data.leftOuterJoin(list).map(row => {
         var item = row._2._1
         if (row._2._2.isDefined) {
-          item = new StockEntity(item.products, item.recommendations, row._2._2.get)
+          item = new StockEntity(
+            products = item.products,
+            recommendations = item.recommendations,
+            references = row._2._2.get)
         }
         (row._1, item)
       })

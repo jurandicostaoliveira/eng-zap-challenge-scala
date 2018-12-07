@@ -161,5 +161,4 @@ abstract class AbstractJDBCManager extends Serializable {
         null
     }
   }
-
 }
