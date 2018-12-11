@@ -1,13 +1,12 @@
 package br.com.btg360.repositories
 
 import br.com.btg360.application.Repository
-import br.com.btg360.constants.{Base64Converter, Database}
+import br.com.btg360.constants.{Base64Converter, Channel, Database, Url, TypeConverter => TC}
 import br.com.btg360.entities.{QueueEntity, StockEntity}
 import br.com.btg360.jdbc.MySqlBtg360
 import br.com.btg360.services.{JsonService, PeriodService}
 import org.apache.spark.rdd.RDD
 
-import scala.collection.Map
 import scala.collection.mutable.HashMap
 import scala.util.Random
 
@@ -17,29 +16,11 @@ class TransactionalRepository extends Repository {
 
   private var _batchLimit: Int = 10000
 
-  private var _typeSend: Int = 1
-
-  private var _allinId: Int = 0
-
-  private var _transactionalId: Int = 0
+  private var _queue: QueueEntity = _
 
   private var _data: RDD[(String, StockEntity)] = _
 
-  private var queue: QueueEntity = _
-
-  //
-  //  private var userRuleId: Long = 0
-  //  private var name: String = _
-  //  private var template: String = _
-  //  private var configs: HashMap[String, Any] = HashMap()
-  //  private var subject: String = _
-  //  private var date: String = _
-  //  private var senderEmail: String = _
-  //  private var replyEmail: String = _
-  //  private var senderName: String = _
-  //  private var title: String = _
-  //  private var message: String = _
-  //  private var urlScheme: String = _
+  private var _templateId: Int = 0
 
   /**
     * Getter
@@ -62,72 +43,54 @@ class TransactionalRepository extends Repository {
   /**
     * Getter
     *
-    * @return
+    * @return QueueEntity
     */
-  def typeSend: Int = this._typeSend
+  def queue: QueueEntity = this._queue
 
   /**
     * Setter
     *
-    * @param Int value
+    * @param QueueEntity value
     * @return this
     */
-  def typeSend(value: Int): TransactionalRepository = {
-    this._typeSend = value
+  def queue(value: QueueEntity): TransactionalRepository = {
+    this._queue = value
     this
   }
 
   /**
     * Getter
     *
-    * @return
-    */
-  def allinId: Int = this._allinId
-
-  /**
-    * Setter
-    *
-    * @param Int value
-    * @return this
-    */
-  def allinId(value: Int): TransactionalRepository = {
-    this._allinId = value
-    this
-  }
-
-  /**
-    * Getter
-    *
-    * @return
-    */
-  def transactionalId: Int = this._transactionalId
-
-  /**
-    * Setter
-    *
-    * @param Int value
-    * @return this
-    */
-  def transactionalId(value: Int): TransactionalRepository = {
-    this._transactionalId = value
-    this
-  }
-
-  /**
-    * Getter
-    *
-    * @return
+    * @return RDD
     */
   def data: RDD[(String, StockEntity)] = this._data
 
   /**
     * Setter
     *
+    * @param RDD value
+    * @return this
+    */
+  def data(value: RDD[(String, StockEntity)]): TransactionalRepository = {
+    this._data = value
+    this
+  }
+
+  /**
+    * Getter
+    *
+    * @return Int
+    */
+  def templateId: Int = this._templateId
+
+  /**
+    * Setter
+    *
     * @param Int value
     * @return this
     */
-  def data(value: List[HashMap[String, Any]]): TransactionalRepository = {
-    this._data = value
+  def templateId(value: Int): TransactionalRepository = {
+    this._templateId = value
     this
   }
 
@@ -146,21 +109,21 @@ class TransactionalRepository extends Repository {
     * @return String
     */
   private def generateSendTable: String = {
-    "%s.cor_envio_trans_%d_%s".format(Database.POSTMATIC, this.transactionalId, this.currentMonth)
+    "%s.cor_envio_trans_%d_%s".format(Database.POSTMATIC, this.queue.rule.transactionalId, this.currentMonth)
   }
 
   /**
     * @return String
     */
   private def generateClickTable: String = {
-    "%s.clique_%s_%s".format(Database.POSTMATIC, this.transactionalId, this.currentMonth)
+    "%s.clique_%s_%s".format(Database.POSTMATIC, this.queue.rule.transactionalId, this.currentMonth)
   }
 
   /**
     * @return String
     */
   private def generateTemplateTable: String = {
-    "%s.cor_template_%s".format(Database.POSTMATIC, this.transactionalId)
+    "%s.cor_template_%s".format(Database.POSTMATIC, this.queue.rule.transactionalId)
   }
 
   /**
@@ -299,7 +262,7 @@ class TransactionalRepository extends Repository {
     */
   def updateLastSend: Unit = {
     this.connection(this.db)
-      .whereAnd("id_allinmail", "=", this.allinId)
+      .whereAnd("id_allinmail", "=", this.queue.rule.allinId)
       .update(this.generateLoginTable, HashMap("dt_ult_envio" -> this.now()))
   }
 
@@ -321,20 +284,11 @@ class TransactionalRepository extends Repository {
 
   /**
     * @param Int templateId
-    * @return HashMap
+    * @return Map
     */
-  private def createSendData(user: String, stockEntity: StockEntity, templateId: Int): Map[String, Any] = {
-
-    val entity = new StockEntity(
-      products = stockEntity.products,
-      recommendations = stockEntity.recommendations,
-      references = stockEntity.references,
-      configs = "",
-      email = "",
-      client = "",
-      pixel = "",
-      virtual_mta = ""
-    )
+  private def createSendData(user: String, stock: StockEntity): Map[String, Any] = {
+    val channelMap = this.queue.rule.channelMap
+    val client = Base64Converter.encode(user)
     Map(
       "nm_envio" -> "BTG:%s:%s".format(this.queue.ruleName, this.queue.rule.latinName),
       "nm_subject" -> this.queue.rule.subject,
@@ -343,47 +297,69 @@ class TransactionalRepository extends Repository {
       "nm_reply" -> this.queue.rule.replyEmail,
       "dt_envio" -> new PeriodService("yyyy-MM-dd").now,
       "hr_envio" -> new PeriodService("HH:mm:ss").now,
-      "nm_titulo" -> this.queue.rule.channelMap(this.queue.channelName).subject,
-      "nm_mensagem" -> this.queue.rule.channelMap(this.queue.channelName).message,
-      "url_scheme" -> this.queue.rule.channelMap(this.queue.channelName).urlScheme,
-      "id_tipo_envio" -> this.typeSend,
-      "id_template" -> templateId,
+      "nm_titulo" -> TC.toString(channelMap(this.queue.channelName).subject),
+      "nm_mensagem" -> TC.toString(channelMap(this.queue.channelName).message),
+      "url_scheme" -> TC.toString(channelMap(this.queue.channelName).urlScheme),
+      "id_tipo_envio" -> Channel.all(this.queue.channelName),
+      "id_template" -> this.templateId,
       "btg_user_rule_id" -> this.queue.userRuleId,
-
-      //
-      //      'nm_email' => isset($items['email']) ? $this->escape($items['email']) : null,
-      //      'nm_celular' => isset($items['cellPhone']) ? $this->escape($items['cellPhone']) : null,
-      //      'nm_push' => isset($items['pushId']) ? $this->escape($items['pushId']) : null,
-      //      'nm_facebook' => isset($items['facebookId']) ? $this->escape($items['facebookId']) : null,
-      "valor_json" -> new JsonService().encode(entity)
+      "nm_email" -> this.fillUser(user, List(Channel.EMAIL)),
+      "nm_celular" -> this.fillUser(user, List(Channel.SMS)),
+      "nm_push" -> this.fillUser(user, List(Channel.PUSH_ANDROID, Channel.PUSH_IOS)),
+      "nm_facebook" -> this.fillUser(user, List(Channel.FACEBOOK)),
+      "valor_json" -> new JsonService().encode(new StockEntity(
+        products = stock.products,
+        recommendations = stock.recommendations,
+        references = stock.references,
+        configs = "",
+        email = user,
+        client = client,
+        pixel = "%s?client=%s&userId=%d&userRuleId=%d&timestamp=%d".format(
+          Url.PIXEL_VIEW,
+          client,
+          this.queue.userId,
+          this.queue.userRuleId,
+          this.queue.deliveryTimestamp
+        ),
+        virtual_mta = this.queue.vmta
+      ))
     )
+  }
+
+  /**
+    * @param List   channels
+    * @param String user
+    * @return String
+    */
+  private def fillUser(user: String, channels: List[String]): String = {
+    if (channels.contains(this.queue.channelName)) {
+      return user
+    }
+    TC.VOID
   }
 
   /**
     * Persist send data
     */
-  def saveSend(templateId: Int): Unit = {
+  def saveSend: Unit = {
     try {
-      val dataset = this.createSendData(templateId)
       val table = this.generateSendTable
       var limiter: Int = 0
       var totalizator: Int = 0
       val total: Long = this.data.count
       var queries: List[String] = List()
 
-      this.data.foreach(row => {
-        println(row._1)
-        //        val strValues = "'%s'".format(row.values.mkString("','"))
-        //        val query = s"INSERT IGNORE INTO ${table} (${row.keys.mkString(",")}) VALUES (${strValues});"
-        //        queries = queries :+ query
-        //        limiter += 1
-        //        totalizator += 1
-        //
-        //        if (limiter >= this.batchLimit || totalizator >= total) {
-        //          this.connection(this.db).insertQueryBatch(queries)
-        //          queries = List()
-        //          limiter = 0
-        //        }
+      this.data.collect().foreach(row => {
+        val data = this.createSendData(row._1, row._2)
+        val values = "'%s'".format(data.values.mkString("','"))
+        queries = queries :+ s"INSERT IGNORE INTO ${table} (${data.keys.mkString(",")}) VALUES (${values});"
+        limiter += 1
+        totalizator += 1
+        if (limiter >= this.batchLimit || totalizator >= total) {
+          this.connection(this.db).insertQueryBatch(queries)
+          queries = List()
+          limiter = 0
+        }
       })
     } catch {
       case e: Exception => println(e.printStackTrace())

@@ -1,7 +1,6 @@
 package br.com.btg360.entities
 
 import br.com.btg360.application.Entity
-import br.com.btg360.services.UrlService
 
 import scala.collection.Map
 import scala.collection.mutable.HashMap

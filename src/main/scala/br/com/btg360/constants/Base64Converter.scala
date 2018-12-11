@@ -2,7 +2,7 @@ package br.com.btg360.constants
 
 import java.util.Base64
 
-object Base64Converter {
+object Base64Converter extends Serializable {
 
   val US_ASCII: String = "US-ASCII"
   val ISO_8859_1: String = "ISO-8859-1"

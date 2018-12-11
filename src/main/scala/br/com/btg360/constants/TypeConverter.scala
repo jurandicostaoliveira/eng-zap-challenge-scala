@@ -2,6 +2,10 @@ package br.com.btg360.constants
 
 object TypeConverter {
 
+  val VOID: String = ""
+
+  val ZERO: Int = 0
+
   /**
     * Validate field cases comes with none and returns the default value
     *
@@ -22,7 +26,7 @@ object TypeConverter {
     * @return String
     */
   def toString(value: Any): String = {
-    this.noneTo(value, "")
+    this.noneTo(value, this.VOID)
   }
 
   /**
@@ -30,7 +34,7 @@ object TypeConverter {
     * @return Int
     */
   def toInt(value: Any): Int = {
-    this.noneTo(value, 0).toInt
+    this.noneTo(value, this.ZERO).toInt
   }
 
   /**
@@ -38,7 +42,7 @@ object TypeConverter {
     * @return Double
     */
   def toDouble(value: Any): Double = {
-    this.noneTo(value, 0).toDouble
+    this.noneTo(value, this.ZERO).toDouble
   }
 
   /**
@@ -46,7 +50,7 @@ object TypeConverter {
     * @return Double
     */
   def toFloat(value: Any): Float = {
-    this.noneTo(value, 0).toFloat
+    this.noneTo(value, this.ZERO).toFloat
   }
 
   /**

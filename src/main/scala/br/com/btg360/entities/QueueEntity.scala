@@ -3,7 +3,6 @@ package br.com.btg360.entities
 import br.com.btg360.application.Entity
 import br.com.btg360.constants.{Channel, Database, Rule, TypeConverter => TC}
 import br.com.btg360.services.{JsonService, PeriodService}
-import org.apache.log4j.Logger
 
 class QueueEntity extends Entity {
 
@@ -37,8 +36,6 @@ class QueueEntity extends Entity {
   var deliveryAt: String = _
   var deliveryTimestamp: Long = 0
   var utmLink: String = _
-
-  var logger: Logger = _
 
   /**
     * Parsed the rule configuration data

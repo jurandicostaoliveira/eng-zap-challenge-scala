@@ -1,23 +1,34 @@
 package br.com.btg360.services
 
 import br.com.btg360.application.Service
+import br.com.btg360.constants.Message
 import br.com.btg360.entities.{QueueEntity, StockEntity}
-import br.com.btg360.logger.Log4jPrinter
 import br.com.btg360.repositories.TransactionalRepository
 import org.apache.spark.rdd.RDD
 
-class TransactionalService(
-                            queue: QueueEntity,
-                            data: RDD[(String, StockEntity)]
-                          ) extends Service {
+class TransactionalService() extends Service {
 
   private val repository = new TransactionalRepository()
 
-  def persist: Unit = {
-    this.data.foreach(row => {
-      Log4jPrinter.get.warn(row._1 + " -> " + new JsonService().encode(row._2))
-      Log4jPrinter.get.warn(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-    })
+  /**
+    * @param QueueEntity queue
+    * @param RDD data
+    */
+  def persist(queue: QueueEntity, data: RDD[(String, StockEntity)]): Unit = {
+    try {
+      queue.rule.transactionalId = 1111
+      this.repository
+        .queue(queue)
+        .data(data)
+        .templateId(0)
+        .createSendTable
+        .saveSend
+
+      println(Message.TRANSACTIONAL_SUCCESS)
+    } catch {
+      case e: Exception => println(e.printStackTrace())
+        println(Message.TRANSACTIONAL_ERROR)
+    }
   }
 
 }

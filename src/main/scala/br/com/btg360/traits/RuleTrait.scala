@@ -162,7 +162,7 @@ trait RuleTrait extends Application {
     */
   private def all: Unit = {
     this.queueRepository.updateStatus(this.queue.userRuleId.toInt, QueueStatus.PROCESSED)
-    var data = this.getData
+    val data = this.getData
 
     if (data == null || data.count() <= 0) {
       this.queueRepository.updateStatus(this.queue.userRuleId.toInt, this.getCompletedStatus)
@@ -170,10 +170,7 @@ trait RuleTrait extends Application {
       return
     }
 
-    new TransactionalService(
-      this.queue,
-      this.apply(this.filter(data))
-    ).persist
+    new TransactionalService().persist(this.queue, this.apply(this.filter(data)))
     this.queueRepository.updateStatus(this.queue.userRuleId.toInt, this.getCompletedStatus)
   }
 

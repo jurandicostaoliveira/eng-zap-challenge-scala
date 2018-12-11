@@ -1,7 +1,7 @@
 package br.com.btg360.services
 
 import br.com.btg360.application.Service
-import br.com.btg360.constants.{Message, TypeConverter => TC}
+import br.com.btg360.constants.{Keyspace, Message, TypeConverter => TC}
 import br.com.btg360.entities._
 import br.com.btg360.repositories.{ConsolidatedRepository, ProductRepository}
 import br.com.btg360.spark.SparkCoreSingleton
@@ -38,7 +38,7 @@ class DataMapperService(queue: QueueEntity) extends Service with Serializable {
     */
   private def productData: RDD[(Any, ProductEntity)] = {
     val table = this.queue.getProductTable
-    println(Message.PRODUCT_TABLE_NAME.format(table))
+    println(Message.PRODUCT_TABLE_NAME.format(Keyspace.BTG360 + "." + table))
     new ProductRepository().table(table).findAllKeyBy(
       entity => (entity.productId, entity)
     )

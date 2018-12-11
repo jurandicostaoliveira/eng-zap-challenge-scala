@@ -1,7 +1,5 @@
 package br.com.btg360.application
 
-import scala.reflect.ClassTag
-
 abstract class Application extends Serializable {
 
   /**
