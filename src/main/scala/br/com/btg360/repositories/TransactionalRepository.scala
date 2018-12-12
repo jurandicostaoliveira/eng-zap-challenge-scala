@@ -22,6 +22,8 @@ class TransactionalRepository extends Repository {
 
   private var _templateId: Int = 0
 
+  private var _themeConfigs: Map[String, Any] = Map()
+
   /**
     * Getter
     *
@@ -91,6 +93,24 @@ class TransactionalRepository extends Repository {
     */
   def templateId(value: Int): TransactionalRepository = {
     this._templateId = value
+    this
+  }
+
+  /**
+    * Getter
+    *
+    * @return Map
+    */
+  def themeConfigs: Map[String, Any] = this._themeConfigs
+
+  /**
+    * Setter
+    *
+    * @param Map value
+    * @return this
+    */
+  def themeConfigs(value: Map[String, Any]): TransactionalRepository = {
+    this._themeConfigs = value
     this
   }
 
@@ -271,11 +291,11 @@ class TransactionalRepository extends Repository {
     *
     * @return Int
     */
-  def saveTemplate: Int = {
+  def saveTemplate(template: String): Int = {
     val rand: Long = new Random().nextInt((50000 - 1000) * 38)
     this.connection(this.db).insertGetId(this.generateTemplateTable, HashMap(
       "nm_template" -> "BTG_template_%s_%d".format(this.now("yyyy_MM_dd_HH_mm"), rand),
-      "nm_html" -> "", //template
+      "nm_html" -> template,
       "fl_descartar" -> 0,
       "dt_cadastro" -> this.now(),
       "fl_twig" -> 1
@@ -311,7 +331,7 @@ class TransactionalRepository extends Repository {
         products = stock.products,
         recommendations = stock.recommendations,
         references = stock.references,
-        configs = "",
+        configs = this.themeConfigs,
         email = user,
         client = client,
         pixel = "%s?client=%s&userId=%d&userRuleId=%d&timestamp=%d".format(

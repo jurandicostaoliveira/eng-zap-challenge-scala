@@ -1,12 +1,23 @@
 package br.com.btg360.run
 
+import br.com.btg360.repositories.{TemplateRepository, ThemeRepository}
+import br.com.btg360.services.JsonService
 import br.com.btg360.worker.rule.Daily
 
 import scala.collection.mutable.HashMap
 
 object DailyRuleRun extends App {
 
-  new Daily().dispatch(17)
+//  val data = new ThemeRepository().findById(2)
+//  val configs = new JsonService().decode[Map[String, Any]](data.configs)
+//  val a  = configs -- Set("header", "footer")
+
+  val data = new TemplateRepository().findById(1)
+
+
+  println(data.html)
+
+  //new Daily().dispatch(17)
 
 
   //  val rdd: RDD[(String, Int)] = SparkCoreSingleton.getContext.parallelize(HashMap("email1" -> 1, "email2" -> 2).toSeq)

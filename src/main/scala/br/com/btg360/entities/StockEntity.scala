@@ -9,7 +9,7 @@ case class StockEntity(
                         products: List[HashMap[String, Any]] = List(),
                         recommendations: List[HashMap[String, Any]] = List(),
                         references: Map[String, Any] = Map(),
-                        configs: String = "",
+                        configs: Map[String, Any] = Map(),
                         email: String = "",
                         client: String = "",
                         pixel: String = "",
