@@ -13,7 +13,7 @@ class Connection {
       val p = new PropService().get(fileName)
       new RedisClient(p.getProperty("host"), p.getProperty("port").toInt, p.getProperty("database").toInt)
     } catch {
-      case e: Exception => println(e.getLocalizedMessage)
+      case e: Exception => println("REDIS CONNECTION ERROR: " + e.getLocalizedMessage)
         new RedisClient()
     }
   }

@@ -42,7 +42,7 @@ class TransactionalService() extends Service {
         this.pixelImg(),
         new UrlService().parse(queue, TC.toString(theme("header"))),
         this.templateRepository.findById(queue.rule.templateId).html,
-        new UrlService().parse(queue, TC.toString(theme("footer"))),
+        new UrlService().parse(queue, TC.toString(theme("footer")))
       ),
       configs
     )
@@ -55,15 +55,27 @@ class TransactionalService() extends Service {
   def persist(queue: QueueEntity, data: RDD[(String, StockEntity)]): Unit = {
     try {
       val layout = this.createLayout(queue)
-      queue.rule.transactionalId = 1111
-      this.transactionalRepository
-        .queue(queue)
-        .data(data)
-        .templateId(this.transactionalRepository.saveTemplate(layout._1))
-        .themeConfigs(layout._2)
+      val templateId: Int = this.transactionalRepository.queue(queue).data(data).themeConfigs(layout._2)
+        .createTemplateTable
+        .saveTemplate(layout._1)
+
+      if (templateId <= 0) {
+        println(Message.TEMPLATE_ERROR)
+        return
+      }
+
+      val registered = this.transactionalRepository.templateId(templateId)
         .createSendTable
+        .createClickTable
+        .alterSendTable
         .saveSend
 
+      if (!registered) {
+        println(Message.TRANSACTIONAL_ERROR)
+        return
+      }
+
+      this.transactionalRepository.updateLastSend
       println(Message.TRANSACTIONAL_SUCCESS)
     } catch {
       case e: Exception => println(e.printStackTrace())

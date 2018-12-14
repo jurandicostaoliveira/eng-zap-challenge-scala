@@ -1,9 +1,9 @@
 package br.com.btg360.traits
 
 import br.com.btg360.constants._
-import br.com.btg360.entities.{QueueEntity, StockEntity}
+import br.com.btg360.entities.{QueueEntity, StockEntity, UserEntity}
 import br.com.btg360.logger.Log4jPrinter
-import br.com.btg360.repositories.{ConsolidatedRepository, QueueRepository}
+import br.com.btg360.repositories.{ConsolidatedRepository, QueueRepository, UserRepository}
 import br.com.btg360.services.{Port25Service, _}
 import org.apache.spark.rdd.RDD
 
@@ -11,9 +11,11 @@ import scala.util.control.Breaks._
 
 trait RuleTrait extends Application {
 
+  protected var user: UserEntity = _
+
   protected var queue: QueueEntity = _
 
-  private var userId: Int = 0
+  private val userRepository = new UserRepository()
 
   private val queueRepository = new QueueRepository()
 
@@ -45,11 +47,12 @@ trait RuleTrait extends Application {
     */
   def dispatch(userId: Int): Unit = {
     try {
-      this.userId = userId
+      this.user = this.userRepository.findById(userId)
       val rows = this.queueRepository.findAll(userId, this.getTypes)
 
       rows.foreach(row => {
         this.queue = row.parse
+        this.queue.rule.transactionalId = this.user.transId
         breakable {
           if (this.isDailyAndNotReady) {
             return

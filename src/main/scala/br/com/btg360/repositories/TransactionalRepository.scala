@@ -266,15 +266,16 @@ class TransactionalRepository extends Repository {
   }
 
   /**
-    *
+    * @return this
     */
-  def alterSendTable: Unit = {
+  def alterSendTable: TransactionalRepository = {
     val table: String = this.generateSendTable
     val column = "btg_user_rule_id"
     if (!this.columnExists(table, column)) {
       this.connection(this.db)
         .ddlExecutor(s"ALTER TABLE ${table} ADD COLUMN ${column} int(11) DEFAULT NULL;")
     }
+    this
   }
 
   /**
@@ -361,7 +362,7 @@ class TransactionalRepository extends Repository {
   /**
     * Persist send data
     */
-  def saveSend: Unit = {
+  def saveSend: Boolean = {
     try {
       val table = this.generateSendTable
       var limiter: Int = 0
@@ -381,8 +382,10 @@ class TransactionalRepository extends Repository {
           limiter = 0
         }
       })
+      true
     } catch {
       case e: Exception => println(e.printStackTrace())
+        false
     }
   }
 

@@ -202,10 +202,12 @@ abstract class Repository extends Model {
 
       stmt.executeUpdate()
       val keys = stmt.getGeneratedKeys
-      keys.next()
-      val key = keys.getInt(1)
-      stmt.close()
-      key
+      println(keys.next())
+      5
+//      keys.next()
+//      val key = keys.getInt(1)
+//      stmt.close()
+//      key
     } catch {
       case e: SQLException => println(e.printStackTrace())
         0
