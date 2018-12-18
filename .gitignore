@@ -9,3 +9,4 @@ src/main/resources/.environment.properties
 target/
 storage/
 src/main/main.iml
+.attach_pid8159

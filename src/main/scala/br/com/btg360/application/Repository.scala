@@ -1,6 +1,6 @@
 package br.com.btg360.application
 
-import java.sql.{Connection, ResultSet, SQLException}
+import java.sql.{Connection, ResultSet, SQLException, Statement}
 
 import br.com.btg360.constants.{TypeConverter => TC}
 import br.com.btg360.jdbc.MySqlBtg360
@@ -192,7 +192,7 @@ abstract class Repository extends Model {
       val strFields: String = data.keys.mkString(",")
       val strValues: String = List.fill(data.size)("?").mkString(",")
       val query = s"INSERT INTO $table ($strFields) VALUES ($strValues);"
-      val stmt = this.dbConnection.prepareStatement(query)
+      val stmt = this.dbConnection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)
       var index = 1
 
       for (value <- data.values) {
@@ -202,12 +202,10 @@ abstract class Repository extends Model {
 
       stmt.executeUpdate()
       val keys = stmt.getGeneratedKeys
-      println(keys.next())
-      5
-//      keys.next()
-//      val key = keys.getInt(1)
-//      stmt.close()
-//      key
+      keys.next()
+      val key = keys.getInt(1)
+      stmt.close()
+      key
     } catch {
       case e: SQLException => println(e.printStackTrace())
         0

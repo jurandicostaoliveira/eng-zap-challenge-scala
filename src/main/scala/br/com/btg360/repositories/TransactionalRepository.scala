@@ -159,18 +159,18 @@ class TransactionalRepository extends Repository {
   def createTemplateTable: TransactionalRepository = {
     val query: String =
       s"""CREATE TABLE IF NOT EXISTS ${this.generateTemplateTable} (
-    `id_template` int(11) NOT NULL AUTO_INCREMENT,
-    `nm_template` varchar(200) DEFAULT NULL,
-    `nm_html` longtext,
-    `fl_descartar` int(11) DEFAULT NULL,
-    `dt_cadastro` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `fl_twig` int(11) DEFAULT '0',
-    PRIMARY KEY (`id_template`),
-    UNIQUE KEY `template` (`nm_template`) USING BTREE,
-    KEY `nmtemplate` (`nm_template`),
-    KEY `idtemplate` (`id_template`),
-    KEY `fldescartar` (`fl_descartar`),
-    KEY `fltwig` (`fl_twig`)
+        `id_template` int(11) NOT NULL AUTO_INCREMENT,
+        `nm_template` varchar(200) DEFAULT NULL,
+        `nm_html` longtext,
+        `fl_descartar` int(11) DEFAULT NULL,
+        `dt_cadastro` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        `fl_twig` int(11) DEFAULT '0',
+        PRIMARY KEY (`id_template`),
+        UNIQUE KEY `template` (`nm_template`) USING BTREE,
+        KEY `nmtemplate` (`nm_template`),
+        KEY `idtemplate` (`id_template`),
+        KEY `fldescartar` (`fl_descartar`),
+        KEY `fltwig` (`fl_twig`)
     ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;"""
 
     this.connection(this.db).ddlExecutor(query)

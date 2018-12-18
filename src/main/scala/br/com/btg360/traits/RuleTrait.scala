@@ -1,5 +1,6 @@
 package br.com.btg360.traits
 
+import br.com.btg360.application.Application
 import br.com.btg360.constants._
 import br.com.btg360.entities.{QueueEntity, StockEntity, UserEntity}
 import br.com.btg360.logger.Log4jPrinter
