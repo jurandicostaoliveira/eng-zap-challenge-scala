@@ -1,6 +1,6 @@
 package br.com.btg360.repositories
 
-import java.sql.{ResultSet, SQLException}
+import java.sql.SQLException
 
 import br.com.btg360.application.Repository
 import br.com.btg360.constants.{Database, Table}
@@ -36,7 +36,7 @@ class UserRepository extends Repository {
     *
     * @return ResultSet
     */
-  def findAllActive(): ResultSet = {
+  def findAllActive(): List[Int] = {
     try {
       val query =
         s""" SELECT DISTINCT ${this.userTable}.id
@@ -47,10 +47,15 @@ class UserRepository extends Repository {
               ${this.userRulesTable}.status = 1
               AND ${this.userTable}.isMultiChannel = 1;
        """
-      this.connection(this.db).queryExecutor(query)
+      var list: List[Int] = List()
+      val rows = this.connection(this.db).queryExecutor(query)
+      while (rows.next()) {
+        list = list :+ rows.getInt(1)
+      }
+      list
     } catch {
       case e: SQLException => println(e.printStackTrace())
-        null
+        List()
     }
   }
 

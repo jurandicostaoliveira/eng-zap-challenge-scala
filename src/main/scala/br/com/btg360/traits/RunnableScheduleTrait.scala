@@ -1,6 +1,6 @@
 package br.com.btg360.traits
 
-trait SchedulerContextTrait {
+trait RunnableScheduleTrait {
 
   def run(userId: Int)
 

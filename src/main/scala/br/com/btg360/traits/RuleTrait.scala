@@ -135,6 +135,12 @@ trait RuleTrait extends Application {
     this
   }
 
+  /**
+    * Return mapping all filters
+    *
+    * @param RDD data
+    * @return RDD
+    */
   private def filter(data: RDD[(String, StockEntity)]): RDD[(String, StockEntity)] = {
     var dataset = new DailySendLimitService(this.queue).filter(data.keys)
     println(Message.TOTAL_DAILY_LIMIT_REMOVED.format(dataset.count()))
@@ -149,12 +155,18 @@ trait RuleTrait extends Application {
     })
   }
 
+  /**
+    * Apply extra structures
+    *
+    * @param RDD data
+    * @return RDD
+    */
   private def apply(data: RDD[(String, StockEntity)]): RDD[(String, StockEntity)] = {
     var dataset = data
     if (Channel.isEmail(this.queue.channelName)) {
-      //if (this.queue.ruleTypeId != Rule.AUTOMATIC_ID) {
-      //dataset = new ReferenceListService().add(this.queue, data)
-      //}
+      if (this.queue.ruleTypeId != Rule.AUTOMATIC_ID) {
+        dataset = new ReferenceListService().add(this.queue, data)
+      }
 
       dataset = new Port25Service().add(dataset)
     }
