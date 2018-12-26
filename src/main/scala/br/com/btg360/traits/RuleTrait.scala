@@ -188,6 +188,8 @@ trait RuleTrait extends Application {
 
     new TransactionalService().persist(this.queue, this.apply(this.filter(data)))
     this.queueRepository.updateStatus(this.queue.userRuleId.toInt, this.getCompletedStatus)
+    //this.consolidatedRepository.table(this.queue.getConsolidatedTable).updateSubmitted(1)
+    //Resolver o problema do platform ID
   }
 
 }

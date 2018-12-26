@@ -26,26 +26,21 @@ abstract class Repository extends Model {
   }
 
   /**
-    * @param query
-    * @return
-    */
-  def queryExecutor(query: String): ResultSet = {
-    try {
-      this.dbConnection.createStatement().executeQuery(query)
-    } catch {
-      case e: SQLException => println(e.getErrorCode + ": " + e.getMessage)
-        null
-    }
-  }
-
-  /**
     * @param String query
+    * @return ResultSet
     */
-  def ddlExecutor(query: String): Unit = {
+  def queryExecutor(query: String, onlyExecution: Boolean = false): ResultSet = {
     try {
-      this.dbConnection.createStatement().executeUpdate(query)
+      val stmt = this.dbConnection.createStatement()
+      if (onlyExecution) {
+        stmt.executeUpdate(query)
+        return null
+      }
+
+      stmt.executeQuery(query)
     } catch {
       case e: SQLException => println(e.getStackTrace)
+        null
     }
   }
 

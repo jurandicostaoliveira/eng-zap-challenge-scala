@@ -5,7 +5,7 @@ import br.com.btg360.worker.rule.Automatic
 //object AutomaticRuleRun extends Application with App {
 //  import Any_._
 object AutomaticRuleRun extends App {
-  new Automatic().dispatch(14)
+  //new Automatic().dispatch(14)
 
   //  var list: Any = None
   //

@@ -7,12 +7,7 @@ import br.com.btg360.traits.RunnableScheduleTrait
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.duration._
 
-class Scheduler(
-                 name: String,
-                 wait: FiniteDuration = 0.second,
-                 interval: FiniteDuration = 60.seconds,
-                 runnable: RunnableScheduleTrait
-               ) {
+class Scheduler {
 
   /**
     * Receiver system class of actors
@@ -26,19 +21,53 @@ class Scheduler(
   }
 
   /**
-    * Scheduling system settings
+    * Executable for all active users
+    *
+    * @param String                name
+    * @param FiniteDuration        wait
+    * @param FiniteDuration        interval
+    * @param RunnableScheduleTrait runnable
     */
-  private val system = ActorSystem("RunnableSchedule")
-  private val actor = system.actorOf(Props(new ActorContext(this.runnable)), this.name)
-  private val users = new UserRepository().findAllActive()
-  implicit val executionContext = system.dispatcher
+  def all(
+           name: String,
+           wait: FiniteDuration = 0.second,
+           interval: FiniteDuration = 60.seconds,
+           runnable: RunnableScheduleTrait
+         ): Unit = {
+    val system = ActorSystem("RunnableScheduleAll")
+    val actor = system.actorOf(Props(new ActorContext(runnable)), name)
+    val users = new UserRepository().findAllActive()
+    implicit val executionContext = system.dispatcher
 
-  system.scheduler.schedule(this.wait, this.interval, new Runnable {
-    override def run(): Unit = {
-      users.foreach(userId => {
-        actor ! userId
-      })
-    }
-  })
+    system.scheduler.schedule(wait, interval, new Runnable {
+      override def run(): Unit = {
+        users.foreach(userId => actor ! userId)
+      }
+    })
+  }
+
+  /**
+    * Executable for user groups
+    *
+    * @param String                name
+    * @param FiniteDuration        wait
+    * @param FiniteDuration        interval
+    * @param RunnableScheduleTrait runnable
+    */
+  def once(
+            name: String,
+            wait: FiniteDuration = 0.second,
+            interval: FiniteDuration = 60.seconds,
+            runnable: RunnableScheduleTrait
+          ): Unit = {
+    val system = ActorSystem("RunnableScheduleOnce")
+    implicit val executionContext = system.dispatcher
+
+    system.scheduler.schedule(wait, interval, new Runnable {
+      override def run(): Unit = {
+        runnable.run()
+      }
+    })
+  }
 
 }

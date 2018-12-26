@@ -173,7 +173,7 @@ class TransactionalRepository extends Repository {
         KEY `fltwig` (`fl_twig`)
     ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;"""
 
-    this.connection(this.db).ddlExecutor(query)
+    this.connection(this.db).queryExecutor(query, true)
     this
   }
 
@@ -192,7 +192,7 @@ class TransactionalRepository extends Repository {
               KEY `dt_clique` (`dt_clique`)
             ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;"""
 
-    this.connection(this.db).ddlExecutor(query)
+    this.connection(this.db).queryExecutor(query, true)
     this
   }
 
@@ -261,7 +261,7 @@ class TransactionalRepository extends Repository {
                 KEY `id_envio_anterior` (`id_envio_anterior`)
             ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;"""
 
-    this.connection(this.db).ddlExecutor(query)
+    this.connection(this.db).queryExecutor(query, true)
     this
   }
 
@@ -273,7 +273,7 @@ class TransactionalRepository extends Repository {
     val column = "btg_user_rule_id"
     if (!this.columnExists(table, column)) {
       this.connection(this.db)
-        .ddlExecutor(s"ALTER TABLE ${table} ADD COLUMN ${column} int(11) DEFAULT NULL;")
+        .queryExecutor(s"ALTER TABLE $table ADD COLUMN $column int(11) DEFAULT NULL;", true)
     }
     this
   }

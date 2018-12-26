@@ -123,7 +123,17 @@ class QueueRepository extends Repository {
         .whereAnd("today", "=", new PeriodService("yyyy-MM-dd").now)
         .update(this.rulesQueueTable, data)
     }
+  }
 
+  /**
+    * Delete queue data with period of days
+    *
+    * @param Int days
+    */
+  def deleteOnDays(days: Int = 30): Unit = {
+    val day = this.periodService.format("yyyy-MM-dd").timeByDay(-days)
+    val query = s"""DELETE FROM ${this.rulesQueueTable} WHERE today <= '$day';"""
+    this.connection(this.db).queryExecutor(query, true)
   }
 
 }
