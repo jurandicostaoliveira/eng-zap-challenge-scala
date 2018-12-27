@@ -9,7 +9,7 @@ import scala.collection.immutable.List
 import scala.collection.mutable.HashMap
 
 
-abstract class Repository extends Model {
+abstract class Repository extends Application {
 
   private var dbConnection: Connection = this.invoke(classOf[MySqlBtg360]).open
 
