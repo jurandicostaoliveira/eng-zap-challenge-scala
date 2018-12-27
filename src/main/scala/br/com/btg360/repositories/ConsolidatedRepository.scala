@@ -39,8 +39,8 @@ class ConsolidatedRepository extends Repository {
     *
     * @return RDD
     */
-  def findAll: RDD[ConsolidatedEntity] = {
-    this.db.sparkRead(this.table, "isSent = 0").rdd.map(row => {
+  def findAll(platformId: Int = 0): RDD[ConsolidatedEntity] = {
+    this.db.sparkRead(this.table, s"isSent = 0 AND platformId = $platformId").rdd.map(row => {
       new ConsolidatedEntity().setRow(row)
     })
   }
@@ -51,8 +51,11 @@ class ConsolidatedRepository extends Repository {
     * @param entity
     * @return RDD
     */
-  def findAllKeyBy(entity: ConsolidatedEntity => (Any, ConsolidatedEntity)): RDD[(Any, ConsolidatedEntity)] = {
-    this.findAll.map(row => entity(row))
+  def findAllKeyBy(
+                    entity: ConsolidatedEntity => (Any, ConsolidatedEntity),
+                    platformId: Int = 0
+                  ): RDD[(Any, ConsolidatedEntity)] = {
+    this.findAll(platformId).map(row => entity(row))
   }
 
   /**

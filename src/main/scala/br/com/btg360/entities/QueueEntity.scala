@@ -33,6 +33,7 @@ class QueueEntity extends Entity {
   var rule: RuleDataEntity = _
   //Channel
   var channelName: String = Channel.EMAIL
+  var platformId: Int = 0
   var deliveryAt: String = _
   var deliveryTimestamp: Long = 0
   var utmLink: String = _
@@ -59,7 +60,7 @@ class QueueEntity extends Entity {
     * @return String
     */
   def getConsolidatedTable: String = {
-    "%s.%s_%s".format(Database.CONSOLIDATED, this.consolidatedTableName, this.channelName)
+    "%s.%s_%s".format(Database.CONSOLIDATED, this.consolidatedTableName, Channel.getLabel(this.channelName))
   }
 
   /**

@@ -28,6 +28,23 @@ class QueueRepository extends Repository {
 
   private val consolidatedRulesTable = "%s.%s".format(Database.PANEL, Table.CONSOLIDATED_RULES)
 
+  /**
+    * @return List
+    */
+  def findCurrentByStatus(statusList: List[Int]): List[QueueEntity] = {
+    val query =
+      s"""
+          SELECT * FROM ${this.rulesQueueTable}
+          WHERE today = '${this.today}' AND status IN (${statusList.mkString(",")});
+      """
+    this.connection(this.db).fetch(query, classOf[QueueEntity])
+  }
+
+  /**
+    * @param Int  userId
+    * @param List ruleTypes
+    * @return List
+    */
   def findAll(userId: Int, ruleTypes: List[Int]): List[QueueEntity] = {
     val query =
       s"""
@@ -105,7 +122,7 @@ class QueueRepository extends Repository {
     * @param Int status
     */
   def updateStatus(userRuleId: Int, status: Int): Unit = {
-    val now = new PeriodService().now
+    val now = this.periodService.format("yyyy-MM-dd HH:mm:ss").now
     val data: HashMap[String, Any] = status match {
       case QueueStatus.CREATED => HashMap("createdIn" -> now, "status" -> status)
       case QueueStatus.STARTED => HashMap("startedIn" -> now, "status" -> status)
@@ -120,7 +137,7 @@ class QueueRepository extends Repository {
     if (data != null) {
       this.connection(this.db)
         .whereAnd("userRuleId", "=", userRuleId)
-        .whereAnd("today", "=", new PeriodService("yyyy-MM-dd").now)
+        .whereAnd("today", "=", this.today)
         .update(this.rulesQueueTable, data)
     }
   }

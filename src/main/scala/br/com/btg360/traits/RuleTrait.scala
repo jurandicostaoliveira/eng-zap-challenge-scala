@@ -79,7 +79,9 @@ trait RuleTrait extends Application {
       this.queueRepository.updateStatus(this.queue.userRuleId.toInt, QueueStatus.CREATED)
     } else {
       this.queueRepository.updateStatus(this.queue.userRuleId.toInt, QueueStatus.RECOMMENDATION_PREPARED)
-      this.consolidatedRepository.table(this.queue.getConsolidatedTable).updateSubmitted(0)
+      this.consolidatedRepository.table(this.queue.getConsolidatedTable).updateSubmitted(
+        0, this.queue.platformId
+      )
     }
   }
 
@@ -130,6 +132,7 @@ trait RuleTrait extends Application {
     channels.foreach(channel => {
       println(Message.CHANNEL_RUNNING.format(channel.toUpperCase))
       this.queue.channelName = channel
+      this.queue.platformId = Channel.getPlatformId(channel)
       this.all
     })
     this
@@ -188,8 +191,9 @@ trait RuleTrait extends Application {
 
     new TransactionalService().persist(this.queue, this.apply(this.filter(data)))
     this.queueRepository.updateStatus(this.queue.userRuleId.toInt, this.getCompletedStatus)
-    //this.consolidatedRepository.table(this.queue.getConsolidatedTable).updateSubmitted(1)
-    //Resolver o problema do platform ID
+    this.consolidatedRepository.table(this.queue.getConsolidatedTable).updateSubmitted(
+      1, this.queue.platformId
+    )
   }
 
 }

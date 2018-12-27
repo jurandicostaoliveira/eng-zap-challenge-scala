@@ -1,7 +1,7 @@
 package br.com.btg360.services
 
 import java.text.SimpleDateFormat
-import java.util.{Calendar, Date}
+import java.util.{Calendar, Date, Locale}
 
 class PeriodService {
 
