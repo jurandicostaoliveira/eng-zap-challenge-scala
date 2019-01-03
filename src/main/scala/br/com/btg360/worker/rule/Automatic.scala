@@ -1,6 +1,6 @@
 package br.com.btg360.worker.rule
 
-import br.com.btg360.constants.Automatic
+import br.com.btg360.constants.{Automatic => AT}
 import br.com.btg360.entities.{QueueEntity, StockEntity}
 import br.com.btg360.repositories.AutomaticRepository
 import br.com.btg360.services.AutomaticService
@@ -31,16 +31,17 @@ class Automatic(queue: QueueEntity) {
     * @return RDD
     */
   def getData: RDD[(String, StockEntity)] = {
-    var rdd: RDD[(String, StockEntity)] = this.getAutomaticRuleModel.sc.emptyRDD[(String, StockEntity)]
-    this.queue.ruleName match {
-      case Automatic.BIRTHDAY =>
-        rdd = this.birthday
-      case Automatic.SENDING_DATE =>
-        rdd = this.sendingDate
-      case Automatic.SENDING_DATE =>
-        rdd = this.inactive
+    try {
+      this.queue.ruleName match {
+        case AT.BIRTHDAY => this.birthday
+        case AT.SENDING_DATE => this.sendingDate
+        case AT.INACTIVE => this.inactive
+        case _ => this.getAutomaticRuleModel.sc.emptyRDD[(String, StockEntity)]
+      }
+    } catch {
+      case e: Exception => println(e.printStackTrace())
+        this.getAutomaticRuleModel.sc.emptyRDD[(String, StockEntity)]
     }
-    rdd
   }
 
   /**
