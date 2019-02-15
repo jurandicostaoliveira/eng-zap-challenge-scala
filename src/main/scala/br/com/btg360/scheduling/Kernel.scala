@@ -6,6 +6,7 @@ import br.com.btg360.repositories.{ConsolidatedRepository, QueueRepository}
 import br.com.btg360.services._
 import br.com.btg360.traits.RunnableScheduleTrait
 import br.com.btg360.worker.rule.{Daily, Hourly}
+import br.com.btg360.constants.Time
 
 import scala.concurrent.duration._
 
@@ -45,7 +46,7 @@ object Kernel extends App {
     */
   scheduler.once("clear-send-limit", 0.second, 30.minutes, new RunnableScheduleTrait {
     override def run(userId: Int): Unit = {
-      if (new PeriodService("HH").now == "00") {
+      if (Time.isMidnight) {
         new DailySendLimitService(new QueueEntity()).destroyNotCurrent
       }
     }
@@ -56,7 +57,7 @@ object Kernel extends App {
     */
   scheduler.once("clear-queue", 0.second, 30.minutes, new RunnableScheduleTrait {
     override def run(userId: Int): Unit = {
-      if (new PeriodService("HH").now == "00") {
+      if (Time.isMidnight) {
         new QueueRepository().deleteOnDays(30)
       }
     }
@@ -67,7 +68,7 @@ object Kernel extends App {
     */
   scheduler.once("clear-consolidated-tables", 0.second, 30.minutes, new RunnableScheduleTrait {
     override def run(userId: Int): Unit = {
-      if (new PeriodService("HH").now == "00") {
+      if (Time.isMidnight) {
         new ConsolidatedRepository().deleteOnDays(90)
       }
     }
