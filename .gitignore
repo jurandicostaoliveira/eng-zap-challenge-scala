@@ -10,3 +10,4 @@ target/
 storage/
 src/main/main.iml
 .attach_pid8159
+nohup.out

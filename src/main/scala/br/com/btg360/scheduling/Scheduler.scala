@@ -36,12 +36,11 @@ class Scheduler {
          ): Unit = {
     val system = ActorSystem("RunnableScheduleAll")
     val actor = system.actorOf(Props(new ActorContext(runnable)), name)
-    val users = new UserRepository().findAllActive()
     implicit val executionContext = system.dispatcher
 
     system.scheduler.schedule(wait, interval, new Runnable {
       override def run(): Unit = {
-        users.foreach(userId => actor ! userId)
+        new UserRepository().findAllActive().foreach(userId => actor ! userId)
       }
     })
   }

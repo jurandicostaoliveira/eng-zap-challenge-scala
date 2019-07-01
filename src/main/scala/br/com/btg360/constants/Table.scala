@@ -12,7 +12,7 @@ object Table {
 
   val CONFIGS: String = "configs"
 
-  val RULES_QUEUE: String = "rules_queue"
+  val RULES_QUEUE: String = "rules_queue_multichannel"
 
   val THEMES: String = "themes"
 

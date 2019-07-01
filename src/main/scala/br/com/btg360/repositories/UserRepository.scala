@@ -3,7 +3,7 @@ package br.com.btg360.repositories
 import java.sql.SQLException
 
 import br.com.btg360.application.Repository
-import br.com.btg360.constants.{Database, Table}
+import br.com.btg360.constants.{Database, MultiChannel, Table}
 import br.com.btg360.entities.UserEntity
 import br.com.btg360.jdbc.MySqlBtg360
 
@@ -45,7 +45,7 @@ class UserRepository extends Repository {
             ON ${this.userRulesTable}.userId = ${this.userTable}.id
           WHERE
               ${this.userRulesTable}.status = 1
-              AND ${this.userTable}.isMultiChannel = 1;
+              AND ${this.userTable}.isMultiChannel = ${MultiChannel.STATUS};
        """
       var list: List[Int] = List()
       val rows = this.connection(this.db).queryExecutor(query)
