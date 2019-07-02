@@ -23,82 +23,82 @@ object Kernel extends App {
     }
   })
 
-//  /**
-//    * Daily rules
-//    */
-//  scheduler.all("daily-rules", 1.minute, 1.hour, new RunnableScheduleTrait {
-//    override def run(userId: Int): Unit = {
-//      new Daily().dispatch(userId)
-//    }
-//  })
-//
-//  /**
-//    * Hourly rules
-//    */
-//  scheduler.all("hourly-rules", 30.minutes, 1.hour, new RunnableScheduleTrait {
-//    override def run(userId: Int): Unit = {
-//      new Hourly().dispatch(userId)
-//    }
-//  })
-//
-//  /**
-//    * Clear send limit
-//    */
-//  scheduler.once("clear-send-limit", 0.second, 30.minutes, new RunnableScheduleTrait {
-//    override def run(userId: Int): Unit = {
-//      if (Time.isMidnight) {
-//        new DailySendLimitService(new QueueEntity()).destroyNotCurrent
-//      }
-//    }
-//  })
-//
-//  /**
-//    * Clear queue
-//    */
-//  scheduler.once("clear-queue", 0.second, 30.minutes, new RunnableScheduleTrait {
-//    override def run(userId: Int): Unit = {
-//      if (Time.isMidnight) {
-//        new QueueRepository().deleteOnDays(30)
-//      }
-//    }
-//  })
-//
-//  /**
-//    * Clear consolidated tables
-//    */
-//  scheduler.once("clear-consolidated-tables", 0.second, 30.minutes, new RunnableScheduleTrait {
-//    override def run(userId: Int): Unit = {
-//      if (Time.isMidnight) {
-//        new ConsolidatedRepository().deleteOnDays(90)
-//      }
-//    }
-//  })
-//
-//  /**
-//    * Queue progress
-//    */
-//  scheduler.once("queue-progress", 2.hour, 55.minutes, new RunnableScheduleTrait {
-//    override def run(userId: Int): Unit = {
-//      new QueueProgressService().tolerance(2).run()
-//    }
-//  })
-//
-//  /**
-//    * Log clear
-//    */
-//  scheduler.once("log-clear", 0.second, 30.days, new RunnableScheduleTrait {
-//    override def run(userId: Int): Unit = {
-//      val pattern = "%s/rules/%s"
-//      new FileService().deleteRecursive(
-//        pattern.format(Path.LOGS, new PeriodService("yyyy/MM").timeByMonth(-2))
-//      )
-//
-//      val year = new PeriodService("yyyy")
-//      val oldYear = year.timeByMonth(-2)
-//      if (!oldYear.equals(year.now)) {
-//        new FileService().deleteRecursive(pattern.format(Path.LOGS, oldYear))
-//      }
-//    }
-//  })
+  /**
+    * Daily rules
+    */
+  scheduler.all("daily-rules", 1.minute, 1.hour, new RunnableScheduleTrait {
+    override def run(userId: Int): Unit = {
+      new Daily().dispatch(userId)
+    }
+  })
+
+  /**
+    * Hourly rules
+    */
+  scheduler.all("hourly-rules", 30.minutes, 1.hour, new RunnableScheduleTrait {
+    override def run(userId: Int): Unit = {
+      new Hourly().dispatch(userId)
+    }
+  })
+
+  /**
+    * Clear send limit
+    */
+  scheduler.once("clear-send-limit", 0.second, 30.minutes, new RunnableScheduleTrait {
+    override def run(userId: Int): Unit = {
+      if (Time.isMidnight) {
+        new DailySendLimitService(new QueueEntity()).destroyNotCurrent
+      }
+    }
+  })
+
+  /**
+    * Clear queue
+    */
+  scheduler.once("clear-queue", 0.second, 30.minutes, new RunnableScheduleTrait {
+    override def run(userId: Int): Unit = {
+      if (Time.isMidnight) {
+        new QueueRepository().deleteOnDays(30)
+      }
+    }
+  })
+
+  /**
+    * Clear consolidated tables
+    */
+  scheduler.once("clear-consolidated-tables", 0.second, 30.minutes, new RunnableScheduleTrait {
+    override def run(userId: Int): Unit = {
+      if (Time.isMidnight) {
+        new ConsolidatedRepository().deleteOnDays(90)
+      }
+    }
+  })
+
+  /**
+    * Queue progress
+    */
+  scheduler.once("queue-progress", 2.hour, 55.minutes, new RunnableScheduleTrait {
+    override def run(userId: Int): Unit = {
+      new QueueProgressService().tolerance(2).run()
+    }
+  })
+
+  /**
+    * Log clear
+    */
+  scheduler.once("log-clear", 0.second, 30.days, new RunnableScheduleTrait {
+    override def run(userId: Int): Unit = {
+      val pattern = "%s/rules/%s"
+      new FileService().deleteRecursive(
+        pattern.format(Path.LOGS, new PeriodService("yyyy/MM").timeByMonth(-2))
+      )
+
+      val year = new PeriodService("yyyy")
+      val oldYear = year.timeByMonth(-2)
+      if (!oldYear.equals(year.now)) {
+        new FileService().deleteRecursive(pattern.format(Path.LOGS, oldYear))
+      }
+    }
+  })
 
 }
