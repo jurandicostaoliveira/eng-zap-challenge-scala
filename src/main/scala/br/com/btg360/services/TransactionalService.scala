@@ -71,7 +71,7 @@ class TransactionalService() extends Service {
         .saveSend
 
       if (!registered) {
-        println(Message.TRANSACTIONAL_ERROR)
+        println(Message.TRANSACTIONAL_NOT_REGISTER)
         return
       }
 

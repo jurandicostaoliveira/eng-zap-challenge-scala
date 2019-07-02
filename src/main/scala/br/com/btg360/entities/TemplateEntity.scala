@@ -10,6 +10,6 @@ class TemplateEntity extends Entity {
   var html: String = _
   var created_at: Any = _
   var updated_at: Any = _
-  var status: Int = 0
+  var status: Any = 0
 
 }

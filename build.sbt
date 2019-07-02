@@ -15,7 +15,7 @@ libraryDependencies ++= Seq(
   "com.datastax.spark" %% "spark-cassandra-connector" % sparkVersion,
   "org.quartz-scheduler" % "quartz" % "2.2.1",
   "com.typesafe.akka" %% "akka-actor" % "2.3.2",
-  "mysql" % "mysql-connector-java" % "5.1.12",
+  "mysql" % "mysql-connector-java" % "5.1.46",
   "org.apache.logging.log4j" % "log4j-scala" % "11.0",
   "net.debasishg" %% "redisclient" % "3.8", //https://github.com/debasishg/scala-redis
   "org.json4s" %% "json4s-native" % "3.3.0", //https://github.com/json4s/json4s
