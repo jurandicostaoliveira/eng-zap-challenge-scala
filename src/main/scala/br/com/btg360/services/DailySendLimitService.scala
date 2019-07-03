@@ -23,20 +23,20 @@ class DailySendLimitService(queue: QueueEntity) {
     * Filtering to start the defined limit
     *
     * @param String entityName
-    * @return List
+    * @return RDD
     */
-  private def pluck(entityName: String): List[String] = {
+  private def pluck(entityName: String, users: List[String]): RDD[String] = {
     var keys: List[String] = List()
 
     this.redis.hgetall(entityName).foreach(row => {
       for ((key, value) <- row) {
-        if (value.toInt <= this.queue.sendLimit) {
+        if (value.toInt <= this.queue.sendLimit && users.contains(key)) {
           keys = keys :+ key
         }
       }
     })
 
-    keys
+    this.sc.parallelize(keys)
   }
 
   /**
@@ -55,7 +55,7 @@ class DailySendLimitService(queue: QueueEntity) {
       }
     })
 
-    this.sc.parallelize(this.pluck(entityName))
+    this.pluck(entityName, usersList)
   }
 
   /**
