@@ -4,7 +4,9 @@ import java.io.File
 
 object Path {
 
-  val PROJECT: String = new File(".").getCanonicalPath
+  //val PROJECT: String = new File(".").getCanonicalPath
+
+  val PROJECT: String = "/home/Btg-Scala-Sending-Generator"
 
   val STORAGE: String = "%s/storage".format(PROJECT)
 
