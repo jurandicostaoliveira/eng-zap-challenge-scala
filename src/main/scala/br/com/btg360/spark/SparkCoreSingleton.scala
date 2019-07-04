@@ -52,7 +52,7 @@ object SparkCoreSingleton extends Serializable {
     val builder: SparkSession.Builder = SparkSession.builder()
 
     if (Environment.isDevelopment) {
-      builder.config("spark.local.dir", p.getProperty("sparkLocalDir"))
+      //builder.config("spark.local.dir", p.getProperty("sparkLocalDir"))
     }
 
     return builder.master(p.getProperty("master"))
@@ -64,10 +64,11 @@ object SparkCoreSingleton extends Serializable {
       .config("spark.executor.memory", p.getProperty("sparkExecutorMemory"))
       .config("spark.driver.allowMultipleContexts", p.getProperty("sparkDriverAllowMultipleContexts"))
       .config("spark.cassandra.connection.compression", p.getProperty("sparkCassandraConnectionCompression"))
-      //.config("spark.ui.port", p.getProperty("sparkUiPort"))
+      .config("spark.ui.port", p.getProperty("sparkUiPort"))
       .config("spark.cassandra.connection.timeout_ms", p.getProperty("sparkCassandraConnectionTimeoutMs"))
       .config("spark.network.timeout", p.getProperty("sparkNetworkTimeout"))
       .config("spark.cassandra.input.consistency.level", p.getProperty("sparkCassandraInputConsistencyLevel"))
+      .config("spark.local.dir", p.getProperty("sparkLocalDir"))
       .getOrCreate()
   }
 
