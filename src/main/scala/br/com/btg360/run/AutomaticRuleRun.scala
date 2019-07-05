@@ -1,11 +1,29 @@
 package br.com.btg360.run
 
+import br.com.btg360.entities.{QueueEntity, RuleDataEntity, StockEntity}
 import br.com.btg360.worker.rule.Automatic
+import org.apache.spark.rdd.RDD
 
 //object AutomaticRuleRun extends Application with App {
 //  import Any_._
 object AutomaticRuleRun extends App {
-  //new Automatic().dispatch(14)
+
+//  var queueEntity = new QueueEntity()
+//
+//  queueEntity.userRuleId = 83
+//  queueEntity.today = "2019-07-05"
+//  queueEntity.userId = 6
+//  queueEntity.ruleTypeId = 3
+//  queueEntity.ruleName = "inactive"
+//  queueEntity.dataStringJson = "{  \n   \"configs\":{  \n      \"ruleName\":\"inativos_btg\",\n      \"subject\":\"Voc\\u00ea tem acompanhados nossas inova\\u00e7\\u00f5es?\",\n      \"senderName\":\"Polishop\",\n      \"senderEmail\":\"ofertas@envio.polishop.com.br\",\n      \"emailResponsible\":\"bruno.miquelini@polishop.com.br\",\n      \"hour\":\"15:00:00\",\n      \"interval\":30\n   },\n   \"module\":{  \n      \"selected\":\"\",\n      \"quantity\":12,\n      \"percentMin\":30,\n      \"percentMax\":70\n   },\n   \"html\":{  \n      \"template\":\"\",\n      \"theme\":\"\",\n      \"layout\":2,\n      \"content\":\"\"\n   },\n   \"channels\":{  \n      \"email\":{  \n         \"status\":true,\n         \"utms\":[  \n            {  \n               \"key\":\"utm_medium\",\n               \"value\":\"email\"\n            },\n            {  \n               \"key\":\"utm_campaign\",\n               \"value\":\"btg_inativos\"\n            },\n            {  \n               \"key\":\"utm_source\",\n               \"value\":\"btg360\"\n            },\n            {  \n               \"key\":\"utm_content\",\n               \"value\":\"inativos\"\n            }\n         ]\n      },\n      \"facebook\":{  \n         \"status\":false,\n         \"utms\":[  \n\n         ]\n      },\n      \"push\":{  \n         \"status\":false,\n         \"utms\":[  \n\n         ]\n      }\n   },\n   \"automatics\":{  \n      \"list\":2191663,\n      \"exclusion\":\"\",\n      \"filter\":\"\",\n      \"field\":\"\",\n      \"format\":\"m-d\"\n   },\n   \"rule\":{  \n      \"ruleId\":19,\n      \"typeId\":3,\n      \"typeName\":\"auto\",\n      \"typeAlias\":\"Autom\\u00e1ticas\",\n      \"name\":\"Inativos\",\n      \"alias\":\"inactive\",\n      \"peal\":0,\n      \"module\":0,\n      \"description\":\"Envios autom\\u00e1ticos de acordo com o per\\u00edodo de inatividade dos usu\\u00e1rios com suas campanhas de e-mail marketing\",\n      \"minDescription\":\"Envios autom\\u00e1ticos de acordo com o per\\u00edodo de inatividade dos usu\\u00e1rios com suas campanhas de e-mail marketing\",\n      \"techDescription\":\"Disparos realizados com informa\\u00e7\\u00f5es de listas. Ou seja, sem a necessidade de configura\\u00e7\\u00e3o de TAGs\",\n      \"period\":1,\n      \"icon\":\"flaticon-healthy\",\n      \"priority\":1,\n      \"groupId\":17\n   },\n   \"account\":{  \n      \"id\":6,\n      \"btgId\":6347,\n      \"allinId\":7131,\n      \"transId\":5998,\n      \"token\":\"2e6f9b0d5885b6010f9167787445617f553a735p\"\n   }\n}"
+//  queueEntity.parse
+//
+//  var data : RDD[(String, StockEntity)] = new Automatic(queueEntity).getData
+//
+//  println("gdfgdfgdf"+data.count())
+
+
+
 
   //  var list: Any = None
   //
