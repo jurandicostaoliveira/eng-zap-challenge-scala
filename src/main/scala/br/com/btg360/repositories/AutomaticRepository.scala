@@ -256,7 +256,7 @@ class AutomaticRepository extends Repository {
 
       var query =
         s"""
-           (SELECT * FROM ${listTable} as lTable
+           (SELECT lTable.* FROM ${listTable} as lTable
            INNER JOIN ${activityTable} as acTable
            ON acTable.nm_email = lTable.nm_email
            WHERE
