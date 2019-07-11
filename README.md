@@ -10,3 +10,12 @@ Sending generator to postimatic transational
 $ echo 'APP_ENV=development' > src/main/resources/.environment.properties
 ```
 
+## Compilation
+
+To compile the project, enter the project's directory and execute the command below
+
+```
+$ sbt assembly
+```
+
+
