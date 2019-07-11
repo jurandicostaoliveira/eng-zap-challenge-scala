@@ -21,6 +21,6 @@ class UserEntity extends Entity {
   var token: String = _
   var migrated: Int = 0
   var released: Int = 0
-  var isMultiChannel: Int = 0
+  var isMultiChannel: Boolean = false
 
 }
