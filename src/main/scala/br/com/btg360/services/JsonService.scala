@@ -1,6 +1,7 @@
 package br.com.btg360.services
 
 import br.com.btg360.application.Service
+import org.apache.commons.lang3.StringEscapeUtils
 import org.json4s._
 import org.json4s.native.Serialization.{read, write}
 
@@ -29,7 +30,7 @@ class JsonService extends Service {
     * @return String
     */
   def encode(caseClass: AnyRef): String = {
-    write(caseClass)
+    StringEscapeUtils.escapeJson(write(caseClass))
   }
 
 }
