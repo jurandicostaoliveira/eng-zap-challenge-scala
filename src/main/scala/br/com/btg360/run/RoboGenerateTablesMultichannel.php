@@ -11,7 +11,7 @@ $conn = mysqli_connect("177.153.231.93","root","loca1020");
 
 mysqli_select_db($conn, "btg_consolidated");
 
-$query = "show tables from btg_consolidated where Tables_in_btg_consolidated like '%_".$idBtg."_%' and Tables_in_btg_consolidated not like 'peal%'; ";
+$query = "show tables from btg_consolidated where Tables_in_btg_consolidated like '%_". $idBtg ."_%' and Tables_in_btg_consolidated not like 'peal%' and Tables_in_btg_consolidated not like '%_email';";
 
 $result = $conn->query($query);
 
