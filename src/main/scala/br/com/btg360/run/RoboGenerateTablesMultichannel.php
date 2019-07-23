@@ -23,7 +23,7 @@ while( $row = $result->fetch_assoc() ) {
 
     if( !empty($resultIsEmpty) && $resultIsEmpty->num_rows > 0 ) {
 
-        echo "A tabela ".$row['Tables_in_btg_consolidated']."_email não esta vazia\n\n"; exit;
+        echo "A tabela ".$row['Tables_in_btg_consolidated']."_email não esta vazia\n\n";
     }
 
     $query = "CREATE TABLE IF NOT EXISTS `".$row['Tables_in_btg_consolidated']."_email` (
