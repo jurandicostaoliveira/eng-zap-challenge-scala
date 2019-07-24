@@ -3,7 +3,7 @@ package br.com.btg360.repositories
 import br.com.btg360.application.Repository
 import br.com.btg360.constants.{Base64Converter, Channel, Database, Url, TypeConverter => TC}
 import br.com.btg360.entities.{QueueEntity, StockEntity}
-import br.com.btg360.jdbc.MySqlAllin
+import br.com.btg360.jdbc.{MySqlAllin, MySqlBtg360}
 import br.com.btg360.services.{JsonService, PeriodService}
 import org.apache.spark.rdd.RDD
 
@@ -12,7 +12,8 @@ import scala.util.Random
 
 class TransactionalRepository extends Repository {
 
-  private val db = new MySqlAllin().open
+  //private val db = new MySqlAllin().open
+  private val db = new MySqlBtg360().open
 
   private var _batchLimit: Int = 10000
 

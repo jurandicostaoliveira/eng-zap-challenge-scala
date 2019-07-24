@@ -29,7 +29,7 @@ class JsonService extends Service {
     * @return String
     */
   def encode(caseClass: AnyRef): String = {
-    """ %s """.format(write(caseClass))
+    write(caseClass)
   }
 
 }
