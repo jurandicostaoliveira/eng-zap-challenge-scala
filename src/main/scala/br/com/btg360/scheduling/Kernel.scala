@@ -26,7 +26,7 @@ object Kernel extends App {
   /**
     * Daily rules
     */
-  scheduler.all("daily-rules", 1.minute, 1.hour, new RunnableScheduleTrait {
+  scheduler.all("daily-rules", 20.minute, 1.hour, new RunnableScheduleTrait {
     override def run(userId: Int): Unit = {
       new Daily().dispatch(userId)
     }
@@ -79,7 +79,7 @@ object Kernel extends App {
     */
   scheduler.once("queue-progress", 2.hour, 55.minutes, new RunnableScheduleTrait {
     override def run(userId: Int): Unit = {
-      new QueueProgressService().tolerance(2).run()
+      new QueueProgressService().tolerance(3).run()
     }
   })
 

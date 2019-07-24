@@ -51,6 +51,18 @@ trait RuleTrait extends Application {
       this.user = this.userRepository.findById(userId)
       val rows = this.queueRepository.findAll(userId, this.getTypes)
 
+      /**
+        * Update queue hourly
+        */
+      rows.foreach(row => {
+        if (row.ruleTypeId == Rule.HOURLY_ID && row.status == QueueStatus.RECOMMENDATION_PREPARED) {
+          this.queueRepository.updateStatus(row.userRuleId.toInt, QueueStatus.PROCESSED)
+        }
+      })
+
+      /**
+        * Execute all
+        */
       rows.foreach(row => {
         this.queue = row.parse
         this.queue.rule.transactionalId = this.user.transId
@@ -180,7 +192,10 @@ trait RuleTrait extends Application {
     * Processing of rules
     */
   private def all: Unit = {
-    this.queueRepository.updateStatus(this.queue.userRuleId.toInt, QueueStatus.PROCESSED)
+    if (List(Rule.DAILY_ID, Rule.AUTOMATIC_ID).contains(this.queue.ruleTypeId)) {
+      this.queueRepository.updateStatus(this.queue.userRuleId.toInt, QueueStatus.PROCESSED)
+    }
+
     val data = this.getData
 
     if (data == null || data.count() <= 0) {
