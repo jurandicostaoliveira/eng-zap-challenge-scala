@@ -1,6 +1,7 @@
 package br.com.btg360.entities
 
 import br.com.btg360.application.Entity
+import org.apache.commons.lang3.StringEscapeUtils
 
 import scala.collection.Map
 import scala.collection.mutable.HashMap
@@ -29,6 +30,8 @@ case class StockEntity(
              consolidated: ConsolidatedEntity,
              product: ProductEntity
            ): HashMap[String, Any] = {
+
+    val productName = StringEscapeUtils.escapeJson(product.productName)
     HashMap(
       "userId" -> consolidated.userId,
       "userSent" -> consolidated.userSent,
@@ -74,10 +77,10 @@ case class StockEntity(
       "priceBy" -> product.priceBy,
       "priceNum" -> product.priceNum,
       "priceByNum" -> product.priceByNum,
-      "productDesc" -> product.productName, //Hack .: productDesc
+      "productDesc" -> productName, //Hack .: productDesc
       "productGroupId" -> product.productGroupId,
       "productLink" -> product.productLink,
-      "productName" -> product.productName,
+      "productName" -> productName,
       "quantity" -> product.quantity,
       "state" -> product.state,
       "subCategory" -> product.subCategory,
