@@ -28,16 +28,16 @@ class UrlService extends Service {
                 link: String,
                 productId: String = "0",
                 isRecommendation: Int = 0,
-                position: Int = 0
+                position: Int = 0,
+                client: String = "null"
               ): String = {
-
     val utmLink = if (queue.utmLink.isEmpty) null else "?%s".format(queue.utmLink)
     "%s/%d/%d/%d/%s/%d/%d/%d/%d/%s/%s%s".format(
       Url.REDIRECTOR,
       queue.userId,
       queue.userRuleId,
       Channel.all(queue.channelName),
-      "{{client}}",
+      base64.encode(client),
       queue.deliveryTimestamp,
       queue.rule.layoutId,
       position,

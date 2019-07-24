@@ -73,7 +73,8 @@ class DataMapperService(queue: QueueEntity) extends Service with Serializable {
             TC.toString(row("productLink")),
             TC.toString(row("productId")),
             TC.toInt(row("isRecommendation")),
-            position
+            position,
+            rows._1
           )
 
           if (row("isRecommendation").equals(1)) {
