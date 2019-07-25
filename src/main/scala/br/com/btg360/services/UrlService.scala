@@ -9,7 +9,7 @@ class UrlService extends Service {
   private val exceptLinks = List("##optout##", "##preview##", "#")
 
   private val replacePatterns: Map[String, String] = Map(
-    "[\\\\n]" -> "",
+    "[\\n]" -> "",
     "href[\\s]+\\=[\\s]+|href[\\s]+\\=|href=[\\s]+" -> "href="
   )
 
@@ -28,8 +28,7 @@ class UrlService extends Service {
                 link: String,
                 productId: String = "0",
                 isRecommendation: Int = 0,
-                position: Int = 0,
-                client: String = "null"
+                position: Int = 0
               ): String = {
     val utmLink = if (queue.utmLink.isEmpty) null else "?%s".format(queue.utmLink)
     "%s/%d/%d/%d/%s/%d/%d/%d/%d/%s/%s%s".format(
@@ -37,7 +36,7 @@ class UrlService extends Service {
       queue.userId,
       queue.userRuleId,
       Channel.all(queue.channelName),
-      base64.encode(client),
+      """ {{ client }} """,
       queue.deliveryTimestamp,
       queue.rule.layoutId,
       position,
