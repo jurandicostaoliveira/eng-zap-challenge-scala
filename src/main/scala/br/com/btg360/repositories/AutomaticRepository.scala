@@ -144,9 +144,6 @@ class AutomaticRepository extends Repository {
       val df: DataFrame = this.db.sparkRead(
         """(SELECT * FROM emailpro_lista.base_7018_2127908 WHERE DT_NASCIMENTO LIKE "1981-11-%" LIMIT 1) emp_alias"""
       )
-
-      println("PRINTA DATAFRAME: ")
-      df.show(20)
     } catch {
       case e: Exception => println(e.printStackTrace())
     }
@@ -216,7 +213,6 @@ class AutomaticRepository extends Repository {
          """
       query = this.queryFilterAppend(query)
       val df: DataFrame = this.db.sparkRead(query)
-      df.show(20)
       this.dfToRDD(df)
     } catch {
       case e: Exception => e.getLocalizedMessage

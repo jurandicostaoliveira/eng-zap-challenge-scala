@@ -18,10 +18,9 @@ class UrlService extends Service {
     *
     * @param QueueEntity queue
     * @param String      link
-    * @param string         position
+    * @param String      position
     * @param String      productId
     * @param Int         isRecommendation
-
     * @return String
     */
   def redirect(
@@ -33,7 +32,7 @@ class UrlService extends Service {
                 client: String = ""
               ): String = {
 
-    val strClient = if (client.isEmpty) """ {{ client }} """ else base64.encode(client)
+    val strClient = if (client.isEmpty) """{{ client }}""".trim else base64.encode(client)
     val utmLink = if (queue.utmLink.isEmpty) null else "?%s".format(queue.utmLink)
 
     "%s/%d/%d/%d/%s/%s/%d/%d/%s/%d/%s/%s%s".format(
