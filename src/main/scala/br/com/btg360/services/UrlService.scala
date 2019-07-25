@@ -36,7 +36,7 @@ class UrlService extends Service {
     val strClient = if (client.isEmpty) """ {{ client }} """ else base64.encode(client)
     val utmLink = if (queue.utmLink.isEmpty) null else "?%s".format(queue.utmLink)
 
-    "%s/%d/%d/%d/%d/%s/%d/%d/%d/%d/%s/%s%s".format(
+    "%s/%d/%d/%d/%s/%s/%d/%d/%s/%d/%s/%s%s".format(
       Url.REDIRECTOR,
       queue.rule.btgId,
       queue.userId,
