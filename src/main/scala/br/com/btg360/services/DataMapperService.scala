@@ -1,7 +1,7 @@
 package br.com.btg360.services
 
 import br.com.btg360.application.Service
-import br.com.btg360.constants.{Keyspace, Message, TypeConverter => TC}
+import br.com.btg360.constants.{HtmlPosition, Keyspace, Message, TypeConverter => TC}
 import br.com.btg360.entities._
 import br.com.btg360.repositories.{ConsolidatedRepository, ProductRepository}
 import br.com.btg360.spark.SparkCoreSingleton
@@ -71,9 +71,10 @@ class DataMapperService(queue: QueueEntity) extends Service with Serializable {
           row("productLink") = new UrlService().redirect(
             this.queue,
             TC.toString(row("productLink")),
+            HtmlPosition.CONTENT,
             TC.toString(row("productId")),
             TC.toInt(row("isRecommendation")),
-            position
+            rows._1
           )
 
           if (row("isRecommendation").equals(1)) {

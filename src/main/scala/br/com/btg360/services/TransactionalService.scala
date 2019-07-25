@@ -1,10 +1,9 @@
 package br.com.btg360.services
 
 import br.com.btg360.application.Service
-import br.com.btg360.constants.{Message, Template}
+import br.com.btg360.constants.{HtmlPosition, Message, Template, TypeConverter => TC}
 import br.com.btg360.entities.{QueueEntity, StockEntity}
 import br.com.btg360.repositories.{TemplateRepository, ThemeRepository, TransactionalRepository}
-import br.com.btg360.constants.{TypeConverter => TC}
 import org.apache.spark.rdd.RDD
 
 class TransactionalService() extends Service {
@@ -30,7 +29,9 @@ class TransactionalService() extends Service {
     */
   private def createLayout(queue: QueueEntity): (String, Map[String, Any]) = {
     if (queue.rule.layoutId == Template.STATIC_ID) {
-      return ("%s%s".format(this.pixelImg(), new UrlService().parse(queue, queue.rule.content)), Map())
+      return ("%s%s".format(this.pixelImg(), new UrlService().parse(
+        queue, queue.rule.content, HtmlPosition.CONTENT)), Map()
+      )
     }
 
     val theme = new JsonService().decode[Map[String, Any]](
@@ -40,9 +41,9 @@ class TransactionalService() extends Service {
     (
       "%s%s%s%s".format(
         this.pixelImg(),
-        new UrlService().parse(queue, TC.toString(theme("header"))),
+        new UrlService().parse(queue, TC.toString(theme("header")), HtmlPosition.HEADER),
         this.templateRepository.findById(queue.rule.templateId).html,
-        new UrlService().parse(queue, TC.toString(theme("footer")))
+        new UrlService().parse(queue, TC.toString(theme("footer")), HtmlPosition.FOOTER)
       ),
       configs
     )
