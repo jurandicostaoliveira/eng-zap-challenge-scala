@@ -47,7 +47,7 @@ class UrlService extends Service {
       position,
       isRecommendation,
       productId,
-      base64.encode(link),
+      base64.encode(link.replace("/?", "?")),
       utmLink
     )
   }
