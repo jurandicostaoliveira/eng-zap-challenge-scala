@@ -34,6 +34,7 @@ class QueueEntity extends Entity {
   //Channel
   var channelName: String = Channel.EMAIL
   var platformId: Int = 0
+  var deliveryHourAt: String = _
   var deliveryAt: String = _
   var deliveryTimestamp: Long = 0
   var utmLink: String = _
@@ -46,6 +47,7 @@ class QueueEntity extends Entity {
   def parse: QueueEntity = {
     if (this.rule == null) {
       this.rule = new JsonService().decode[RuleDataEntity](this.dataStringJson)
+      this.deliveryHourAt = this.generateDeliveryHourAt
       this.deliveryAt = this.generateDeliveryAt
       this.deliveryTimestamp = this.generateDeliveryTimestamp
       this.utmLink = this.generateUtmLink
@@ -73,17 +75,26 @@ class QueueEntity extends Entity {
   }
 
   /**
-    * Returns the time to exit sending
+    * Returns the hour to exit sending
     *
     * @return String
     */
-  private def generateDeliveryAt: String = {
+  private def generateDeliveryHourAt: String = {
     var hour = this.rule.hour
     if (this.ruleTypeId == Rule.HOURLY_ID) {
       hour = "%d:00:00".format(TC.toInt(new PeriodService("HH").now) + 1)
     }
 
-    "%s %s".format(this.today, hour)
+    hour
+  }
+
+  /**
+    * Returns the time to exit sending
+    *
+    * @return String
+    */
+  private def generateDeliveryAt: String = {
+    "%s %s".format(this.today, this.generateDeliveryHourAt)
   }
 
   /**
