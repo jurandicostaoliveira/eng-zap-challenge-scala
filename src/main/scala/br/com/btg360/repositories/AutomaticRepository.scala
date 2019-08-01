@@ -256,7 +256,7 @@ class AutomaticRepository extends Repository {
            INNER JOIN ${activityTable} as acTable
            ON acTable.nm_email = lTable.nm_email
            WHERE
-           acTable.dt_atividade = ${period}
+           acTable.dt_atividade = "${period}"
          """
       query = this.queryFilterAppend(query)
       val df: DataFrame = this.db.sparkRead(query)
