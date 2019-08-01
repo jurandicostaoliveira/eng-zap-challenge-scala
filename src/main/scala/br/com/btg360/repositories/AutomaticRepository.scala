@@ -104,7 +104,7 @@ class AutomaticRepository extends Repository {
         (this.listExclusionId != this.listId)) {
       whereNotIn =
         s"""
-            AND NOT IN(SELECT nm_email FROM ${this.getExclusionListTable})
+            AND nm_email NOT IN(SELECT nm_email FROM ${this.getExclusionListTable})
           """
 
     }
