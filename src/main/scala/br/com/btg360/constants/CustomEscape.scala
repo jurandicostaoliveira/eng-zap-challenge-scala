@@ -10,7 +10,7 @@ object CustomEscape {
     */
   def toJson(value: String): String = {
     StringEscapeUtils.escapeJson(value)
-      .replace("'", "&lsquo;")
+      .replace("'", "\\u0027")
   }
 
 }
