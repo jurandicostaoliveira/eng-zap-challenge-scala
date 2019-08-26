@@ -45,6 +45,8 @@ class UserRepository extends Repository {
             ON ${this.userRulesTable}.userId = ${this.userTable}.id
           WHERE
               ${this.userRulesTable}.status = 1
+              AND ${this.userTable}.homologation = 1
+              AND ${this.userTable}.isAllowed = 1
               AND ${this.userTable}.isMultiChannel = ${MultiChannel.STATUS};
        """
       var list: List[Int] = List()
