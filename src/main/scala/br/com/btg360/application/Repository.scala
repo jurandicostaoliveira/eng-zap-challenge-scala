@@ -11,7 +11,7 @@ import scala.collection.mutable.HashMap
 
 abstract class Repository extends Application {
 
-  private var dbConnection: Connection = this.invoke(classOf[MySqlBtg360]).open
+  protected var dbConnection: Connection = this.invoke(classOf[MySqlBtg360]).open
 
   private var where: String = ""
 
@@ -253,6 +253,32 @@ abstract class Repository extends Application {
       }
 
       stmt.executeBatch()
+      stmt.close()
+    } catch {
+      case e: Exception => println(e.printStackTrace())
+    }
+  }
+
+
+  /**
+    * Insert multiple data with prepare statement
+    *
+    * @param String query
+    * @param List   data
+    */
+  def insertStatementBatch(query: String, data: List[Map[String, Any]]): Unit = {
+    try {
+      val stmt = this.dbConnection.prepareStatement(query)
+      for (map <- data) {
+        var index = 1
+        for ((key, value) <- map) {
+          if (value == null) stmt.setNull(index, 0) else stmt.setObject(index, value)
+          index += 1
+        }
+        stmt.addBatch()
+      }
+
+      stmt.executeLargeBatch()
       stmt.close()
     } catch {
       case e: Exception => println(e.printStackTrace())

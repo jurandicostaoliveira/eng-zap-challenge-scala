@@ -3,7 +3,7 @@ package br.com.btg360.repositories
 import br.com.btg360.application.Repository
 import br.com.btg360.constants.{Base64Converter, Channel, Database, Url, TypeConverter => TC}
 import br.com.btg360.entities.{QueueEntity, StockEntity}
-import br.com.btg360.jdbc.MySqlAllin
+import br.com.btg360.jdbc.{MySqlAllin, MySqlBtg360}
 import br.com.btg360.services.{JsonService, PeriodService}
 import org.apache.spark.rdd.RDD
 
@@ -370,20 +370,25 @@ class TransactionalRepository extends Repository {
   def saveSend: Boolean = {
     try {
       val table = this.generateSendTable
+      val total: Long = this.data.count
       var limiter: Int = 0
       var totalizator: Int = 0
-      val total: Long = this.data.count
-      var queries: List[String] = List()
+      var query: String = null
+      var data: List[Map[String, Any]] = List()
 
       this.data.collect().foreach(row => {
-        val data = this.createSendData(row._1, row._2)
-        val values = "'%s'".format(data.values.mkString("','"))
-        queries = queries :+ s"INSERT IGNORE INTO ${table} (${data.keys.mkString(",")}) VALUES (${values});"
+        val dataMap = this.createSendData(row._1, row._2)
+        if (query == null) {
+          query = String.format("INSERT IGNORE INTO %s (%s) VALUES (%s);",
+            table, dataMap.keys.mkString(","), List.fill(dataMap.size)("?").mkString(",")
+          )
+        }
+        data = data :+ dataMap
         limiter += 1
         totalizator += 1
         if (limiter >= this.batchLimit || totalizator >= total) {
-          this.connection(this.db).insertQueryBatch(queries)
-          queries = List()
+          this.connection(this.db).insertStatementBatch(query, data)
+          data = List()
           limiter = 0
         }
       })
