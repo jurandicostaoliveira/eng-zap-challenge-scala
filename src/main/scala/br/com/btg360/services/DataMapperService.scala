@@ -86,7 +86,7 @@ class DataMapperService(queue: QueueEntity) extends Service with Serializable {
         })
 
         (rows._1, new StockEntity(products, recommendations))
-      })
+      }).filter(row => row._2.products.size > 0)
 
       println(Message.TOTAL_ITEMS_FOUND.format(data.count()))
       data

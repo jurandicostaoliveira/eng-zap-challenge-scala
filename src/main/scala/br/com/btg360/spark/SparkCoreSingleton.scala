@@ -66,6 +66,7 @@ object SparkCoreSingleton extends Serializable {
       .config("spark.cassandra.connection.compression", p.getProperty("sparkCassandraConnectionCompression"))
       .config("spark.ui.port", p.getProperty("sparkUiPort"))
       .config("spark.cassandra.connection.timeout_ms", p.getProperty("sparkCassandraConnectionTimeoutMs"))
+      .config("spark.cassandra.connection.keep_alive_ms", p.getProperty("sparkCassandraConnectionKeepAliveMs"))
       .config("spark.network.timeout", p.getProperty("sparkNetworkTimeout"))
       .config("spark.cassandra.input.consistency.level", p.getProperty("sparkCassandraInputConsistencyLevel"))
       .config("spark.local.dir", p.getProperty("sparkLocalDir"))

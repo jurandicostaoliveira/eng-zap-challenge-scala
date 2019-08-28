@@ -7,10 +7,13 @@ import br.com.btg360.services._
 import br.com.btg360.traits.RunnableScheduleTrait
 import br.com.btg360.worker.rule.{Daily, Hourly}
 import br.com.btg360.constants.Time
+import br.com.btg360.spark.SparkCoreSingleton
 
 import scala.concurrent.duration._
 
 object Kernel extends App {
+
+  SparkCoreSingleton.getContext
 
   val scheduler = new Scheduler()
 
