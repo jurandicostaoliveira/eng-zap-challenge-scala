@@ -48,7 +48,7 @@ object SparkCoreSingleton extends Serializable {
     *
     * @return
     */
-  def getContext: SparkContext = this.synchronized {
+  def getContext: SparkContext = {
     if (this.sparkContext == null) {
       this.sparkContext = this.getSparkSession.sparkContext
       this.sparkContext.setLocalProperty("spark.scheduler.pool", "default")
