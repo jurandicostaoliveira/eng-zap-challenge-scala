@@ -4,19 +4,24 @@ import akka.actor.{Actor, ActorSystem, Props}
 import br.com.btg360.repositories.UserRepository
 import br.com.btg360.traits.RunnableScheduleTrait
 
-import scala.concurrent.duration.FiniteDuration
-import scala.concurrent.duration._
+import scala.concurrent.Future
+import scala.concurrent.duration.{FiniteDuration, _}
 
 class Scheduler {
 
   /**
     * Receiver system class of actors
     *
-    * @param SchedulerContextTrait context
+    * @param RunnableScheduleTrait runnable
     */
   class ActorContext(runnable: RunnableScheduleTrait) extends Actor {
+
+    implicit val executionContext = this.context.dispatcher
+
     override def receive: Receive = {
-      case userId: Int => runnable.run(userId)
+      case userId: Int => Future {
+        runnable.run(userId)
+      }
     }
   }
 
