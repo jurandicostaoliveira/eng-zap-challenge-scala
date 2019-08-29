@@ -1,7 +1,9 @@
 package br.com.btg360.services
 
+import java.net.{URI, URLEncoder}
+
 import br.com.btg360.application.Service
-import br.com.btg360.constants.{Channel, HtmlPosition, Url, Base64Converter => base64}
+import br.com.btg360.constants.{HtmlPosition, Url, Base64Converter => base64}
 import br.com.btg360.entities.QueueEntity
 
 class UrlService extends Service {
@@ -12,6 +14,26 @@ class UrlService extends Service {
     "[\\n]" -> "",
     "href[\\s]+\\=[\\s]+|href[\\s]+\\=|href=[\\s]+" -> "href="
   )
+
+  /**
+    * Generate URI
+    *
+    * @param String uri
+    * @param String queryString
+    * @return String
+    */
+  private def generateUri(uri: String, qs: String): String = {
+    if (!qs.isEmpty) {
+      val uriSymbol: String = if (uri.contains("?")) "" else "?"
+      var qsSymbol: String = if (new URI(uri).getQuery == null) "" else "&"
+      if (uri.takeRight(1).equals("?")) {
+        qsSymbol = ""
+      }
+      return "%s%s%s%s".format(uri, uriSymbol, qsSymbol, qs)
+    }
+
+    uri
+  }
 
   /**
     * Generating the link to the redirector
@@ -33,23 +55,22 @@ class UrlService extends Service {
               ): String = {
 
     val strClient = if (client.isEmpty) """{{ client }}""".trim else base64.encode(client)
-    val utmLink = if (queue.utmLink.isEmpty) null else "?%s".format(queue.utmLink)
-
-    "%s/%d/%d/%d/%s/%s/%d/%d/%s/%d/%s/%s%s".format(
-      Url.REDIRECTOR,
-      queue.rule.btgId,
-      queue.userId,
-      queue.userRuleId,
-      queue.channelName,
-      strClient,
-      queue.deliveryTimestamp,
-      queue.rule.layoutId,
-      position,
-      isRecommendation,
-      productId,
-      base64.encode(link.replace("/?", "?")),
-      utmLink
+    val uri = this.generateUri(link, queue.utmLink)
+    val params: List[String] = List(
+      "btgId=%s".format(queue.rule.btgId),
+      "userId=%s".format(queue.userId),
+      "userRuleId=%s".format(queue.userRuleId),
+      "channel=%s".format(queue.channelName),
+      "client=%s".format(strClient),
+      "timestamp=%s".format(queue.deliveryTimestamp),
+      "templateType=%s".format(queue.rule.layoutId),
+      "position=%s".format(position),
+      "isRecommendation=%s".format(isRecommendation),
+      "productId=%s".format(productId),
+      "link=%s".format(URLEncoder.encode(uri, "UTF-8"))
     )
+
+    "%s?%s".format(Url.REDIRECTOR, params.mkString("&"))
   }
 
   /**

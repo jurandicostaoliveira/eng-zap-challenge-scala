@@ -62,10 +62,9 @@ class DataMapperService(queue: QueueEntity) extends Service with Serializable {
     */
   def get: RDD[(String, StockEntity)] = {
     try {
-      val data = this.join.groupByKey().map(rows => {
+      val group = this.join.groupByKey().map(rows => {
         var products: List[HashMap[String, Any]] = List()
         var recommendations: List[HashMap[String, Any]] = List()
-        var position: Int = 0
 
         rows._2.foreach(row => {
           row("productLink") = new UrlService().redirect(
@@ -82,12 +81,12 @@ class DataMapperService(queue: QueueEntity) extends Service with Serializable {
           } else {
             products = products :+ row
           }
-          position += 1
         })
 
         (rows._1, new StockEntity(products, recommendations))
-      }).filter(row => row._2.products.size > 0)
+      })
 
+      val data = group.filter(row => row._2.products.size > 0)
       println(Message.TOTAL_ITEMS_FOUND.format(data.count()))
       data
     } catch {

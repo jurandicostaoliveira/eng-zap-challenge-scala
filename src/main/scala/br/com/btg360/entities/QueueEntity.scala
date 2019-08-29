@@ -37,7 +37,7 @@ class QueueEntity extends Entity {
   var deliveryHourAt: String = _
   var deliveryAt: String = _
   var deliveryTimestamp: Long = 0
-  var utmLink: String = _
+  var utmLink: String = ""
 
   /**
     * Parsed the rule configuration data
