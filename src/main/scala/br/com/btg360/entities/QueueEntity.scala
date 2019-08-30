@@ -80,9 +80,15 @@ class QueueEntity extends Entity {
     * @return String
     */
   private def generateDeliveryHourAt: String = {
+    val timeNow = "%d:00:00".format(TC.toInt(new PeriodService("HH").now) + 1)
     var hour = this.rule.hour
+
+    if (hour.isEmpty) {
+      hour = timeNow
+    }
+
     if (this.ruleTypeId == Rule.HOURLY_ID) {
-      hour = "%d:00:00".format(TC.toInt(new PeriodService("HH").now) + 1)
+      hour = timeNow
     }
 
     hour
