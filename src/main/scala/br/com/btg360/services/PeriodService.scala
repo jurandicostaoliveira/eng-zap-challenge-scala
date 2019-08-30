@@ -11,7 +11,7 @@ class PeriodService {
 
   def this(format: String) {
     this()
-    this._format = format
+    this._format = format.trim
   }
 
   /**
@@ -24,7 +24,7 @@ class PeriodService {
     * @return PeriodService
     */
   def format(value: String): PeriodService = {
-    this._format = value
+    this._format = value.trim
     this
   }
 
@@ -95,7 +95,7 @@ class PeriodService {
     * @return Date
     */
   def toDate(stringDate: String): Date = {
-    this.simpleDateFormat.parse(stringDate)
+    this.simpleDateFormat.parse(stringDate.trim)
   }
 
   /**

@@ -1,9 +1,11 @@
 package br.com.btg360.repositories
 
+import java.net.URLEncoder
+
 import br.com.btg360.application.Repository
 import br.com.btg360.constants.{Base64Converter, Channel, Database, Url, TypeConverter => TC}
 import br.com.btg360.entities.{QueueEntity, StockEntity}
-import br.com.btg360.jdbc.{MySqlAllin, MySqlBtg360}
+import br.com.btg360.jdbc.MySqlAllin
 import br.com.btg360.services.{JsonService, PeriodService}
 import org.apache.spark.rdd.RDD
 
@@ -340,12 +342,12 @@ class TransactionalRepository extends Repository {
         configs = this.themeConfigs,
         email = user,
         client = client,
-        pixel = "%s?client=%s&userId=%d&userRuleId=%d&timestamp=%d".format(
+        pixel = "%s?client=%s&userId=%s&userRuleId=%s&deliveryAt=%s".format(
           Url.PIXEL_VIEW,
           client,
           this.queue.userId,
           this.queue.userRuleId,
-          this.queue.deliveryTimestamp
+          URLEncoder.encode(this.queue.deliveryAt, Base64Converter.UTF_8)
         ),
         virtual_mta = this.queue.vmta
       ))

@@ -62,12 +62,12 @@ class UrlService extends Service {
       "userRuleId=%s".format(queue.userRuleId),
       "channel=%s".format(queue.channelName),
       "client=%s".format(strClient),
-      "timestamp=%s".format(queue.deliveryTimestamp),
+      "deliveryAt=%s".format(URLEncoder.encode(queue.deliveryAt, base64.UTF_8)),
       "templateType=%s".format(queue.rule.layoutId),
       "position=%s".format(position),
       "isRecommendation=%s".format(isRecommendation),
       "productId=%s".format(productId),
-      "link=%s".format(URLEncoder.encode(uri, "UTF-8"))
+      "link=%s".format(URLEncoder.encode(uri, base64.UTF_8))
     )
 
     "%s?%s".format(Url.REDIRECTOR, params.mkString("&"))
