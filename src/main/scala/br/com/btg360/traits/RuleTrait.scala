@@ -207,12 +207,12 @@ trait RuleTrait extends Application {
     new TransactionalService().persist(this.queue, this.apply(this.filter(data)))
 
     this.queueRepository.updateStatus(this.queue.userRuleId.toInt, this.getCompletedStatus)
-    println(String.format(Message.UPDATE_RULE_STATUS, this.queue.userRuleId.toInt, this.getCompletedStatus))
+    println(Message.UPDATE_RULE_STATUS.format(this.queue.userRuleId.toInt, this.getCompletedStatus))
 
     this.consolidatedRepository.table(this.queue.getConsolidatedTable).updateSubmitted(
       1, this.queue.platformId
     )
-    println(String.format(Message.UPDATE_CONSOLIDATED_STATUS, 1, this.queue.platformId))
+    println(Message.UPDATE_CONSOLIDATED_STATUS.format(1, this.queue.platformId))
   }
 
 }
