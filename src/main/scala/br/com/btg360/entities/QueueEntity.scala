@@ -1,7 +1,7 @@
 package br.com.btg360.entities
 
 import br.com.btg360.application.Entity
-import br.com.btg360.constants.{Channel, Database, Rule, TypeConverter => TC}
+import br.com.btg360.constants.{Channel, Database, Keyspace, Rule, TypeConverter => TC}
 import br.com.btg360.services.{JsonService, PeriodService}
 
 class QueueEntity extends Entity {
@@ -71,7 +71,7 @@ class QueueEntity extends Entity {
     * @return
     */
   def getProductTable: String = {
-    "product_%d".format(this.rule.allinId)
+    "%s.product_%d".format(Keyspace.BTG360, this.rule.allinId)
   }
 
   /**

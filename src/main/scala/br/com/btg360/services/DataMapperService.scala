@@ -1,7 +1,7 @@
 package br.com.btg360.services
 
 import br.com.btg360.application.Service
-import br.com.btg360.constants.{HtmlPosition, Keyspace, Message, TypeConverter => TC}
+import br.com.btg360.constants.{HtmlPosition, Message, TypeConverter => TC}
 import br.com.btg360.entities._
 import br.com.btg360.repositories.{ConsolidatedRepository, ProductRepository}
 import br.com.btg360.spark.SparkCoreSingleton
@@ -19,13 +19,13 @@ class DataMapperService(queue: QueueEntity) extends Service with Serializable {
   private def consolidatedData: RDD[(Any, ConsolidatedEntity)] = {
     val repository = new ConsolidatedRepository()
     val table = this.queue.getConsolidatedTable
-    println(Message.CONSOLIDATED_TABLE_NAME.format(table))
 
     if (!repository.tableExists(table)) {
       println(Message.CONSOLIDATED_TABLE_NOT_FOUND.format(table))
-      return SparkCoreSingleton.getContext.emptyRDD[(Any, ConsolidatedEntity)]
+      return null
     }
 
+    println(Message.CONSOLIDATED_TABLE_NAME.format(table))
     repository.table(table).findAllKeyBy(
       entity => (entity.productId, entity), this.queue.platformId
     )
@@ -37,9 +37,16 @@ class DataMapperService(queue: QueueEntity) extends Service with Serializable {
     * @return RDD
     */
   private def productData: RDD[(Any, ProductEntity)] = {
+    val repository = new ProductRepository()
     val table = this.queue.getProductTable
-    println(Message.PRODUCT_TABLE_NAME.format(Keyspace.BTG360 + "." + table))
-    new ProductRepository().table(table).findAllKeyBy(
+
+    if (!repository.cassandraTableExists(table)) {
+      println(Message.PRODUCT_TABLE_NOT_FOUND.format(table))
+      return null
+    }
+
+    println(Message.PRODUCT_TABLE_NAME.format(table))
+    repository.table(table).findAllKeyBy(
       entity => (entity.productId, entity)
     )
   }
@@ -50,6 +57,10 @@ class DataMapperService(queue: QueueEntity) extends Service with Serializable {
     * @return
     */
   private def join: RDD[(String, HashMap[String, Any])] = {
+    if (this.consolidatedData == null || this.productData == null) {
+      return null
+    }
+
     this.consolidatedData.join(this.productData).map(row => {
       (row._2._1.userSent, new StockEntity().toMap(row._2._1, row._2._2))
     })
@@ -62,7 +73,12 @@ class DataMapperService(queue: QueueEntity) extends Service with Serializable {
     */
   def get: RDD[(String, StockEntity)] = {
     try {
-      val group = this.join.groupByKey().map(rows => {
+      val join = this.join
+      if (join == null) {
+        throw new Exception(Message.CONSOLIDATED_OR_PRODUCT_NOT_FOUND)
+      }
+
+      val group = join.groupByKey().map(rows => {
         var products: List[HashMap[String, Any]] = List()
         var recommendations: List[HashMap[String, Any]] = List()
 

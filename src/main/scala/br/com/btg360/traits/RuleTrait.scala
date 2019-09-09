@@ -197,7 +197,6 @@ trait RuleTrait extends Application {
     }
 
     val data = this.getData
-
     if (data == null || data.count() <= 0) {
       this.queueRepository.updateStatus(this.queue.userRuleId.toInt, this.getCompletedStatus)
       println(Message.ITEMS_NOT_FOUND)

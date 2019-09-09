@@ -2,8 +2,10 @@ package br.com.btg360.application
 
 import java.sql.{Connection, ResultSet, SQLException, Statement}
 
-import br.com.btg360.constants.{TypeConverter => TC}
+import br.com.btg360.constants.{Keyspace, TypeConverter => TC}
 import br.com.btg360.jdbc.MySqlBtg360
+import br.com.btg360.spark.SparkCoreSingleton
+import com.datastax.driver.core.KeyspaceMetadata
 
 import scala.collection.immutable.List
 import scala.collection.mutable.HashMap
@@ -386,6 +388,27 @@ abstract class Repository extends Application {
       stmt.close()
     } catch {
       case e: SQLException => println(e.printStackTrace())
+    }
+  }
+
+  /**
+    * Check if a cassandra table exists
+    *
+    * @param String table
+    * @return String
+    */
+  def cassandraTableExists(table: String): Boolean = {
+    try {
+      val row = this.databaseSplit(table)
+      val ks: KeyspaceMetadata = SparkCoreSingleton.getSession.getCluster.getMetadata.getKeyspace(row("database"))
+      if (ks.getTable(row("table")) == null) {
+        return false
+      } else {
+        return true
+      }
+    } catch {
+      case e: Exception => println(e.printStackTrace())
+        false
     }
   }
 
