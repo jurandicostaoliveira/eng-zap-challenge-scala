@@ -58,11 +58,13 @@ class DataMapperService(queue: QueueEntity) extends Service with Serializable {
     * @return
     */
   private def join: RDD[(String, HashMap[String, Any])] = {
-    if (this.consolidatedData == null || this.productData == null) {
+    val consolidatedData = this.consolidatedData
+    val productData = this.productData
+    if (consolidatedData == null || productData == null) {
       return null
     }
 
-    this.consolidatedData.join(this.productData).map(row => {
+    consolidatedData.join(productData).map(row => {
       (row._2._1.userSent, new StockEntity().toMap(row._2._1, row._2._2))
     })
   }
