@@ -71,7 +71,7 @@ class QueueEntity extends Entity {
     * @return
     */
   def getProductTable: String = {
-    "%s.product_%d".format(Keyspace.BTG360, this.rule.allinId)
+    "product_%d".format(this.rule.allinId)
   }
 
   /**

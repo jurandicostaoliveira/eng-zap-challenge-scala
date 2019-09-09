@@ -1,7 +1,7 @@
 package br.com.btg360.services
 
 import br.com.btg360.application.Service
-import br.com.btg360.constants.{HtmlPosition, Message, TypeConverter => TC}
+import br.com.btg360.constants.{HtmlPosition, Keyspace, Message, TypeConverter => TC}
 import br.com.btg360.entities._
 import br.com.btg360.repositories.{ConsolidatedRepository, ProductRepository}
 import br.com.btg360.spark.SparkCoreSingleton
@@ -39,13 +39,14 @@ class DataMapperService(queue: QueueEntity) extends Service with Serializable {
   private def productData: RDD[(Any, ProductEntity)] = {
     val repository = new ProductRepository()
     val table = this.queue.getProductTable
+    val keyspaceAndTable = "%s.%s".format(Keyspace.BTG360, table)
 
-    if (!repository.cassandraTableExists(table)) {
-      println(Message.PRODUCT_TABLE_NOT_FOUND.format(table))
+    if (!repository.cassandraTableExists(keyspaceAndTable)) {
+      println(Message.PRODUCT_TABLE_NOT_FOUND.format(keyspaceAndTable))
       return null
     }
 
-    println(Message.PRODUCT_TABLE_NAME.format(table))
+    println(Message.PRODUCT_TABLE_NAME.format(keyspaceAndTable))
     repository.table(table).findAllKeyBy(
       entity => (entity.productId, entity)
     )
@@ -75,7 +76,7 @@ class DataMapperService(queue: QueueEntity) extends Service with Serializable {
     try {
       val join = this.join
       if (join == null) {
-        throw new Exception(Message.CONSOLIDATED_OR_PRODUCT_NOT_FOUND)
+        return null
       }
 
       val group = join.groupByKey().map(rows => {
