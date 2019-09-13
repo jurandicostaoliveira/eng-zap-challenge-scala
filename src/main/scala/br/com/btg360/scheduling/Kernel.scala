@@ -1,12 +1,11 @@
 package br.com.btg360.scheduling
 
-import br.com.btg360.constants.Path
+import br.com.btg360.constants.{Path, QueueStatus, Time}
 import br.com.btg360.entities.QueueEntity
 import br.com.btg360.repositories.{ConsolidatedRepository, QueueRepository}
 import br.com.btg360.services._
 import br.com.btg360.traits.RunnableScheduleTrait
 import br.com.btg360.worker.rule.{Daily, Hourly}
-import br.com.btg360.constants.Time
 import br.com.btg360.spark.SparkCoreSingleton
 
 import scala.concurrent.duration._
@@ -45,6 +44,19 @@ object Kernel extends App {
   })
 
   /**
+    * Queue progress
+    */
+  scheduler.once("queue-progress", 1.hour, 55.minutes, new RunnableScheduleTrait {
+    override def run(userId: Int): Unit = {
+      new QueueProgressService()
+        .statusFrom(List(QueueStatus.PREPARED, QueueStatus.RECOMMENDATION_STARTED, QueueStatus.PROCESSED))
+        .statusTo(QueueStatus.RECOMMENDATION_PREPARED)
+        .tolerance(2)
+        .run()
+    }
+  })
+
+  /**
     * Clear send limit
     */
   scheduler.once("clear-send-limit", 0.second, 30.minutes, new RunnableScheduleTrait {
@@ -74,15 +86,6 @@ object Kernel extends App {
       if (Time.isMidnight) {
         new ConsolidatedRepository().deleteOnDays(90)
       }
-    }
-  })
-
-  /**
-    * Queue progress
-    */
-  scheduler.once("queue-progress", 2.hour, 55.minutes, new RunnableScheduleTrait {
-    override def run(userId: Int): Unit = {
-      new QueueProgressService().tolerance(3).run()
     }
   })
 
