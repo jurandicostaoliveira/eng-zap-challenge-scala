@@ -342,11 +342,13 @@ class TransactionalRepository extends Repository {
         configs = this.themeConfigs,
         email = user,
         client = client,
-        pixel = "%s?client=%s&userId=%s&userRuleId=%s&deliveryAt=%s".format(
+        pixel = "%s?btgId=%s&userId=%s&userRuleId=%s&channel=%s&client=%s&deliveryAt=%s".format(
           Url.PIXEL_VIEW,
-          client,
+          this.queue.rule.btgId,
           this.queue.userId,
           this.queue.userRuleId,
+          this.queue.channelName,
+          client,
           URLEncoder.encode(this.queue.deliveryAt, Base64Converter.UTF_8)
         ),
         virtual_mta = this.queue.vmta
