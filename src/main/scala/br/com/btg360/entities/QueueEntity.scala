@@ -1,7 +1,7 @@
 package br.com.btg360.entities
 
 import br.com.btg360.application.Entity
-import br.com.btg360.constants.{Channel, Database, Keyspace, Rule, TypeConverter => TC}
+import br.com.btg360.constants.{Channel, Database, Rule, TypeConverter => TC}
 import br.com.btg360.services.{JsonService, PeriodService}
 
 class QueueEntity extends Entity {
@@ -12,7 +12,7 @@ class QueueEntity extends Entity {
   var userId: Long = 0
   var groupId: Long = 0
   var ruleTypeId: Int = 0
-  var ruleName: String = _
+  var ruleName: String = ""
   var isPeal: Int = 0
   var priority: Long = 0
   var status: Int = 0
@@ -28,14 +28,14 @@ class QueueEntity extends Entity {
   var finalizedIn: Any = _ //Date or String
   //Queue Configs
   var sendLimit: Int = 1
-  var vmta: String = _
-  var dataStringJson: String = _
+  var vmta: String = ""
+  var dataStringJson: String = ""
   var rule: RuleDataEntity = _
   //Channel
   var channelName: String = Channel.EMAIL
   var platformId: Int = 0
-  var deliveryHourAt: String = _
-  var deliveryAt: String = _
+  var deliveryHourAt: String = ""
+  var deliveryAt: String = ""
   var deliveryTimestamp: Long = 0
   var utmLink: String = ""
 
