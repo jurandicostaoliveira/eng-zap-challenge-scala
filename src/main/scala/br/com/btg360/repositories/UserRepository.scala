@@ -5,11 +5,13 @@ import java.sql.SQLException
 import br.com.btg360.application.Repository
 import br.com.btg360.constants.{Database, MultiChannel, Table}
 import br.com.btg360.entities.UserEntity
-import br.com.btg360.jdbc.MySqlBtg360
+import br.com.btg360.jdbc.{MySqlAllin, MySqlBtg360}
 
 class UserRepository extends Repository {
 
-  private val db = new MySqlBtg360().open
+  private val dbBtg360 = new MySqlBtg360().open
+
+  private val dbAllin = new MySqlAllin().open
 
   val userTable: String = "%s.%s".format(Database.MASTER, Table.USERS)
 
@@ -24,7 +26,7 @@ class UserRepository extends Repository {
   def findById(id: Int): UserEntity = {
     try {
       val query = s"""SELECT * FROM ${this.userTable} WHERE id = $id LIMIT 1;"""
-      this.connection(this.db).fetch(query, classOf[UserEntity]).head
+      this.connection(this.dbBtg360).fetch(query, classOf[UserEntity]).head
     } catch {
       case e: SQLException => println(e.printStackTrace())
         new UserEntity()
@@ -50,7 +52,7 @@ class UserRepository extends Repository {
               AND ${this.userTable}.isMultiChannel = ${MultiChannel.STATUS};
        """
       var list: List[Int] = List()
-      val rows = this.connection(this.db).queryExecutor(query)
+      val rows = this.connection(this.dbBtg360).queryExecutor(query)
       while (rows.next()) {
         list = list :+ rows.getInt(1)
       }
@@ -58,6 +60,38 @@ class UserRepository extends Repository {
     } catch {
       case e: SQLException => println(e.printStackTrace())
         List()
+    }
+  }
+
+  /**
+    * Process to disable clients
+    */
+  def disableByAllin: Unit = {
+    try {
+      //Btg360
+      var listBtg360: List[Long] = List()
+      val rsBtg360 = this.connection(this.dbBtg360).queryExecutor(
+        "SELECT allinId FROM master.users WHERE homologation = 1;"
+      )
+      while (rsBtg360.next()) {
+        listBtg360 = listBtg360 :+ rsBtg360.getLong(1)
+      }
+
+      //Allin
+      var listAllin: List[Long] = List()
+      val rsInAllin = this.connection(this.dbAllin).queryExecutor(
+        "SELECT id_login FROM emailpro_mailsender.cor_login WHERE fl_ativo = 1 AND id_login_situacao = 1;"
+      )
+      while (rsInAllin.next()) {
+        listAllin = listAllin :+ rsInAllin.getLong(1)
+      }
+
+      val list: String = listBtg360.diff(listAllin).mkString(",")
+      this.connection(this.dbBtg360).queryExecutor(
+        s"UPDATE master.users SET homologation = 0, homologation_at = NOW() WHERE allinId IN (${list});", true
+      )
+    } catch {
+      case e: SQLException => println(e.printStackTrace())
     }
   }
 

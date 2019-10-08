@@ -349,6 +349,16 @@ abstract class Repository extends Application {
 
   /**
     * @param String column
+    * @param List   value
+    * @return this
+    */
+  def whereIn(column: String, value: List[Any]): Repository = {
+    this.where = s""" ${column} IN(${value.mkString(",")}) """
+    this
+  }
+
+  /**
+    * @param String column
     * @param String condition
     * @param Any    value
     * @param String clause

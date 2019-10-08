@@ -2,7 +2,7 @@ package br.com.btg360.scheduling
 
 import br.com.btg360.constants.{Path, QueueStatus, Time}
 import br.com.btg360.entities.QueueEntity
-import br.com.btg360.repositories.{ConsolidatedRepository, QueueRepository}
+import br.com.btg360.repositories.{ConsolidatedRepository, QueueRepository, UserRepository}
 import br.com.btg360.services._
 import br.com.btg360.traits.RunnableScheduleTrait
 import br.com.btg360.worker.rule.{Daily, Hourly}
@@ -104,6 +104,15 @@ object Kernel extends App {
       if (!oldYear.equals(year.now)) {
         new FileService().deleteRecursive(pattern.format(Path.LOGS, oldYear))
       }
+    }
+  })
+
+  /**
+    * Process disable clients
+    */
+  scheduler.once("disable-clients", 1.hour, 1.day, new RunnableScheduleTrait {
+    override def run(userId: Int): Unit = {
+      new UserRepository().disableByAllin
     }
   })
 
