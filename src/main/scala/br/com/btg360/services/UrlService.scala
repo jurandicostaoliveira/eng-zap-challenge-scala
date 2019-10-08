@@ -23,16 +23,21 @@ class UrlService extends Service {
     * @return String
     */
   private def generateUri(uri: String, qs: String): String = {
-    if (!qs.isEmpty) {
-      val uriSymbol: String = if (uri.contains("?")) "" else "?"
-      var qsSymbol: String = if (new URI(uri).getQuery == null) "" else "&"
-      if (uri.takeRight(1).equals("?")) {
-        qsSymbol = ""
+    try {
+      if (!qs.isEmpty) {
+        val uriSymbol: String = if (uri.contains("?")) "" else "?"
+        var qsSymbol: String = if (new URI(uri).getQuery == null) "" else "&"
+        if (uri.takeRight(1).equals("?")) {
+          qsSymbol = ""
+        }
+        return "%s%s%s%s".format(uri, uriSymbol, qsSymbol, qs)
       }
-      return "%s%s%s%s".format(uri, uriSymbol, qsSymbol, qs)
-    }
 
-    uri
+      uri
+    } catch {
+      case e: Exception => println("ERROR : " + e.getMessage)
+        uri
+    }
   }
 
   /**
