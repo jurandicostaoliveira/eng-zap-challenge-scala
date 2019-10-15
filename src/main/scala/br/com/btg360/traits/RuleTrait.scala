@@ -157,15 +157,19 @@ trait RuleTrait extends Application {
     * @return RDD
     */
   private def filter(data: RDD[(String, StockEntity)]): RDD[(String, StockEntity)] = {
-    var dataset = new DailySendLimitService(this.queue).filter(data.keys)
-    println(Message.TOTAL_DAILY_LIMIT_REMOVED.format(dataset.count()))
+    var keys: RDD[String] = data.keys
 
-    if (Channel.isEmail(this.queue.channelName)) {
-      dataset = new OptoutService(this.queue).filter(dataset)
-      println(Message.TOTAL_OPTOUT_REMOVED.format(dataset.count()))
+    if (Rule.isRemoveDailyLimit(this.queue.groupId.toInt)) {
+      keys = new DailySendLimitService(this.queue).filter(keys)
+      println(Message.TOTAL_DAILY_LIMIT_REMOVED.format(keys.count()))
     }
 
-    dataset.map(key => (key, 0)).join(data).map(row => {
+    if (Channel.isEmail(this.queue.channelName)) {
+      keys = new OptoutService(this.queue).filter(keys)
+      println(Message.TOTAL_OPTOUT_REMOVED.format(keys.count()))
+    }
+
+    keys.map(key => (key, 0)).join(data).map(row => {
       (row._1, row._2._2)
     })
   }
