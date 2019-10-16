@@ -49,7 +49,7 @@ class QueueEntity extends Entity {
       this.rule = new JsonService().decode[RuleDataEntity](this.dataStringJson)
       this.deliveryHourAt = this.generateDeliveryHourAt
       this.deliveryAt = this.generateDeliveryAt
-      this.deliveryTimestamp = this.generateDeliveryTimestamp
+      //this.deliveryTimestamp = this.generateDeliveryTimestamp
       this.utmLink = this.generateUtmLink
     }
 
