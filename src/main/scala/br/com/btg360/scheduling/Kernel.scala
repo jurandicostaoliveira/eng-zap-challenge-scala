@@ -110,10 +110,10 @@ object Kernel extends App {
   /**
     * Process disable clients
     */
-  scheduler.once("disable-clients", 1.hour, 1.day, new RunnableScheduleTrait {
-    override def run(userId: Int): Unit = {
-      new UserRepository().disableByAllin
-    }
-  })
+//    scheduler.once("disable-clients", 1.hour, 1.day, new RunnableScheduleTrait {
+//      override def run(userId: Int): Unit = {
+//        new UserRepository().disableByAllin
+//      }
+//    })
 
 }
