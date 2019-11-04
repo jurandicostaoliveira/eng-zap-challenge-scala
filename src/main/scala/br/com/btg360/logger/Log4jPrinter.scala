@@ -18,7 +18,9 @@ object Log4jPrinter extends Serializable {
   def configure(path: String, maxFileSize: String = "100MB", maxBackupIndex: Int = 10) = {
     this.logger = Logger.getLogger(path)
     try {
-      this.logger.removeAllAppenders();
+      if (this.logger.getAllAppenders.hasMoreElements) {
+        this.logger.removeAllAppenders()
+      }
       val layout: PatternLayout = new PatternLayout("%d{yyyy-MM-dd HH:mm:ss} %-5p - %m%n")
       val appender: RollingFileAppender = new RollingFileAppender(layout, path, true)
       appender.setMaxFileSize(maxFileSize)
