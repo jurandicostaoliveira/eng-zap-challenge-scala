@@ -18,7 +18,11 @@ class Port25Service extends Service {
     * @return RDD
     */
   def add(data: RDD[(String, StockEntity)]): RDD[(String, StockEntity)] = {
-    data.union(this.sc.parallelize(Seq((this.email, data.first()._2))))
+    if (!data.isEmpty) {
+      return data.union(this.sc.parallelize(Seq((this.email, data.first()._2))))
+    }
+
+    data
   }
 
 }

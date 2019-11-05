@@ -4,24 +4,28 @@ import org.apache.spark.sql.Row
 
 class FilterEntity extends Serializable {
 
-  var id: Int = _
-  var field: String = _
-  var comparator: String = _
-  var value: String = _
-  var format: String = _
-  var groupId: Int = _
-  var operator: String = _
-  var groupOperator: String = _
+  var id: Int = 0
+  var field: String = ""
+  var comparator: String = ""
+  var value: String = ""
+  var format: String = ""
+  var groupId: Int = 0
+  var operator: String = ""
+  var groupOperator: String = ""
 
   def setRow(row: Row): FilterEntity = {
-    this.id = row.getAs("id")
-    this.field = row.getAs("field")
-    this.comparator = row.getAs("comparator")
-    this.value = row.getAs("value")
-    this.format = row.getAs("format")
-    this.groupId = row.getAs("groupId")
-    this.operator = row.getAs("operator")
-    this.groupOperator = row.getAs("groupOperator")
+    try {
+      this.id = row.getAs("id")
+      this.field = row.getAs("field")
+      this.comparator = row.getAs("comparator")
+      this.value = row.getAs("value")
+      this.format = row.getAs("format")
+      this.groupId = row.getAs("groupId")
+      this.operator = row.getAs("operator")
+      this.groupOperator = row.getAs("groupOperator")
+    } catch {
+      case e: Exception => println("AUTOMATIC FILTER ERROR : " + e.getMessage)
+    }
     this
   }
 }

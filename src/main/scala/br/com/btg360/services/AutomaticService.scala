@@ -31,7 +31,7 @@ class AutomaticService extends Service {
   )
 
   def toOperator(data: FilterEntity): String = {
-    String.format("LOWER(%s) %s %s", data.comparator, data.value.toLowerCase)
+    String.format("LOWER(%s) %s %s", data.field, data.comparator, data.value.toLowerCase)
   }
 
   def toLike(data: FilterEntity): String = {
