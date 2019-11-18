@@ -282,6 +282,7 @@ abstract class Repository extends Application {
 
       stmt.executeLargeBatch()
       stmt.close()
+      this.dbConnection.close()
     } catch {
       case e: Exception => println(e.printStackTrace())
     }
