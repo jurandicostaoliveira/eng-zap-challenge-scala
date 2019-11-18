@@ -391,7 +391,7 @@ class TransactionalRepository extends Repository {
         limiter += 1
         totalizator += 1
         if (limiter >= this.batchLimit || totalizator >= total) {
-          this.connection(this.db).insertStatementBatch(query, data)
+          this.connection(new MySqlAllin().open).insertStatementBatch(query, data)
           data = List()
           limiter = 0
         }
