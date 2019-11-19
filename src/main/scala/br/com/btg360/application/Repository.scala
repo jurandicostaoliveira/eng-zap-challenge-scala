@@ -36,13 +36,10 @@ abstract class Repository extends Application {
       val stmt = this.dbConnection.createStatement()
       if (onlyExecution) {
         stmt.executeUpdate(query)
-        stmt.close()
         return null
       }
 
-      val rs: ResultSet = stmt.executeQuery(query)
-      stmt.close()
-      rs
+      stmt.executeQuery(query)
     } catch {
       case e: SQLException => println(e.getStackTrace)
         null
