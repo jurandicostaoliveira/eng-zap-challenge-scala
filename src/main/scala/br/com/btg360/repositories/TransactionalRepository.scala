@@ -391,7 +391,7 @@ class TransactionalRepository extends Repository {
         limiter += 1
         totalizator += 1
         if (limiter >= this.batchLimit || totalizator >= total) {
-          this.connection(new MySqlAllin().open).insertStatementBatch(query, data)
+          this.connection(this.db).insertStatementBatch(query, data)
           data = List()
           limiter = 0
         }
@@ -401,6 +401,13 @@ class TransactionalRepository extends Repository {
       case e: Exception => println(e.printStackTrace())
         false
     }
+  }
+
+  /**
+    * Closing all thread connection
+    */
+  def closeConnection: Unit = {
+      this.db.close()
   }
 
 }

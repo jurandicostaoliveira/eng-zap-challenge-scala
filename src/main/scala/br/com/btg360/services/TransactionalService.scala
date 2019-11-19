@@ -77,6 +77,7 @@ class TransactionalService() extends Service {
       }
 
       this.transactionalRepository.updateLastSend
+      this.transactionalRepository.closeConnection
       println(Message.TRANSACTIONAL_SUCCESS)
     } catch {
       case e: Exception => println(e.printStackTrace())
