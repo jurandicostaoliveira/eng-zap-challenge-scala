@@ -1,6 +1,6 @@
 package br.com.btg360.repositories
 
-import java.sql.ResultSet
+import java.sql.{Connection, ResultSet}
 
 import br.com.btg360.application.Repository
 import br.com.btg360.constants.{Database, Table}
@@ -76,8 +76,11 @@ class ReferenceListRepository extends Repository {
     */
   def findSettings: ResultSet = {
     try {
-      val query = s"SELECT * FROM ${this.generateListTable} WHERE id_lista = ${this._listId};"
-      this.connection(this.db.open).queryExecutor(query)
+      val conn: Connection = this.db.open
+      val query: String = s"SELECT * FROM ${this.generateListTable} WHERE id_lista = ${this._listId};"
+      val rs: ResultSet = this.connection(conn).queryExecutor(query)
+      conn.close()
+      rs
     } catch {
       case e: Exception => println(e.printStackTrace())
         null
@@ -89,7 +92,11 @@ class ReferenceListRepository extends Repository {
     */
   private def describe: ResultSet = {
     try {
-      this.connection(this.db.open).queryExecutor(s"DESCRIBE ${this.generateReferenceListTable};")
+      val conn: Connection = this.db.open
+      val query: String = s"DESCRIBE ${this.generateReferenceListTable};"
+      val rs: ResultSet = this.connection(conn).queryExecutor(query)
+      conn.close()
+      rs
     } catch {
       case e: Exception => println(e.printStackTrace())
         null
