@@ -74,29 +74,40 @@ class ReferenceListRepository extends Repository {
   /**
     * @return ResultSet
     */
-  def findSettings: ResultSet = {
+  def findSettings: Map[String, Int] = {
+    var map: Map[String, Int] = Map("isFiled" -> 1, "isExcluded" -> 1)
     try {
       val conn: Connection = this.db.open
       val query: String = s"SELECT * FROM ${this.generateListTable} WHERE id_lista = ${this._listId};"
       val rs: ResultSet = this.connection(conn).queryExecutor(query)
+      while (rs.next()) {
+        map = Map(
+          "isFiled" -> rs.getInt("fl_arquivado"),
+          "isExcluded" -> rs.getInt("fl_excluir")
+        )
+      }
       conn.close()
-      rs
+      map
     } catch {
       case e: Exception => println(e.printStackTrace())
-        null
+        map
     }
   }
 
   /**
     * @return ResultSet
     */
-  private def describe: ResultSet = {
+  private def describe: List[String] = {
     try {
       val conn: Connection = this.db.open
       val query: String = s"DESCRIBE ${this.generateReferenceListTable};"
       val rs: ResultSet = this.connection(conn).queryExecutor(query)
+      var columns: List[String] = List()
+      while (rs.next()) {
+        columns ::= rs.getString("Field")
+      }
       conn.close()
-      rs
+      columns
     } catch {
       case e: Exception => println(e.printStackTrace())
         null
@@ -110,12 +121,7 @@ class ReferenceListRepository extends Repository {
     */
   def findAll: RDD[Map[String, Any]] = {
     try {
-      val describe = this.describe
-      var columns: List[String] = List()
-      while (describe.next()) {
-        columns ::= describe.getString("Field")
-      }
-
+      val columns = this.describe
       this.db.sparkRead(this.generateReferenceListTable).rdd.map(row => {
         row.getValuesMap(columns)
       })

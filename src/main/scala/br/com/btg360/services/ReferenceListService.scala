@@ -18,11 +18,7 @@ class ReferenceListService extends Service {
   def exists(listId: Int): Boolean = {
     try {
       val data = this.repository.listId(listId).findSettings
-      if (data == null || !data.next()) {
-        return false
-      }
-
-      if (data.getInt("fl_arquivado") != 0 || data.getInt("fl_excluir") != 0) {
+      if (data("isFiled") != 0 || data("isExcluded") != 0) {
         return false
       }
 
