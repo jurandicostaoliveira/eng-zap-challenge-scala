@@ -28,7 +28,7 @@ object Kernel extends App {
   /**
     * Daily rules
     */
-  scheduler.all("daily-rules", 20.minute, 1.hour, new RunnableScheduleTrait {
+  scheduler.all("daily-rules", 25.minute, 1.hour, new RunnableScheduleTrait {
     override def run(userId: Int): Unit = {
       new Daily().dispatch(userId)
     }
@@ -37,7 +37,7 @@ object Kernel extends App {
   /**
     * Hourly rules
     */
-  scheduler.all("hourly-rules", 1.minute, 30.minutes, new RunnableScheduleTrait {
+  scheduler.all("hourly-rules", 1.minute, 20.minutes, new RunnableScheduleTrait {
     override def run(userId: Int): Unit = {
       new Hourly().dispatch(userId)
     }
