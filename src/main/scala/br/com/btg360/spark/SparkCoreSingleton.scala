@@ -34,6 +34,7 @@ object SparkCoreSingleton extends Serializable {
       .config("spark.cassandra.input.consistency.level", p.getProperty("sparkCassandraInputConsistencyLevel"))
       .config("spark.driver.memory", p.getProperty("sparkDriverMemory"))
       .config("spark.executor.memory", p.getProperty("sparkExecutorMemory"))
+      .config("spark.memory.fraction", p.getProperty("sparkMemoryFraction"))
       .config("spark.driver.allowMultipleContexts", p.getProperty("sparkDriverAllowMultipleContexts"))
       .config("spark.ui.port", p.getProperty("sparkUiPort"))
       .config("spark.network.timeout", p.getProperty("sparkNetworkTimeout"))
