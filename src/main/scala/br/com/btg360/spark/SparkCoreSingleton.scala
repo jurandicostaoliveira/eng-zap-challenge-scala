@@ -38,6 +38,7 @@ object SparkCoreSingleton extends Serializable {
       .config("spark.driver.allowMultipleContexts", p.getProperty("sparkDriverAllowMultipleContexts"))
       .config("spark.ui.port", p.getProperty("sparkUiPort"))
       .config("spark.network.timeout", p.getProperty("sparkNetworkTimeout"))
+      .config("spark.executor.heartbeatInterval", p.getProperty("sparkExecutorHeartbeatInterval"))
       .config("spark.local.dir", p.getProperty("sparkLocalDir"))
       .config("spark.scheduler.mode", p.getProperty("sparkSchedulerMode"))
       .config("spark.scheduler.allocation.file", p.getProperty("sparkSchedulerAllocationFile"))
