@@ -34,7 +34,7 @@ object SparkCoreSingleton extends Serializable {
       .config("spark.cassandra.input.consistency.level", p.getProperty("sparkCassandraInputConsistencyLevel"))
       .config("spark.driver.memory", p.getProperty("sparkDriverMemory"))
       .config("spark.executor.memory", p.getProperty("sparkExecutorMemory"))
-      .config("spark.memory.fraction", p.getProperty("sparkMemoryFraction"))
+      //.config("spark.memory.fraction", p.getProperty("sparkMemoryFraction"))
       .config("spark.driver.allowMultipleContexts", p.getProperty("sparkDriverAllowMultipleContexts"))
       .config("spark.ui.port", p.getProperty("sparkUiPort"))
       .config("spark.network.timeout", p.getProperty("sparkNetworkTimeout"))
@@ -46,8 +46,8 @@ object SparkCoreSingleton extends Serializable {
       .config("spark.shuffle.spill.compress", p.getProperty("sparkShuffleSpillCompress"))
       .config("spark.default.parallelism", p.getProperty("sparkDefaultParallelism"))
       .config("spark.sql.shuffle.partitions", p.getProperty("sparkSqlShufflePartitions"))
-      .config("spark.executor.extraJavaOptions", "-verbose:gc -XX:+PrintGCDetails -XX:+PrintGCTimeStamps")
-      .config("spark.driver.extraJavaOptions", "-verbose:gc -XX:+PrintGCDetails -XX:+PrintGCTimeStamps")
+      .config("spark.executor.extraJavaOptions", "-XX:ReservedCodeCacheSize=100M -XX:MaxMetaspaceSize=256m -XX:CompressedClassSpaceSize=256m")
+      .config("spark.driver.extraJavaOptions", "-XX:ReservedCodeCacheSize=100M -XX:MaxMetaspaceSize=256m -XX:CompressedClassSpaceSize=256m")
       .getOrCreate()
   }
 
