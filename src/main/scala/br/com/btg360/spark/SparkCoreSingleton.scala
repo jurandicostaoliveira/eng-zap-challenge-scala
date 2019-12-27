@@ -47,8 +47,8 @@ object SparkCoreSingleton extends Serializable {
       .config("spark.shuffle.spill.compress", p.getProperty("sparkShuffleSpillCompress"))
       .config("spark.default.parallelism", p.getProperty("sparkDefaultParallelism"))
       .config("spark.sql.shuffle.partitions", p.getProperty("sparkSqlShufflePartitions"))
-      .config("spark.executor.extraJavaOptions", "-XX:+UseParallelGC -XX:+UseParallelOldGC")
-      .config("spark.driver.extraJavaOptions", "-XX:+UseParallelGC -XX:+UseParallelOldGC")
+      //.config("spark.executor.extraJavaOptions", "-XX:+UseParallelGC -XX:+UseParallelOldGC")
+      //.config("spark.driver.extraJavaOptions", "-XX:+UseParallelGC -XX:+UseParallelOldGC")
       .getOrCreate()
   }
 
