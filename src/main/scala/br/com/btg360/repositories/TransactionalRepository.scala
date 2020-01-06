@@ -1,6 +1,6 @@
 package br.com.btg360.repositories
 
-import java.net.URLEncoder
+import java.net.{URLEncoder, URLDecoder}
 
 import br.com.btg360.application.Repository
 import br.com.btg360.constants.{Base64Converter, Channel, Database, Url, TypeConverter => TC}
@@ -319,7 +319,7 @@ class TransactionalRepository extends Repository {
     val client = Base64Converter.encode(user)
     Map(
       "nm_envio" -> "BTG:%s:%s".format(this.queue.ruleName, this.queue.rule.latinName),
-      "nm_subject" -> this.queue.rule.subject,
+      "nm_subject" -> URLDecoder.decode(this.queue.rule.subject, Base64Converter.UTF_8),
       "nm_remetente" -> this.queue.rule.senderName,
       "email_remetente" -> this.queue.rule.senderEmail,
       "nm_reply" -> this.queue.rule.replyEmail,
@@ -407,7 +407,7 @@ class TransactionalRepository extends Repository {
     * Closing all thread connection
     */
   def closeConnection: Unit = {
-      this.db.close()
+    this.db.close()
   }
 
 }
