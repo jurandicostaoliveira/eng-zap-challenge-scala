@@ -49,7 +49,7 @@ object Kernel extends App {
   scheduler.once("queue-progress", 1.hour, 55.minutes, new RunnableScheduleTrait {
     override def run(userId: Int): Unit = {
       new QueueProgressService()
-        .statusFrom(List(QueueStatus.PREPARED, QueueStatus.RECOMMENDATION_STARTED, QueueStatus.PROCESSED))
+        .statusFrom(List(QueueStatus.PREPARED, QueueStatus.RECOMMENDATION_STARTED))
         .statusTo(QueueStatus.RECOMMENDATION_PREPARED)
         .tolerance(2)
         .run()
