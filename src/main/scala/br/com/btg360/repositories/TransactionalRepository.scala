@@ -319,7 +319,7 @@ class TransactionalRepository extends Repository {
     val client = Base64Converter.encode(user)
     Map(
       "nm_envio" -> "BTG:%s:%s".format(this.queue.ruleName, this.queue.rule.latinName),
-      "nm_subject" -> URLDecoder.decode(this.queue.rule.subject, Base64Converter.UTF_8),
+      "nm_subject" -> URLDecoder.decode(this.queue.rule.subject.replaceAll("%", "%25"), Base64Converter.UTF_8),
       "nm_remetente" -> this.queue.rule.senderName,
       "email_remetente" -> this.queue.rule.senderEmail,
       "nm_reply" -> this.queue.rule.replyEmail,
