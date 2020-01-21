@@ -2,7 +2,7 @@ package br.com.btg360.services
 
 import br.com.btg360.application.Service
 import org.json4s._
-import org.json4s.native.Serialization.{read, write}
+import org.json4s.jackson.Serialization.{read, write}
 
 
 class JsonService extends Service {
