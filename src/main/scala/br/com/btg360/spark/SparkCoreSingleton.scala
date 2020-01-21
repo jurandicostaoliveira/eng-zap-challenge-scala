@@ -23,7 +23,8 @@ object SparkCoreSingleton extends Serializable {
     val p: Properties = new PropService().get(this.fileName)
     val builder: SparkSession.Builder = SparkSession.builder()
 
-    return builder.master(p.getProperty("master"))
+    return builder
+      //.master(p.getProperty("master"))
       .appName(p.getProperty("appName"))
       .config("spark.cassandra.connection.host", p.getProperty("host"))
       .config("spark.cassandra.auth.username", p.getProperty("username"))
