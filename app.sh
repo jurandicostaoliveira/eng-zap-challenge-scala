@@ -28,7 +28,7 @@ fi
 
 sparkSubmitRun() {
         nohup \
-        spark-submit \
+        /home/spark/spark/bin/spark-submit \
         --class br.com.btg360.scheduling.Kernel \
         --master yarn \
         --deploy-mode client \
