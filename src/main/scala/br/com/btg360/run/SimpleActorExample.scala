@@ -47,6 +47,6 @@ object SimpleActorExample extends App {
   })
 
 
-  system.awaitTermination()
+  //system.awaitTermination()
 
 }
