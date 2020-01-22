@@ -18,4 +18,36 @@ To compile the project, enter the project's directory and execute the command be
 $ sbt assembly
 ```
 
+#### Scripts to manipulate the application
+
+Enter the user spark  :
+
+```
+$ su spark
+```
+
+Deploy :
+
+```
+$ /bin/bash /home/Btg-Scala-Sending-Generator/bin/app.sh deploy
+```
+
+Stop :
+
+```
+$ /bin/bash /home/Btg-Scala-Sending-Generator/bin/app.sh stop
+```
+ 
+Start : 
+
+```
+$ /bin/bash /home/Btg-Scala-Sending-Generator/bin/app.sh start
+```
+
+Restart :
+
+```
+$ /bin/bash /home/Btg-Scala-Sending-Generator/bin/app.sh restart
+```
+
 
