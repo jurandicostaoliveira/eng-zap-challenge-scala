@@ -1,7 +1,6 @@
 #Development file identifier
 src/main/resources/.environment.properties
 
-/bin/
 .cache-main
 .idea/
 .project
