@@ -23,6 +23,10 @@ object SparkCoreSingleton extends Serializable {
     val p: Properties = new PropService().get(this.fileName)
     val builder: SparkSession.Builder = SparkSession.builder()
 
+    if (Environment.isDevelopment) {
+      builder.master("local[*]").config("spark.local.dir", "/home/tmp/spark")
+    }
+
     return builder
       .appName(p.getProperty("appName"))
       .config("spark.cassandra.connection.host", p.getProperty("host"))
