@@ -32,7 +32,7 @@ sparkSubmitRun() {
         --class br.com.btg360.scheduling.Kernel \
         --master yarn \
         --deploy-mode client \
-        --driver-memory 10g \
+        --driver-memory 20g \
         --executor-memory 9g \
         --num-executors 12 \
         --executor-cores 5 \
@@ -41,9 +41,9 @@ sparkSubmitRun() {
         --conf spark.yarn.historyServer.allowTracking=true \
         --conf spark.shuffle.service.enabled=true \
         --conf spark.dynamicAllocation.enabled=true \
-        --conf spark.dynamicAllocation.initialExecutors=4 \
+        --conf spark.dynamicAllocation.initialExecutors=12 \
         --conf spark.dynamicAllocation.maxExecutors=12 \
-        --conf spark.dynamicAllocation.minExecutors=2 \
+        --conf spark.dynamicAllocation.minExecutors=4 \
         --conf spark.core.connection.ack.wait.timeout=6000 \
         --conf spark.storage.memoryFraction=1 \
         --conf spark.rdd.compress=true \
