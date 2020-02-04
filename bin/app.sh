@@ -33,7 +33,7 @@ sparkSubmitRun() {
         --master yarn \
         --deploy-mode client \
         --driver-memory 20g \
-        --executor-memory 9g \
+        --executor-memory 8g \
         --num-executors 12 \
         --executor-cores 5 \
         --conf spark.local.dir=/storage/tmp \
