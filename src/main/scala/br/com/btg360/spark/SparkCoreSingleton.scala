@@ -24,7 +24,9 @@ object SparkCoreSingleton extends Serializable {
     val builder: SparkSession.Builder = SparkSession.builder()
 
     if (Environment.isDevelopment) {
-      builder.master("local[*]").config("spark.local.dir", "/home/tmp/spark")
+      builder
+        .master(p.getProperty("master"))
+        .config("spark.local.dir", p.getProperty("sparkLocalDir"))
     }
 
     return builder

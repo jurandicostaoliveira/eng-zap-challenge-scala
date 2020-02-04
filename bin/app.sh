@@ -32,8 +32,8 @@ sparkSubmitRun() {
         --class br.com.btg360.scheduling.Kernel \
         --master yarn \
         --deploy-mode client \
-        --driver-memory 20g \
-        --executor-memory 10g \
+        --driver-memory 10g \
+        --executor-memory 9g \
         --num-executors 12 \
         --executor-cores 5 \
         --conf spark.local.dir=/storage/tmp \
