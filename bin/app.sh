@@ -32,8 +32,8 @@ sparkSubmitRun() {
         --class br.com.btg360.scheduling.Kernel \
         --master yarn \
         --deploy-mode client \
-        --driver-memory 20g \
-        --executor-memory 9g \
+        --driver-memory 30g \
+        --executor-memory 11g \
         --num-executors 20 \
         --executor-cores 6 \
         --conf spark.local.dir=/storage/tmp \
@@ -49,8 +49,8 @@ sparkSubmitRun() {
         --conf spark.rdd.compress=true \
         --conf spark.shuffle.compress=true \
         --conf spark.shuffle.spill.compress=true \
-	    --conf spark.sql.shuffle.partitions=60 \
-        --conf spark.default.parallelism=60 \
+	    --conf spark.sql.shuffle.partitions=120 \
+        --conf spark.default.parallelism=120 \
         --conf spark.network.timeout=12000s \
         --conf spark.executor.heartbeatInterval=1000s \
         --conf spark.cassandra.connection.timeout_ms=60000 \
@@ -66,25 +66,24 @@ sparkSubmitRun() {
 case $1 in
 
 	stop)
-        echo "(0^0) PROCESS STOPPED"
+        echo ":::: PROCESS STOPPED ::::"
         ps aux | grep btg360
+        echo ">> Killing Application"
     	kill -9 $PROCESS
+    	echo ">> Reset Queue"
         mysql -h$MYSQLHOST -u$MYSQLUSER -p$MYSQLPASSWORD -e 'UPDATE btg_jobs.rules_queue_multichannel SET status = 4 WHERE today = CURRENT_DATE() AND status = 5;'
-        echo ">> Cluster running ..."
-        jps
+        echo ">> Cluster Stopped"
         /bin/bash /home/spark/hadoop/sbin/stop-all.sh
-        echo ">> Cluster stopped ..."
         jps
 	;;
 	start)
-        echo "(0_0) PROCESS STARTED"
-        jps
+        echo ":::: PROCESS STARTED ::::"
         /bin/bash /home/spark/hadoop/sbin/start-all.sh
-        echo ">> Cluster running ..."
+        echo ">> Cluster Running"
         jps
         sleep 60
 	    sparkSubmitRun
-        echo "---------------"
+        echo ">> Application Running"
         ps aux | grep btg360
     ;;
 	restart)
@@ -93,9 +92,14 @@ case $1 in
         /bin/bash /home/Btg-Scala-Sending-Generator/bin/app.sh start
 	;;
 	deploy)
+	    echo ":::: PROCESS DEPLOYED ::::"
+	    echo ">> Delete Jar"
         rm -f /home/Btg-Scala-Sending-Generator/target/scala-2.11/Btg-Scala-Sending-Generator-assembly-0.1.jar
+        echo ">> Entering the Directory"
         cd /home/Btg-Scala-Sending-Generator/
+        echo ">> Running Git Pull Command"
         git pull origin cluster
+        echo ">> Compiling Application"
         sbt assembly
         /bin/bash /home/Btg-Scala-Sending-Generator/bin/app.sh restart
 	;;
