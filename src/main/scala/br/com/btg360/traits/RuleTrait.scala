@@ -212,9 +212,12 @@ trait RuleTrait extends Application {
     this.queueRepository.updateStatus(this.queue.userRuleId.toInt, this.getCompletedStatus)
     println(Message.UPDATE_RULE_STATUS.format(this.queue.userRuleId.toInt, this.getCompletedStatus))
 
-    this.consolidatedRepository.table(this.queue.getConsolidatedTable).updateSubmitted(
-      1, this.queue.platformId
-    )
+    if (this.queue.ruleTypeId != Rule.AUTOMATIC_ID) {
+      this.consolidatedRepository.table(this.queue.getConsolidatedTable).updateSubmitted(
+        1, this.queue.platformId
+      )
+    }
+
     println(Message.UPDATE_CONSOLIDATED_STATUS.format(1, this.queue.platformId))
   }
 

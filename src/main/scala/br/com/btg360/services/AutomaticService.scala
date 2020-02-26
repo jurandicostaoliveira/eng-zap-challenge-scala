@@ -24,7 +24,9 @@ class AutomaticService extends Service {
     "between_ma" -> { (data: FilterEntity) => this.toBetween(data) },
     "between_me" -> { (data: FilterEntity) => this.toBetween(data) },
     "is null" -> { (data: FilterEntity) => this.toNull(data) },
+    "is nul" -> { (data: FilterEntity) => this.toNull(data) },
     "is not null" -> { (data: FilterEntity) => this.toNull(data) },
+    "is not nul" -> { (data: FilterEntity) => this.toNull(data) },
     "quantdias" -> { (data: FilterEntity) => this.toDay(data) },
     "qdiasanive" -> { (data: FilterEntity) => this.toDay(data) },
     "curdate()" -> { (data: FilterEntity) => this.toCurdate(data) }
@@ -65,7 +67,9 @@ class AutomaticService extends Service {
   def toNull(data: FilterEntity): String = {
     val conditions: Map[String, String] = Map(
       "is null" -> String.format("%s IS NULL OR %s = ''", data.field, data.field),
-      "is not null" -> String.format("%s IS NOT NULL OR %s = ''", data.field, data.field)
+      "is nul" -> String.format("%s IS NULL OR %s = ''", data.field, data.field),
+      "is not null" -> String.format("%s IS NOT NULL OR %s != ''", data.field, data.field),
+      "is not nul" -> String.format("%s IS NOT NULL OR %s != ''", data.field, data.field)
     )
     conditions(data.comparator)
   }
