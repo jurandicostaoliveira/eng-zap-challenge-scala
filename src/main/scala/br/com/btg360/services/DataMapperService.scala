@@ -26,9 +26,11 @@ class DataMapperService(queue: QueueEntity) extends Service with Serializable {
     }
 
     println(Message.CONSOLIDATED_TABLE_NAME.format(table))
-    repository.table(table).findAllKeyBy(
-      entity => (entity.productId, entity), this.queue.platformId
-    )
+    repository.table(table)
+      .findAll(this.queue.platformId)
+      .keyBy(row => row.userSent + "-" + row.productId)
+      .reduceByKey((entity1, entity2) => entity1)
+      .map(row => (row._2.productId, row._2))
   }
 
   /**
