@@ -64,14 +64,13 @@ sparkSubmitRun() {
 }
 
 case $1 in
-
 	stop)
         echo ":::: PROCESS STOPPED ::::"
         ps aux | grep btg360
         echo ">> Killing Application"
     	kill -9 $PROCESS
     	echo ">> Reset Queue"
-        mysql -h$MYSQLHOST -u$MYSQLUSER -p$MYSQLPASSWORD -e 'UPDATE btg_jobs.rules_queue_multichannel SET status = 4 WHERE today = CURRENT_DATE() AND status = 5;'
+        mysql -h$MYSQLHOST -u$MYSQLUSER -p$MYSQLPASSWORD -e 'UPDATE btg_jobs.rules_queue_multichannel SET status=4 WHERE today=current_date() AND status=5 AND userId IN(SELECT id FROM master.users WHERE homologation=1 AND isMultiChannel=1 AND isDedicatedEnv=0);'
         echo ">> Cluster Stopped"
         /bin/bash /home/spark/hadoop/sbin/stop-all.sh
         jps
@@ -103,5 +102,4 @@ case $1 in
         sbt assembly
         /bin/bash /home/Btg-Scala-Sending-Generator/bin/app.sh restart
 	;;
-
 esac

@@ -49,7 +49,8 @@ class UserRepository extends Repository {
               ${this.userRulesTable}.status = 1
               AND ${this.userTable}.homologation = 1
               AND ${this.userTable}.isAllowed = 1
-              AND ${this.userTable}.isMultiChannel = ${MultiChannel.STATUS};
+              AND ${this.userTable}.isMultiChannel = ${MultiChannel.STATUS}
+              AND ${this.userTable}.isDedicatedEnv = ${MultiChannel.isDedicatedEnv};
        """
       var list: List[Int] = List()
       val rows = this.connection(this.dbBtg360).queryExecutor(query)
