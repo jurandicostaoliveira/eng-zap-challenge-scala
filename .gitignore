@@ -1,5 +1,5 @@
 #Development file identifier
-src/main/resources/.environment.properties
+src/main/resources/environment.properties
 
 .cache-main
 .idea/

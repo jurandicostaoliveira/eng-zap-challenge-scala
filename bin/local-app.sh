@@ -34,12 +34,12 @@ case $1 in
 	    /bin/bash /home/Btg-Scala-Sending-Generator/bin/local-app.sh stop
         sleep 20
         /bin/bash /home/Btg-Scala-Sending-Generator/bin/local-app.sh start
-        ;;
+    ;;
     deploy)
         rm -f /home/Btg-Scala-Sending-Generator/target/scala-2.11/Btg-Scala-Sending-Generator-assembly-0.1.jar
         cd /home/Btg-Scala-Sending-Generator/
         git pull origin cluster
         sbt assembly
         /bin/bash /home/Btg-Scala-Sending-Generator/bin/local-app.sh restart
-    ::
+    ;;
 esac
