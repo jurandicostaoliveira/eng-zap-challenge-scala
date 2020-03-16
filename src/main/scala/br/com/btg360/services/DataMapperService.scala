@@ -59,7 +59,7 @@ class DataMapperService(queue: QueueEntity) extends Service with Serializable {
     *
     * @return
     */
-  private def join: RDD[(String, HashMap[String, Any])] = {
+  private def join: RDD[(String, JsonProductEntity)] = {
     val consolidatedData = this.consolidatedData
     val productData = this.productData
     if (consolidatedData == null || productData == null) {
@@ -67,7 +67,7 @@ class DataMapperService(queue: QueueEntity) extends Service with Serializable {
     }
 
     consolidatedData.join(productData).map(row => {
-      (row._2._1.userSent, new StockEntity().toMap(row._2._1, row._2._2))
+      (row._2._1.userSent, new StockEntity().toJsonProduct(row._2._1, row._2._2))
     })
   }
 
@@ -84,23 +84,23 @@ class DataMapperService(queue: QueueEntity) extends Service with Serializable {
       }
 
       val group = join.groupByKey().map(rows => {
-        var products: List[HashMap[String, Any]] = List()
-        var recommendations: List[HashMap[String, Any]] = List()
+        var products: List[JsonProductEntity] = List()
+        var recommendations: List[JsonProductEntity] = List()
 
         rows._2.foreach(row => {
-          row("productLink") = new UrlService().redirect(
+          val product = row.copy(productLink = new UrlService().redirect(
             this.queue,
-            TC.toString(row("productLink")),
+            TC.toString(row.productLink),
             HtmlPosition.CONTENT,
-            TC.toString(row("productId")),
-            TC.toInt(row("isRecommendation")),
+            TC.toString(row.productId),
+            TC.toInt(row.isRecommendation),
             rows._1
-          )
+          ))
 
-          if (row("isRecommendation").equals(1)) {
-            recommendations = recommendations :+ row
+          if (product.isRecommendation.equals(1)) {
+            recommendations = recommendations :+ product
           } else {
-            products = products :+ row
+            products = products :+ product
           }
         })
 
