@@ -39,6 +39,7 @@ object SparkCoreSingleton extends Serializable {
         .config("spark.cassandra.connection.keep_alive_ms", p.getProperty("sparkCassandraConnectionKeepAliveMs"))
         .config("spark.scheduler.mode", p.getProperty("sparkSchedulerMode"))
         .config("spark.scheduler.allocation.file", p.getProperty("sparkSchedulerAllocationFile"))
+        .config("spark.driver.maxResultSize", p.getProperty("sparkDriverMaxResultSize"))
         .config("spark.local.dir", p.getProperty("sparkLocalDir"))
     }
 
