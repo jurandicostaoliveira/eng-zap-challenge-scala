@@ -28,9 +28,9 @@ class DailySendLimitService(queue: QueueEntity) {
   private def pluck(entityName: String, users: List[String]): RDD[String] = {
     var keys: List[String] = List()
 
-    this.redis.hgetall(entityName).foreach(row => {
-      for ((key, value) <- row) {
-        if (value.toInt <= this.queue.sendLimit && users.contains(key)) {
+    this.redis.hmget(entityName, users: _*).foreach(rows => {
+      for ((key, value) <- rows) {
+        if (value.toInt <= this.queue.sendLimit) {
           keys = keys :+ key
         }
       }
@@ -46,16 +46,21 @@ class DailySendLimitService(queue: QueueEntity) {
     * @return RDD
     */
   def filter(users: RDD[String]): RDD[String] = {
-    val entityName: String = this.createEntityName
-    val usersList = users.collect().toList
+    try {
+      val entityName: String = this.createEntityName
+      val usersList = users.collect().toList
 
-    this.redis.pipeline(row => {
-      for (key <- usersList) {
-        row.hincrby(entityName, key, 1)
-      }
-    })
+      this.redis.pipeline(pipe => {
+        for (key <- usersList) {
+          pipe.hincrby(entityName, key, 1)
+        }
+      })
 
-    this.pluck(entityName, usersList)
+      this.pluck(entityName, usersList)
+    } catch {
+      case e: Exception => println("DAILY SEND LIMIT ERROR: " + e.printStackTrace())
+        users
+    }
   }
 
   /**

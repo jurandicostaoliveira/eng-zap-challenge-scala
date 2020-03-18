@@ -17,7 +17,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-cluster-tools" % "2.5.21",
   "mysql" % "mysql-connector-java" % "5.1.46",
   "org.apache.logging.log4j" % "log4j-scala" % "11.0",
-  "net.debasishg" %% "redisclient" % "3.8", //https://github.com/debasishg/scala-redis
+  "net.debasishg" %% "redisclient" % "3.20", //https://github.com/debasishg/scala-redis
   //"org.json4s" %% "json4s-native" % "3.3.0", //https://github.com/json4s/json4s
   "commons-validator" % "commons-validator" % "1.4.1"
 )
