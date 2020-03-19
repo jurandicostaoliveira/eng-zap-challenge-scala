@@ -11,7 +11,9 @@ import org.apache.spark.SparkContext
 
 object SparkCoreSingleton extends Serializable {
 
-  private val fileName = "cassandra-%s.properties".format(Environment.getAppEnv)
+  private val cassandraFileName = "cassandra-%s.properties".format(Environment.getAppEnv)
+
+  private val redisFileName = "redis-%s.properties".format(Environment.getAppEnv)
 
   private val sparkContext: SparkContext = this.getSparkSession.sparkContext
 
@@ -20,35 +22,39 @@ object SparkCoreSingleton extends Serializable {
     * @return SparkSession
     */
   private def getSparkSession: SparkSession = {
-    val p: Properties = new PropService().get(this.fileName)
+    val pCassandra: Properties = new PropService().get(this.cassandraFileName)
+    val pRedis: Properties = new PropService().get(this.redisFileName)
     val builder: SparkSession.Builder = SparkSession.builder()
 
     if (Environment.isDevelopment || Environment.isHomologation) {
       builder
-        .master(p.getProperty("master"))
-        .config("spark.driver.memory", p.getProperty("sparkDriverMemory"))
-        .config("spark.executor.memory", p.getProperty("sparkExecutorMemory"))
-        .config("spark.rdd.compress", p.getProperty("sparkRddCompress"))
-        .config("spark.shuffle.compress", p.getProperty("sparkShuffleCompress"))
-        .config("spark.shuffle.spill.compress", p.getProperty("sparkShuffleSpillCompress"))
-        .config("spark.sql.shuffle.partitions", p.getProperty("sparkSqlShufflePartitions"))
-        .config("spark.default.parallelism", p.getProperty("sparkDefaultParallelism"))
-        .config("spark.network.timeout", p.getProperty("sparkNetworkTimeout"))
-        .config("spark.executor.heartbeatInterval", p.getProperty("sparkExecutorHeartbeatInterval"))
-        .config("spark.cassandra.connection.timeout_ms", p.getProperty("sparkCassandraConnectionTimeoutMs"))
-        .config("spark.cassandra.connection.keep_alive_ms", p.getProperty("sparkCassandraConnectionKeepAliveMs"))
-        .config("spark.scheduler.mode", p.getProperty("sparkSchedulerMode"))
-        .config("spark.scheduler.allocation.file", p.getProperty("sparkSchedulerAllocationFile"))
-        .config("spark.driver.maxResultSize", p.getProperty("sparkDriverMaxResultSize"))
-        .config("spark.local.dir", p.getProperty("sparkLocalDir"))
+        .master(pCassandra.getProperty("master"))
+        .config("spark.driver.memory", pCassandra.getProperty("sparkDriverMemory"))
+        .config("spark.executor.memory", pCassandra.getProperty("sparkExecutorMemory"))
+        .config("spark.rdd.compress", pCassandra.getProperty("sparkRddCompress"))
+        .config("spark.shuffle.compress", pCassandra.getProperty("sparkShuffleCompress"))
+        .config("spark.shuffle.spill.compress", pCassandra.getProperty("sparkShuffleSpillCompress"))
+        .config("spark.sql.shuffle.partitions", pCassandra.getProperty("sparkSqlShufflePartitions"))
+        .config("spark.default.parallelism", pCassandra.getProperty("sparkDefaultParallelism"))
+        .config("spark.network.timeout", pCassandra.getProperty("sparkNetworkTimeout"))
+        .config("spark.executor.heartbeatInterval", pCassandra.getProperty("sparkExecutorHeartbeatInterval"))
+        .config("spark.cassandra.connection.timeout_ms", pCassandra.getProperty("sparkCassandraConnectionTimeoutMs"))
+        .config("spark.cassandra.connection.keep_alive_ms", pCassandra.getProperty("sparkCassandraConnectionKeepAliveMs"))
+        .config("spark.scheduler.mode", pCassandra.getProperty("sparkSchedulerMode"))
+        .config("spark.scheduler.allocation.file", pCassandra.getProperty("sparkSchedulerAllocationFile"))
+        .config("spark.driver.maxResultSize", pCassandra.getProperty("sparkDriverMaxResultSize"))
+        .config("spark.local.dir", pCassandra.getProperty("sparkLocalDir"))
     }
 
     return builder
-      .appName(p.getProperty("appName"))
-      .config("spark.cassandra.connection.host", p.getProperty("sparkCassandraConnectionHost"))
-      .config("spark.cassandra.auth.username", p.getProperty("sparkCassandraAuthUsername"))
-      .config("spark.cassandra.auth.password", p.getProperty("sparkCassandraAuthPassword"))
-      .config("spark.cassandra.connection.compression", p.getProperty("sparkCassandraConnectionCompression"))
+      .appName(pCassandra.getProperty("appName"))
+      .config("spark.cassandra.connection.host", pCassandra.getProperty("sparkCassandraConnectionHost"))
+      .config("spark.cassandra.auth.username", pCassandra.getProperty("sparkCassandraAuthUsername"))
+      .config("spark.cassandra.auth.password", pCassandra.getProperty("sparkCassandraAuthPassword"))
+      .config("spark.cassandra.connection.compression", pCassandra.getProperty("sparkCassandraConnectionCompression"))
+      .config("spark.redis.host", pRedis.getProperty("host"))
+      .config("spark.redis.port", pRedis.getProperty("port"))
+      .config("spark.redis.auth", pRedis.getProperty("secret"))
       .getOrCreate()
   }
 
