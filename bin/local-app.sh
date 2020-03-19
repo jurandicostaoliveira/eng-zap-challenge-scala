@@ -26,7 +26,7 @@ case $1 in
 	;;
 	start)
         echo '(0_0) PROCESS STARTED'
-    	nohup java -cp /home/Btg-Scala-Sending-Generator/target/scala-2.11/Btg-Scala-Sending-Generator-assembly-0.1.jar br.com.btg360.scheduling.Kernel >> /storage/logs/nohup-$INFRA_DATA.out &
+    	nohup java -cp -Xms45000m -Xmx70000m -XX:-UseGCOverheadLimit /home/Btg-Scala-Sending-Generator/target/scala-2.11/Btg-Scala-Sending-Generator-assembly-0.1.jar br.com.btg360.scheduling.Kernel >> /storage/logs/nohup-$INFRA_DATA.out &
         echo '----------------------------------------'
         ps -ef | grep -i btg360 | grep -v grep
     ;;
