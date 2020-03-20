@@ -55,6 +55,7 @@ object SparkCoreSingleton extends Serializable {
       .config("spark.redis.host", pRedis.getProperty("host"))
       .config("spark.redis.port", pRedis.getProperty("port"))
       .config("spark.redis.auth", pRedis.getProperty("secret"))
+      .config("spark.redis.timeout", pRedis.getProperty("timeout"))
       .getOrCreate()
   }
 
