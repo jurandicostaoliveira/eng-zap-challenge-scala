@@ -5,6 +5,7 @@ import br.com.btg360.constants._
 import br.com.btg360.entities.{QueueEntity, StockEntity, UserEntity}
 import br.com.btg360.logger.Log4jPrinter
 import br.com.btg360.repositories.{ConsolidatedRepository, QueueRepository, UserRepository}
+import br.com.btg360.run.DailyRuleRun.queue
 import br.com.btg360.services.{Port25Service, _}
 import org.apache.spark.rdd.RDD
 
@@ -139,6 +140,12 @@ trait RuleTrait extends Application {
     * @return this
     */
   private def flush: RuleTrait = {
+    val currentStatus: Int = this.queueRepository.findByUserRuleId(this.queue.userRuleId.toInt).status
+    if (currentStatus != QueueStatus.RECOMMENDATION_PREPARED) {
+      println(Message.STATUS_IS_UNAVAILABLE_TO_PROCESS.format(currentStatus))
+      return this
+    }
+
     val channels = this.jsonService.decode[List[String]](this.queue.channels)
     println(this.queue.dataStringJson)
     channels.foreach(channel => {
@@ -147,6 +154,7 @@ trait RuleTrait extends Application {
       this.queue.platformId = Channel.getPlatformId(channel)
       this.all
     })
+
     this
   }
 

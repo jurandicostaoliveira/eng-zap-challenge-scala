@@ -153,4 +153,27 @@ class QueueRepository extends Repository {
     this.connection(this.db).queryExecutor(query, true)
   }
 
+  /**
+    * Get data from queue by id
+    *
+    * @param Int userRuleId
+    * @return QueueEntity
+    */
+  def findByUserRuleId(userRuleId: Int): QueueEntity = {
+    val query =
+      s"""
+         SELECT * FROM
+            ${this.rulesQueueTable}
+         WHERE
+            today = '${this.today}'
+            AND userRuleId = ${userRuleId};
+       """
+    val list = this.connection(this.db).fetch(query, classOf[QueueEntity])
+    if (list.size > 0) {
+      return list.head
+    }
+
+    new QueueEntity()
+  }
+
 }
