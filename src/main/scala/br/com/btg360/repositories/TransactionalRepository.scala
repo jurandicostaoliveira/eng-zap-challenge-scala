@@ -130,7 +130,7 @@ class TransactionalRepository extends Repository {
   /**
     * @return String
     */
-  private def generateSendTable: String = {
+  def generateSendTable: String = {
     "%s.cor_envio_trans_%d_%s".format(Database.POSTMATIC, this.queue.rule.transactionalId, this.currentMonth)
   }
 

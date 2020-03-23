@@ -3,7 +3,7 @@ package br.com.btg360.services
 import br.com.btg360.application.Service
 import br.com.btg360.constants.{HtmlPosition, Message, Template, TypeConverter => TC}
 import br.com.btg360.entities.{QueueEntity, StockEntity}
-import br.com.btg360.repositories.{TemplateRepository, ThemeRepository, TransactionalRepository}
+import br.com.btg360.repositories.{TemplateRepository, ThemeRepository, TransactionalPartitionRepository, TransactionalRepository}
 import org.apache.spark.rdd.RDD
 
 class TransactionalService() extends Service {
@@ -13,6 +13,8 @@ class TransactionalService() extends Service {
   private val templateRepository = new TemplateRepository()
 
   private val transactionalRepository = new TransactionalRepository()
+
+  private val transactionalPartitionRepository = new TransactionalPartitionRepository()
 
   /**
     * @return String
@@ -56,7 +58,10 @@ class TransactionalService() extends Service {
   def persist(queue: QueueEntity, data: RDD[(String, StockEntity)]): Unit = {
     try {
       val layout = this.createLayout(queue)
-      val templateId: Int = this.transactionalRepository.queue(queue).data(data).themeConfigs(layout._2)
+      val templateId: Int = this.transactionalRepository
+        .queue(queue)
+        .data(data)
+        .themeConfigs(layout._2)
         .createTemplateTable
         .saveTemplate(layout._1)
 
@@ -65,11 +70,19 @@ class TransactionalService() extends Service {
         return
       }
 
-      val registered = this.transactionalRepository.templateId(templateId)
+      this.transactionalRepository
+        .templateId(templateId)
         .createSendTable
         .createClickTable
         .alterSendTable
-        .saveSend
+
+      val registered = this.transactionalPartitionRepository
+        .queue(queue)
+        .data(data)
+        .table(this.transactionalRepository.generateSendTable)
+        .templateId(templateId)
+        .themeConfigs(this.transactionalRepository.themeConfigs)
+        .save
 
       if (!registered) {
         println(Message.TRANSACTIONAL_NOT_REGISTER)
