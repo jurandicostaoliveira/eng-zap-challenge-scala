@@ -5,8 +5,7 @@ import br.com.btg360.constants._
 import br.com.btg360.entities.{QueueEntity, StockEntity, UserEntity}
 import br.com.btg360.logger.Log4jPrinter
 import br.com.btg360.repositories.{ConsolidatedRepository, QueueRepository, UserRepository}
-import br.com.btg360.run.DailyRuleRun.queue
-import br.com.btg360.services.{Port25Service, _}
+import br.com.btg360.services._
 import org.apache.spark.rdd.RDD
 
 import scala.util.control.Breaks._
