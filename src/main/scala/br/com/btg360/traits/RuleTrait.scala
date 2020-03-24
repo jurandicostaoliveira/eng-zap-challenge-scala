@@ -54,11 +54,11 @@ trait RuleTrait extends Application {
       /**
         * Update queue hourly
         */
-      rows.foreach(row => {
-        if (row.ruleTypeId == Rule.HOURLY_ID && row.status == QueueStatus.RECOMMENDATION_PREPARED) {
-          this.queueRepository.updateStatus(row.userRuleId.toInt, QueueStatus.PROCESSED)
-        }
-      })
+//      rows.foreach(row => {
+//        if (row.ruleTypeId == Rule.HOURLY_ID && row.status == QueueStatus.RECOMMENDATION_PREPARED) {
+//          this.queueRepository.updateStatus(row.userRuleId.toInt, QueueStatus.PROCESSED)
+//        }
+//      })
 
       /**
         * Execute all
