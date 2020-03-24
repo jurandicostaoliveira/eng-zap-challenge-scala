@@ -7,6 +7,7 @@ import br.com.btg360.constants.{Database, Table}
 import br.com.btg360.jdbc.MySqlAllin
 import br.com.btg360.spark.SparkCoreSingleton
 import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.Row
 
 import scala.collection.Map
 
@@ -97,7 +98,7 @@ class ReferenceListRepository extends Repository {
   /**
     * @return ResultSet
     */
-  private def describe: List[String] = {
+  def describe: List[String] = {
     try {
       val conn: Connection = this.db.open
       val query: String = s"DESCRIBE ${this.generateReferenceListTable};"
@@ -119,12 +120,10 @@ class ReferenceListRepository extends Repository {
     *
     * @return RDD
     */
-  def findAll: RDD[Map[String, Any]] = {
+  def findAll: RDD[(String, Row)] = {
     try {
-      val columns = this.describe
-      this.db.sparkRead(this.generateReferenceListTable).rdd.map(row => {
-        row.getValuesMap(columns)
-      })
+      this.db.sparkRead(this.generateReferenceListTable)
+        .rdd.map(row => (row.getAs("nm_email").toString, row))
     } catch {
       case e: Exception => println(e.printStackTrace())
         this.sc.emptyRDD

@@ -54,11 +54,11 @@ trait RuleTrait extends Application {
       /**
         * Update queue hourly
         */
-//      rows.foreach(row => {
-//        if (row.ruleTypeId == Rule.HOURLY_ID && row.status == QueueStatus.RECOMMENDATION_PREPARED) {
-//          this.queueRepository.updateStatus(row.userRuleId.toInt, QueueStatus.PROCESSED)
-//        }
-//      })
+      rows.foreach(row => {
+        if (row.ruleTypeId == Rule.HOURLY_ID && row.status == QueueStatus.RECOMMENDATION_PREPARED) {
+          this.queueRepository.updateStatus(row.userRuleId.toInt, QueueStatus.PROCESSED)
+        }
+      })
 
       /**
         * Execute all
@@ -139,8 +139,11 @@ trait RuleTrait extends Application {
     * @return this
     */
   private def flush: RuleTrait = {
+    /**
+      * Validate current status only daily rules
+      */
     val currentStatus: Int = this.queueRepository.findByUserRuleId(this.queue.userRuleId.toInt).status
-    if (currentStatus != QueueStatus.RECOMMENDATION_PREPARED) {
+    if (this.queue.ruleTypeId != Rule.HOURLY_ID && currentStatus != QueueStatus.RECOMMENDATION_PREPARED) {
       println(Message.STATUS_IS_UNAVAILABLE_TO_PROCESS.format(currentStatus))
       return this
     }
