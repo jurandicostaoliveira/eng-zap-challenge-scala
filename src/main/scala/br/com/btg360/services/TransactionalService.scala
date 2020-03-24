@@ -82,6 +82,7 @@ class TransactionalService() extends Service {
         .table(this.transactionalRepository.generateSendTable)
         .templateId(templateId)
         .themeConfigs(this.transactionalRepository.themeConfigs)
+        .numPartitions(10)
         .save
 
       if (!registered) {

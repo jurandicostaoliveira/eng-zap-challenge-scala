@@ -191,15 +191,17 @@ trait RuleTrait extends Application {
     * @return RDD
     */
   private def apply(data: RDD[(String, StockEntity)]): RDD[(String, StockEntity)] = {
-    var dataset = data
+    var rdd = data
     if (Channel.isEmail(this.queue.channelName)) {
       if (this.queue.ruleTypeId != Rule.AUTOMATIC_ID) {
-        dataset = new ReferenceListService().add(this.queue, data)
+        rdd = new ReferenceListService().add(this.queue, rdd)
+        println(Message.APPLIED_REFERENCE_LIST_SUCCESSFULLY)
       }
 
-      dataset = new Port25Service().add(dataset)
+      rdd = new Port25Service().add(rdd)
+      println(Message.APPLIED_PORT_25_SUCCESSFULLY)
     }
-    dataset
+    rdd
   }
 
   /**
