@@ -270,7 +270,9 @@ abstract class Repository extends Application {
     */
   def insertStatementBatch(query: String, data: List[Map[String, Any]]): Unit = {
     try {
+      this.dbConnection.setAutoCommit(false)
       val stmt = this.dbConnection.prepareStatement(query)
+
       for (map <- data) {
         var index = 1
         for ((key, value) <- map) {
@@ -281,6 +283,7 @@ abstract class Repository extends Application {
       }
 
       stmt.executeLargeBatch()
+      this.dbConnection.commit()
       stmt.close()
     } catch {
       case e: Exception => println(e.printStackTrace())
