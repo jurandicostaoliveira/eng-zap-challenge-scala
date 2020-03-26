@@ -69,7 +69,6 @@ class TransactionalService() extends Service {
       }
 
       val registered = this.transactionalRepository
-        .batchLimit(20000)
         .templateId(templateId)
         .createSendTable
         .createClickTable
