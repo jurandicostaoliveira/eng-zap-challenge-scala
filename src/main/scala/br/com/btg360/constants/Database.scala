@@ -18,4 +18,6 @@ object Database {
 
   val POSTMATIC: String = "postmatic"
 
+  val MAIL_SENDER: String = "emailpro_mailsender"
+
 }

@@ -26,4 +26,6 @@ object Table {
 
   val COR_LIST: String = "cor_lista"
 
+  val CHANNEL_MANAGER_MIGRATION = "channel_manager_migration"
+
 }

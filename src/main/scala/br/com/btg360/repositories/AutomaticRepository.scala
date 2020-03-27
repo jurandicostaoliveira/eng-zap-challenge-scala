@@ -212,6 +212,10 @@ class AutomaticRepository extends Repository {
           WHERE ${this.field} LIKE "%${period}%"
          """
       query = this.queryFilterAppend(query)
+
+      println("QUERY: " + query)
+      System.exit(0)
+
       val df: DataFrame = this.db.sparkRead(query)
       this.dfToRDD(df)
     } catch {

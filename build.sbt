@@ -19,7 +19,8 @@ libraryDependencies ++= Seq(
   "org.apache.logging.log4j" % "log4j-scala" % "11.0",
   "net.debasishg" %% "redisclient" % "3.8", //https://github.com/debasishg/scala-redis
   //"org.json4s" %% "json4s-native" % "3.3.0", //https://github.com/json4s/json4s
-  "commons-validator" % "commons-validator" % "1.4.1"
+  "commons-validator" % "commons-validator" % "1.4.1",
+  "com.m3" %% "curly-scala" % "0.5.+"
 )
 
 lazy val commonSettings = Seq(
