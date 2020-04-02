@@ -1,9 +1,10 @@
 package br.com.btg360.services
 
 import br.com.btg360.application.Service
-import br.com.btg360.entities.{StockEntity, QueueEntity}
+import br.com.btg360.entities.{QueueEntity, StockEntity}
 import br.com.btg360.repositories.ReferenceListRepository
 import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.Row
 
 import scala.collection.Map
 
@@ -42,10 +43,12 @@ class ReferenceListService extends Service {
         return data
       }
 
-      val list: RDD[(String, Map[String, Any])] = this.repository
+      val list: RDD[(String, Row)] = this.repository
         .allinId(queue.rule.allinId)
         .listId(queue.rule.referenceListId)
-        .findAll.map(row => (row("nm_email").toString, row))
+        .findAll
+
+      val columns = this.repository.describe
 
       data.leftOuterJoin(list).map(row => {
         var item = row._2._1
@@ -53,7 +56,8 @@ class ReferenceListService extends Service {
           item = new StockEntity(
             products = item.products,
             recommendations = item.recommendations,
-            references = row._2._2.get)
+            references = row._2._2.get.getValuesMap(columns)
+          )
         }
         (row._1, item)
       })

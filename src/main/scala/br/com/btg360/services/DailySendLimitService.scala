@@ -4,11 +4,10 @@ import br.com.btg360.entities.QueueEntity
 import br.com.btg360.redis.Connection
 import br.com.btg360.spark.SparkCoreSingleton
 import org.apache.spark.rdd.RDD
+import com.redislabs.provider.redis._
 
 
-class DailySendLimitService(queue: QueueEntity) {
-
-  private val sc = SparkCoreSingleton.getContext
+class DailySendLimitService(queue: QueueEntity) extends Serializable {
 
   private val redis = new Connection().get
 
@@ -17,26 +16,24 @@ class DailySendLimitService(queue: QueueEntity) {
   /**
     * @return String
     */
-  private def createEntityName: String = "send_limit_%d_%s".format(this.queue.userId, this.today)
+  private def createKeyName: String = "send_limit_%d_%s".format(this.queue.userId, this.today)
 
   /**
     * Filtering to start the defined limit
     *
-    * @param String entityName
+    * @param String keyName
     * @return RDD
     */
-  private def pluck(entityName: String, users: List[String]): RDD[String] = {
-    var keys: List[String] = List()
+  private def diff(keyName: String, users: RDD[String]): RDD[String] = {
+    val inputData: RDD[(String, String)] = users.keyBy(row => row)
 
-    this.redis.hgetall(entityName).foreach(row => {
-      for ((key, value) <- row) {
-        if (value.toInt <= this.queue.sendLimit && users.contains(key)) {
-          keys = keys :+ key
-        }
-      }
-    })
+    val sendLimit: Int = this.queue.sendLimit
 
-    this.sc.parallelize(keys)
+    val currentData: RDD[(String, String)] = SparkCoreSingleton.getContext
+      .fromRedisHash(keyName)
+      .filter(row => row._2.toInt <= sendLimit)
+
+    inputData.join(currentData).keys
   }
 
   /**
@@ -46,16 +43,21 @@ class DailySendLimitService(queue: QueueEntity) {
     * @return RDD
     */
   def filter(users: RDD[String]): RDD[String] = {
-    val entityName: String = this.createEntityName
-    val usersList = users.collect().toList
+    try {
+      val keyName: String = this.createKeyName
+      val usersList = users.collect().toList
 
-    this.redis.pipeline(row => {
-      for (key <- usersList) {
-        row.hincrby(entityName, key, 1)
-      }
-    })
+      this.redis.pipeline(pipe => {
+        usersList.foreach(user => {
+          pipe.hincrby(keyName, user, 1)
+        })
+      })
 
-    this.pluck(entityName, usersList)
+      this.diff(keyName, users)
+    } catch {
+      case e: Exception => println("DAILY SEND LIMIT ERROR: " + e.printStackTrace())
+        users
+    }
   }
 
   /**

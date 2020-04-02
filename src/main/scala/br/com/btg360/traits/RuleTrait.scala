@@ -5,7 +5,7 @@ import br.com.btg360.constants._
 import br.com.btg360.entities.{QueueEntity, StockEntity, UserEntity}
 import br.com.btg360.logger.Log4jPrinter
 import br.com.btg360.repositories.{ConsolidatedRepository, QueueRepository, UserRepository}
-import br.com.btg360.services.{Port25Service, _}
+import br.com.btg360.services._
 import org.apache.spark.rdd.RDD
 
 import scala.util.control.Breaks._
@@ -139,6 +139,15 @@ trait RuleTrait extends Application {
     * @return this
     */
   private def flush: RuleTrait = {
+    /**
+      * Validate current status only daily rules
+      */
+    val currentStatus: Int = this.queueRepository.findByUserRuleId(this.queue.userRuleId.toInt).status
+    if (this.queue.ruleTypeId != Rule.HOURLY_ID && currentStatus != QueueStatus.RECOMMENDATION_PREPARED) {
+      println(Message.STATUS_IS_UNAVAILABLE_TO_PROCESS.format(currentStatus))
+      return this
+    }
+
     val channels = this.jsonService.decode[List[String]](this.queue.channels)
     println(this.queue.dataStringJson)
     channels.foreach(channel => {
@@ -147,6 +156,7 @@ trait RuleTrait extends Application {
       this.queue.platformId = Channel.getPlatformId(channel)
       this.all
     })
+
     this
   }
 
@@ -181,15 +191,17 @@ trait RuleTrait extends Application {
     * @return RDD
     */
   private def apply(data: RDD[(String, StockEntity)]): RDD[(String, StockEntity)] = {
-    var dataset = data
+    var rdd = data
     if (Channel.isEmail(this.queue.channelName)) {
       if (this.queue.ruleTypeId != Rule.AUTOMATIC_ID) {
-        dataset = new ReferenceListService().add(this.queue, data)
+        rdd = new ReferenceListService().add(this.queue, rdd)
+        println(Message.APPLIED_REFERENCE_LIST_SUCCESSFULLY)
       }
 
-      dataset = new Port25Service().add(dataset)
+      rdd = new Port25Service().add(rdd)
+      println(Message.APPLIED_PORT_25_SUCCESSFULLY)
     }
-    dataset
+    rdd
   }
 
   /**

@@ -1,8 +1,8 @@
 package br.com.btg360.repositories
 
 import java.sql.{Connection, ResultSet}
-import java.text.{DateFormatSymbols, SimpleDateFormat}
-import java.util.{Calendar, Date, Locale, TimeZone}
+import java.text.{SimpleDateFormat}
+import java.util.{Calendar, Locale}
 
 import br.com.btg360.constants.{Automatic => AT}
 import br.com.btg360.application.Repository
@@ -13,16 +13,18 @@ import br.com.btg360.services.PeriodService
 import br.com.btg360.spark.SparkCoreSingleton
 import com.m3.curly.scala.{HTTP, Request}
 import org.apache.spark.rdd.RDD
-import org.joda.time.DateTime
 import org.json4s.DefaultFormats
 import org.json4s.JsonAST.{JArray, JObject}
 import org.json4s.jackson.JsonMethods._
+import br.com.allin.ChannelManagerRepository.ChannelManagerRepository
 
 class AutomaticChannelManagerRepository extends Repository {
 
   private val db = new MySqlAllin()
 
   val sc = SparkCoreSingleton.getContext
+
+  val channelManagerRepository: ChannelManagerRepository = new ChannelManagerRepository(this.sc.getConf, null)
 
   val periodService: PeriodService = new PeriodService()
 
@@ -110,47 +112,38 @@ class AutomaticChannelManagerRepository extends Repository {
 
     try {
 
-      val filter = this.getFilter(AT.BIRTHDAY)
+      val data = this.getDataChannelManager(this.listId, this.getFilter(AT.BIRTHDAY))
 
-      println("FILTER: " + filter)
-
-      sc.emptyRDD[(String, StockEntity)]
+      this.execExclusion(data)
 
     } catch {
-      case e: Exception => e.getLocalizedMessage
-        println("ERROR: ")
+      case e: Exception => {
+        println("ERROR EXEC BIRTHDAY: " + e)
         sc.emptyRDD[(String, StockEntity)]
+      }
     }
   }
 
   def findSendingDate: RDD[(String, StockEntity)] = {
-    sc.emptyRDD[(String, StockEntity)]
-//    try {
-//      if (!this.hasReferenceList) {
-//        return sc.emptyRDD[(String, StockEntity)]
-//      }
-//      val period = periodService.format(this.getFormatToYear).timeByDay(-this.interval)
-//      var query =
-//        s"""
-//           (SELECT * FROM ${this.getListTable}
-//           WHERE ${this.field} = "${period}"
-//        """
-//      query = this.queryFilterAppend(query)
-//      val df: DataFrame = this.db.sparkRead(query)
-//      this.dfToRDD(df)
-//    } catch {
-//      case e: Exception => e.getLocalizedMessage
-//        sc.emptyRDD[(String, StockEntity)]
-//    }
+    try {
+
+      val data = this.getDataChannelManager(this.listId, this.getFilter(AT.SENDING_DATE))
+
+      this.execExclusion(data)
+
+    } catch {
+      case e: Exception => {
+        println("ERROR EXEC SENDING-DATE: " + e)
+        sc.emptyRDD[(String, StockEntity)]
+      }
+    }
   }
 
   def getFilter(automaticType: String): String = {
     try {
-
       this.getStringFilter + this.getPeriod(automaticType)
-
     } catch {
-      case _: Exception => throw new Exception("Exception in getFilter ChannelManager")
+      case _: Exception => throw new Exception("Exception in getFilter ChannelManager - ALLIN: " + this.allinId)
     }
   }
 
@@ -161,18 +154,21 @@ class AutomaticChannelManagerRepository extends Repository {
     }
 
     try {
-
-      val response = HTTP.get(this.getRequestFilter)
-
-      if( response.status != 200 ) {
-        throw new Exception("Exception in getFilter ChannelManager")
-      }
-
-      s"""(${this.getFilterInJson(response.textBody)}) AND """
-
+      getStringFilterExecute
     } catch {
-      case _: Exception => throw new Exception("Exception in getFilter ChannelManager")
+      case _: Exception => getStringFilterExecute
     }
+  }
+
+  def getStringFilterExecute: String = {
+
+    val response = HTTP.get(this.getRequestFilter)
+
+    if( response.status != 200 ) {
+      throw new Exception()
+    }
+
+    s"""(${this.getFilterInJson(response.textBody)}) AND """
   }
 
   def getRequestFilter: Request = {
@@ -185,24 +181,24 @@ class AutomaticChannelManagerRepository extends Repository {
 
   def getFilterInJson(json: String): String = {
 
+    implicit val formats = DefaultFormats
+
     var filter : String = ""
 
     try {
 
       val data = parse(json).asInstanceOf[JObject]
 
-      implicit val formats = DefaultFormats
-
       (data \ "result").asInstanceOf[JArray].arr.foreach{
         f => filter = f.extract[String]
       }
 
     } catch {
-      case _: Exception => throw new Exception("Exception in getFilter ChannelManager")
+      case _: Exception => throw new Exception()
     }
 
     if( filter == "" ) {
-      throw new Exception("Exception in getFilter ChannelManager")
+      throw new Exception()
     }
 
     filter
@@ -212,12 +208,57 @@ class AutomaticChannelManagerRepository extends Repository {
 
     if(AT.BIRTHDAY == automaticType) {
 
+      val dayOfMonth = if ( Calendar.getInstance().get(Calendar.DAY_OF_MONTH) < 10 )
+        "0" + Calendar.getInstance().get(Calendar.DAY_OF_MONTH) else Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
+
       return "(" + this.field + "_copy:*\\ " +
-          new SimpleDateFormat("MMM", Locale.ENGLISH).format(Calendar.getInstance().getTime()) +
-          "\\ " + Calendar.getInstance().get(Calendar.DAY_OF_MONTH) +
-          "\\ 00\\:00\\:00\\ UTC\\ * AND config.isEmailAuthorized:true)"
+        new SimpleDateFormat("MMM", Locale.ENGLISH).format(Calendar.getInstance().getTime()) +
+        "\\ " + dayOfMonth +
+        "\\ 00\\:00\\:00\\ UTC\\ * AND config.isEmailAuthorized:true)"
     }
 
-    "(" + this.field + ":" + new DateTime() + " AND config.isEmailAuthorized:true)"
+    "("+this.field+":"+this.periodService.format("yyyy-MM-dd").timeByDay(-this.interval)+"T00\\:00\\:00Z AND config.isEmailAuthorized:true)"
+  }
+
+  //Erro de No Task Serializable se usar função auxiliar pro map
+  def getDataChannelManager(list: Int, filter: String): RDD[(String, StockEntity)] = {
+
+    try {
+
+      this.channelManagerRepository.get(list.toString, this.allinId, false, filter).rdd.map(json => {
+        implicit val formats = DefaultFormats
+
+        val data = parse(json).asInstanceOf[JObject]
+
+        val map = data.extract[Map[String, Any]]
+
+        val stockEntity = new StockEntity(references = map)
+
+        ((data \ "email").extract[String], stockEntity)
+      })
+
+    } catch {
+      case _: Exception =>
+        this.channelManagerRepository.get(list.toString, this.allinId, false, filter).rdd.map(json => {
+          implicit val formats = DefaultFormats
+
+          val data = parse(json).asInstanceOf[JObject]
+
+          val map = data.extract[Map[String, Any]]
+
+          val stockEntity = new StockEntity(references = map)
+
+          ((data \ "email").extract[String], stockEntity)
+        })
+    }
+  }
+
+  def execExclusion(data: RDD[(String, StockEntity)]): RDD[(String, StockEntity)] = {
+
+    if( this.listExclusionId == 0 || this.listExclusionId == this.listId ) {
+      return data
+    }
+
+    data.subtractByKey(this.getDataChannelManager(this.listExclusionId,""))
   }
 }

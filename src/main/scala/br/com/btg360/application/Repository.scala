@@ -271,6 +271,7 @@ abstract class Repository extends Application {
   def insertStatementBatch(query: String, data: List[Map[String, Any]]): Unit = {
     try {
       val stmt = this.dbConnection.prepareStatement(query)
+
       for (map <- data) {
         var index = 1
         for ((key, value) <- map) {

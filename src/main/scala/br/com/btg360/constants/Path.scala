@@ -10,6 +10,7 @@ object Path {
 
   val STORAGE: String = "%s/storage".format(PROJECT)
 
-  val LOGS: String = "%s/logs".format(STORAGE)
+  //val LOGS: String = "%s/logs".format(STORAGE)
+  val LOGS: String = "/storage/logs"
 
 }

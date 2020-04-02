@@ -56,7 +56,10 @@ class TransactionalService() extends Service {
   def persist(queue: QueueEntity, data: RDD[(String, StockEntity)]): Unit = {
     try {
       val layout = this.createLayout(queue)
-      val templateId: Int = this.transactionalRepository.queue(queue).data(data).themeConfigs(layout._2)
+      val templateId: Int = this.transactionalRepository
+        .queue(queue)
+        .data(data)
+        .themeConfigs(layout._2)
         .createTemplateTable
         .saveTemplate(layout._1)
 
@@ -65,7 +68,8 @@ class TransactionalService() extends Service {
         return
       }
 
-      val registered = this.transactionalRepository.templateId(templateId)
+      val registered = this.transactionalRepository
+        .templateId(templateId)
         .createSendTable
         .createClickTable
         .alterSendTable

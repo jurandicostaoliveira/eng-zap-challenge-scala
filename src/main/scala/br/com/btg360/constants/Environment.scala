@@ -5,7 +5,7 @@ import java.io.File
 
 object Environment {
 
-  val FILE_ENV: String = ".environment.properties"
+  val FILE_ENV: String = "environment.properties"
 
   val APP_ENV: String = "APP_ENV"
 

@@ -17,7 +17,8 @@ class Connection {
         p.getProperty("host"),
         p.getProperty("port").toInt,
         p.getProperty("database").toInt,
-        Try(p.getProperty("secret")).toOption
+        Try(p.getProperty("secret")).toOption,
+        p.getProperty("timeout").toInt
       )
     } catch {
       case e: Exception => println("REDIS CONNECTION ERROR: " + e.printStackTrace())
