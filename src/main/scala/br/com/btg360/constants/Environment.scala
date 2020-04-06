@@ -62,7 +62,7 @@ object Environment {
     */
   def isDedicatedEnv: Boolean = {
     val value = new PropService().get(FILE_ENV).getProperty(IS_DEDICATED_ENV)
-    if (value == null || value.isEmpty || value == false) {
+    if (value == null || value.isEmpty || value.trim.equals("false")) {
       return false
     }
     true
