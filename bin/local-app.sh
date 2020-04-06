@@ -4,6 +4,7 @@ PROCESS=`ps -ef | grep -i btg360 | grep -v grep | awk '{print $2}'`
 MYSQLHOST='177.153.231.93'
 MYSQLUSER='root'
 MYSQLPASSWORD='loca1020'
+ENV_PATH=/home/Btg-Scala-Sending-Generator/src/main/resources/environment.properties
 
 ################# INFRA ####################
 ##### ROTACIONAMENTO DO LOG NOHUP.OUT #####
@@ -18,11 +19,21 @@ fi
 
 ############################################
 
+######## TO BTG DEDICATED ENV ##############
+
+IS_DEDICATED_ENV=`cat $ENV_PATH | grep 'IS_DEDICATED_ENV' | cut -d'=' -f2`
+DEDICATED_ENV_VALUE=0
+if [ $IS_DEDICATED_ENV == true ]; then
+    DEDICATED_ENV_VALUE=1
+fi
+
+############################################
+
 case $1 in
 	stop)
         echo '(0^0) PROCESS STOPPED'
     	kill -9 $PROCESS
-        mysql -h$MYSQLHOST -u$MYSQLUSER -p$MYSQLPASSWORD -e 'UPDATE btg_jobs.rules_queue_multichannel SET status=4 WHERE today=current_date() AND status=5 AND userId IN(SELECT id FROM master.users WHERE homologation=1 AND isMultiChannel=1 AND isDedicatedEnv=1);'
+        mysql -h$MYSQLHOST -u$MYSQLUSER -p$MYSQLPASSWORD -e "UPDATE btg_jobs.rules_queue_multichannel SET status=4 WHERE today=current_date() AND status=5 AND userId IN(SELECT id FROM master.users WHERE homologation=1 AND isMultiChannel=1 AND isDedicatedEnv=$DEDICATED_ENV_VALUE);"
 	;;
 	start)
         echo '(0_0) PROCESS STARTED'
