@@ -4,7 +4,7 @@ Sending generator to postimatic transational
 
 ## Installation
 
- To inform the environment that will run the application, create a file named .development inside the src/main/resources/ directory and set the variable APP_ENV = [development, homologation, production]
+ To inform the environment that will run the application, create a file named .development inside the src/main/resources/ directory and set the variables APP_ENV = [development*, homologation, production, cluster] and IS_DEDICATED_ENV = [true, false*]
 
 ```
 $ echo -e "APP_ENV=development\nIS_DEDICATED_ENV=false" > src/main/resources/environment.properties
@@ -20,7 +20,7 @@ $ sbt assembly
 
 #### Scripts to manipulate the application
 
-Enter the user spark  :
+Enter the user spark to cluster  :
 
 ```
 $ su spark
