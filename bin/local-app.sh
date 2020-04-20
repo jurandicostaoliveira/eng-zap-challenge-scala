@@ -33,6 +33,8 @@ case $1 in
 	stop)
         echo '(0^0) PROCESS STOPPED'
     	kill -9 $PROCESS
+    	rm -rf /storage/tmp/blockmgr-*
+    	rm -rf /storage/tmp/spark-*
         mysql -h$MYSQLHOST -u$MYSQLUSER -p$MYSQLPASSWORD -e "UPDATE btg_jobs.rules_queue_multichannel SET status=4 WHERE today=current_date() AND status=5 AND userId IN(SELECT id FROM master.users WHERE homologation=1 AND isMultiChannel=1 AND isDedicatedEnv=$DEDICATED_ENV_VALUE);"
 	;;
 	start)
