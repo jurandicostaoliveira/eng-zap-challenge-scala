@@ -29,25 +29,25 @@ $ su spark
 Deploy :
 
 ```
-$ /bin/bash /home/Btg-Scala-Sending-Generator/bin/app.sh deploy
+$ /bin/bash /home/Btg-Scala-Sending-Generator/bin/[local-app or cluster-app].sh deploy
 ```
 
 Stop :
 
 ```
-$ /bin/bash /home/Btg-Scala-Sending-Generator/bin/app.sh stop
+$ /bin/bash /home/Btg-Scala-Sending-Generator/bin/[local-app or cluster-app].sh stop
 ```
  
 Start : 
 
 ```
-$ /bin/bash /home/Btg-Scala-Sending-Generator/bin/app.sh start
+$ /bin/bash /home/Btg-Scala-Sending-Generator/bin/[local-app or cluster-app].sh start
 ```
 
 Restart :
 
 ```
-$ /bin/bash /home/Btg-Scala-Sending-Generator/bin/app.sh restart
+$ /bin/bash /home/Btg-Scala-Sending-Generator/bin/[local-app or cluster-app].sh restart
 ```
 
 

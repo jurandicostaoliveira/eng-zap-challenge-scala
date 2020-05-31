@@ -80,6 +80,8 @@ case $1 in
         ps aux | grep btg360
         echo ">> Killing Application"
     	kill -9 $PROCESS
+    	rm -rf /storage/tmp/blockmgr-*
+    	rm -rf /storage/tmp/spark-*
     	echo ">> Reset Queue"
         mysql -h$MYSQLHOST -u$MYSQLUSER -p$MYSQLPASSWORD -e "UPDATE btg_jobs.rules_queue_multichannel SET status=4 WHERE today=current_date() AND status=5 AND userId IN(SELECT id FROM master.users WHERE homologation=1 AND isMultiChannel=1 AND isDedicatedEnv=$DEDICATED_ENV_VALUE);"
         echo ">> Cluster Stopped"
@@ -108,7 +110,7 @@ case $1 in
         echo ">> Entering the Directory"
         cd /home/Btg-Scala-Sending-Generator/
         echo ">> Running Git Pull Command"
-        git pull origin cluster
+        git pull origin master
         echo ">> Compiling Application"
         sbt assembly
         /bin/bash /home/Btg-Scala-Sending-Generator/bin/cluster-app.sh restart
