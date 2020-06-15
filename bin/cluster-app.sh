@@ -4,6 +4,7 @@ PROCESS=`ps -ef | grep -i btg360 | grep -v grep | awk '{print $2}'`
 MYSQLHOST='177.153.231.93'
 MYSQLUSER='root'
 MYSQLPASSWORD='loca1020'
+ENV_PATH=/home/Btg-Scala-Sending-Generator/src/main/resources/environment.properties
 
 export HADOOP_CONF_DIR=/home/spark/hadoop/etc/hadoop
 export SPARK_HOME=/home/spark/spark
@@ -22,6 +23,16 @@ if [ $INFRA_HORAS == "23" ]; then
   INFRA_DATA=$(date -d "+1 day" +%d-%m-%y)
  else
   INFRA_DATA=$(date +%d-%m-%y)
+fi
+
+############################################
+
+######## TO BTG DEDICATED ENV ##############
+
+IS_DEDICATED_ENV=`cat $ENV_PATH | grep 'IS_DEDICATED_ENV' | cut -d'=' -f2`
+DEDICATED_ENV_VALUE=0
+if [ $IS_DEDICATED_ENV == true ]; then
+    DEDICATED_ENV_VALUE=1
 fi
 
 ############################################
@@ -69,8 +80,10 @@ case $1 in
         ps aux | grep btg360
         echo ">> Killing Application"
     	kill -9 $PROCESS
+    	rm -rf /storage/tmp/blockmgr-*
+    	rm -rf /storage/tmp/spark-*
     	echo ">> Reset Queue"
-        mysql -h$MYSQLHOST -u$MYSQLUSER -p$MYSQLPASSWORD -e 'UPDATE btg_jobs.rules_queue_multichannel SET status=4 WHERE today=current_date() AND status=5 AND userId IN(SELECT id FROM master.users WHERE homologation=1 AND isMultiChannel=1 AND isDedicatedEnv=0);'
+        mysql -h$MYSQLHOST -u$MYSQLUSER -p$MYSQLPASSWORD -e "UPDATE btg_jobs.rules_queue_multichannel SET status=4 WHERE today=current_date() AND status=5 AND userId IN(SELECT id FROM master.users WHERE homologation=1 AND isMultiChannel=1 AND isDedicatedEnv=$DEDICATED_ENV_VALUE);"
         echo ">> Cluster Stopped"
         /bin/bash /home/spark/hadoop/sbin/stop-all.sh
         jps
@@ -86,9 +99,9 @@ case $1 in
         ps aux | grep btg360
     ;;
 	restart)
-        /bin/bash /home/Btg-Scala-Sending-Generator/bin/app.sh stop
+        /bin/bash /home/Btg-Scala-Sending-Generator/bin/cluster-app.sh stop
 	    sleep 60
-        /bin/bash /home/Btg-Scala-Sending-Generator/bin/app.sh start
+        /bin/bash /home/Btg-Scala-Sending-Generator/bin/cluster-app.sh start
 	;;
 	deploy)
 	    echo ":::: PROCESS DEPLOYED ::::"
@@ -97,9 +110,9 @@ case $1 in
         echo ">> Entering the Directory"
         cd /home/Btg-Scala-Sending-Generator/
         echo ">> Running Git Pull Command"
-        git pull origin cluster
+        git pull origin master
         echo ">> Compiling Application"
         sbt assembly
-        /bin/bash /home/Btg-Scala-Sending-Generator/bin/app.sh restart
+        /bin/bash /home/Btg-Scala-Sending-Generator/bin/cluster-app.sh restart
 	;;
 esac

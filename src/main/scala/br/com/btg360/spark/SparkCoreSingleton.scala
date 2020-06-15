@@ -26,7 +26,7 @@ object SparkCoreSingleton extends Serializable {
     val pRedis: Properties = new PropService().get(this.redisFileName)
     val builder: SparkSession.Builder = SparkSession.builder()
 
-    if (Environment.isDevelopment || Environment.isHomologation) {
+    if (!Environment.isCluster) {
       builder
         .master(pCassandra.getProperty("master"))
         .config("spark.driver.memory", pCassandra.getProperty("sparkDriverMemory"))

@@ -10,7 +10,7 @@ object MultiChannel {
     * @return Int
     */
   def isDedicatedEnv: Int = {
-    if (Environment.isHomologation) {
+    if (Environment.isDedicatedEnv) {
       return 1
     }
     0
