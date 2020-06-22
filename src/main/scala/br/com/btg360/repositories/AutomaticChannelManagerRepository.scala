@@ -11,7 +11,7 @@ import br.com.btg360.entities.StockEntity
 import br.com.btg360.jdbc.MySqlAllin
 import br.com.btg360.services.PeriodService
 import br.com.btg360.spark.SparkCoreSingleton
-import com.m3.curly.scala.{HTTP, Request}
+import com.m3.curly.{HTTP, Request}
 import org.apache.spark.rdd.RDD
 import org.json4s.DefaultFormats
 import org.json4s.JsonAST.{JArray, JObject}
@@ -164,19 +164,19 @@ class AutomaticChannelManagerRepository extends Repository {
 
     val response = HTTP.get(this.getRequestFilter)
 
-    if( response.status != 200 ) {
+    if( response.getStatus != 200 ) {
       throw new Exception()
     }
 
-    s"""(${this.getFilterInJson(response.textBody)}) AND """
+    s"""(${this.getFilterInJson(response.getTextBody)}) AND """
   }
 
   def getRequestFilter: Request = {
-    Request(
+    new Request(
       s""" ${this.apiChannelManager}${this.filterId}?customerId=${this.allinId}&listId=${this.listId} """
     )
-      .header("Authorization", this.apiChannelManagerToken)
-      .header("cache-control", "no-cache")
+      .setHeader("Authorization", this.apiChannelManagerToken)
+      .setHeader("cache-control", "no-cache")
   }
 
   def getFilterInJson(json: String): String = {

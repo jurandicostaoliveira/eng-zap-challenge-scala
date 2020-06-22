@@ -20,7 +20,7 @@ libraryDependencies ++= Seq(
   "net.debasishg" %% "redisclient" % "3.20", //https://github.com/debasishg/scala-redis
   //"org.json4s" %% "json4s-native" % "3.3.0", //https://github.com/json4s/json4s
   "commons-validator" % "commons-validator" % "1.4.1",
-  "com.m3" %% "curly-scala" % "0.5.+",
+  "com.m3" % "curly" % "0.5.6",
   "com.redislabs" % "spark-redis" % "2.4.0"
 )
 
