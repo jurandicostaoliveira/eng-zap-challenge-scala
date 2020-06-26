@@ -52,7 +52,7 @@ case $1 in
         rm -f /home/Btg-Scala-Sending-Generator/target/scala-2.11/Btg-Scala-Sending-Generator-assembly-0.1.jar
         cd /home/Btg-Scala-Sending-Generator/
         git pull origin master
-        sbt assembly
+        sbt clean assembly
         /bin/bash /home/Btg-Scala-Sending-Generator/bin/local-app.sh restart
     ;;
 esac

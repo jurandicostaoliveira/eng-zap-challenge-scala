@@ -6,4 +6,6 @@ object Url {
 
   val PIXEL_VIEW: String = "http://redirect.btg360.com.br/view/count.gif"
 
+  val API_CHANNEL_MANAGER: String = "http://api-channelmanager.allin.com.br"
+
 }

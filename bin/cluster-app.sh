@@ -112,7 +112,7 @@ case $1 in
         echo ">> Running Git Pull Command"
         git pull origin master
         echo ">> Compiling Application"
-        sbt assembly
+        sbt clean assembly
         /bin/bash /home/Btg-Scala-Sending-Generator/bin/cluster-app.sh restart
 	;;
 esac
