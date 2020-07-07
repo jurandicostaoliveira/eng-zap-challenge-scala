@@ -109,6 +109,16 @@ class Automatic(queue: QueueEntity) {
     * @return RDD
     */
   private def inactive: RDD[(String, StockEntity)] = {
+
+    if( this.isMigratedChannelManager ) {
+
+      return this.getAutomaticChannelManagerRepository.findInactive(
+        this.getAutomaticRuleModel.findInactiveMultichannel
+      ).filter(row => {
+        EmailValidator.getInstance().isValid(row._1)
+      })
+    }
+
     this.getAutomaticRuleModel.findInactive.filter(row => {
       EmailValidator.getInstance().isValid(row._1)
     })

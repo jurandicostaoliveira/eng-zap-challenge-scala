@@ -139,6 +139,21 @@ class AutomaticChannelManagerRepository extends Repository {
     }
   }
 
+  def findInactive(activity: RDD[(String, StockEntity)]): RDD[(String, StockEntity)] = {
+    try {
+
+      val data = this.getDataChannelManager(this.listId, this.getFilter(AT.INACTIVE))
+
+      this.execExclusion(data.join(activity).map(row => (row._1, row._2._1)))
+
+    } catch {
+      case e: Exception => {
+        println("ERROR EXEC INACTIVE: " + e)
+        sc.emptyRDD[(String, StockEntity)]
+      }
+    }
+  }
+
   def getFilter(automaticType: String): String = {
     try {
       this.getStringFilter + this.getPeriod(automaticType)
@@ -217,7 +232,12 @@ class AutomaticChannelManagerRepository extends Repository {
         "\\ 00\\:00\\:00\\ UTC\\ * AND config.isEmailAuthorized:true)"
     }
 
-    "("+this.field+":"+this.periodService.format("yyyy-MM-dd").timeByDay(-this.interval)+"T00\\:00\\:00Z AND config.isEmailAuthorized:true)"
+    if(AT.SENDING_DATE == automaticType) {
+
+      return "("+this.field+":"+this.periodService.format("yyyy-MM-dd").timeByDay(-this.interval)+"T00\\:00\\:00Z AND config.isEmailAuthorized:true)"
+    }
+
+    "(config.isEmailAuthorized:true)"
   }
 
   //Erro de No Task Serializable se usar função auxiliar pro map

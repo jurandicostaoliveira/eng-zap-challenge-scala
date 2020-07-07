@@ -267,6 +267,24 @@ class AutomaticRepository extends Repository {
     }
   }
 
+  def findInactiveMultichannel: RDD[(String, StockEntity)] = {
+    try {
+      val activityTable: String = this.getActivityTable
+      val period = periodService.format("yyyy-MM-dd").timeByDay(-this.interval)
+
+      val query =
+        s"""
+           (SELECT * FROM ${activityTable} WHERE dt_atividade = "${period}") list
+         """
+
+      val df: DataFrame = this.db.sparkRead(query)
+      this.dfToRDD(df)
+    } catch {
+      case e: Exception => e.getLocalizedMessage
+        sc.emptyRDD[(String, StockEntity)]
+    }
+  }
+
   def dfToRDD(df: DataFrame): RDD[(String, StockEntity)] = {
     df.rdd.map(row => {
       val map = row.schema.fieldNames.map(field => field -> row.getAs[Any](field)).toMap
