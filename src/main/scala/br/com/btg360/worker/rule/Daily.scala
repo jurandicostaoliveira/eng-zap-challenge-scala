@@ -11,7 +11,8 @@ class Daily extends RuleTrait {
   /**
     * @return List[Int]
     */
-  override def getTypes: List[Int] = List(Rule.DAILY_ID, Rule.AUTOMATIC_ID)
+  //override def getTypes: List[Int] = List(Rule.DAILY_ID, Rule.AUTOMATIC_ID)
+  override def getTypes: List[Int] = List(Rule.DAILY_ID)
 
   /**
     * @return Int
