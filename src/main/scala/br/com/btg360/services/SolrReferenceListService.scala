@@ -78,7 +78,7 @@ class SolrReferenceListService extends Serializable {
       }
 
       val json = this.jsonParse(response.getTextBody)
-      if (!json("active") && json("archived")) {
+      if (!json("active") || json("archived")) {
         return data
       }
 

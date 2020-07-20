@@ -1,12 +1,11 @@
 package br.com.btg360.repositories
 
 import java.sql.{Connection, ResultSet}
-import java.text.{SimpleDateFormat}
+import java.text.SimpleDateFormat
 import java.util.{Calendar, Locale}
 
-import br.com.btg360.constants.{Automatic => AT}
+import br.com.btg360.constants.{Database, Table, Token, Url, Automatic => AT}
 import br.com.btg360.application.Repository
-import br.com.btg360.constants.{Database, Table}
 import br.com.btg360.entities.StockEntity
 import br.com.btg360.jdbc.MySqlAllin
 import br.com.btg360.services.PeriodService
@@ -27,10 +26,6 @@ class AutomaticChannelManagerRepository extends Repository {
   val channelManagerRepository: ChannelManagerRepository = new ChannelManagerRepository(this.sc.getConf, null)
 
   val periodService: PeriodService = new PeriodService()
-
-  val apiChannelManager: String = "http://api-channelmanager.allin.com.br/channel/filter/"
-
-  val apiChannelManagerToken: String = "10785ea213668ef0bb3d11f8f0e1a9cbbaff67b7d25fe74c12e4d9f8015763ca1bb39eadd740a2049fa1daa85c2fc28cbbd1676a9df5cf636acd66728f00ecd5"
 
   var allinId: Int = _
 
@@ -112,6 +107,8 @@ class AutomaticChannelManagerRepository extends Repository {
 
     try {
 
+      this.isListActive(this.listId)
+
       val data = this.getDataChannelManager(this.listId, this.getFilter(AT.BIRTHDAY))
 
       this.execExclusion(data)
@@ -126,6 +123,8 @@ class AutomaticChannelManagerRepository extends Repository {
 
   def findSendingDate: RDD[(String, StockEntity)] = {
     try {
+
+      this.isListActive(this.listId)
 
       val data = this.getDataChannelManager(this.listId, this.getFilter(AT.SENDING_DATE))
 
@@ -142,6 +141,8 @@ class AutomaticChannelManagerRepository extends Repository {
   def findInactive(activity: RDD[(String, StockEntity)]): RDD[(String, StockEntity)] = {
     try {
 
+      this.isListActive(this.listId)
+
       val data = this.getDataChannelManager(this.listId, this.getFilter(AT.INACTIVE))
 
       this.execExclusion(data.join(activity).map(row => (row._1, row._2._1)))
@@ -151,6 +152,46 @@ class AutomaticChannelManagerRepository extends Repository {
         println("ERROR EXEC INACTIVE: " + e)
         sc.emptyRDD[(String, StockEntity)]
       }
+    }
+  }
+
+  def isListActive(listId: Int) = {
+
+    val response = HTTP.get(this.getRequestListIsActive(listId))
+
+    if( response.getStatus != 200 ) {
+      throw new Exception()
+    }
+
+    this.isListActiveJson(response.getTextBody)
+  }
+
+  def getRequestListIsActive(listId: Int): Request = {
+    new Request(
+      s""" ${Url.API_CHANNEL_MANAGER}/list/${listId}?customerId=${this.allinId} """
+    )
+      .setHeader("Authorization", Token.API_CHANNEL_MANAGER)
+      .setHeader("cache-control", "no-cache")
+  }
+
+  def isListActiveJson(json: String) = {
+
+    implicit val formats = DefaultFormats
+
+    try {
+
+      val data = parse(json).asInstanceOf[JObject]
+
+      val active = (data \ "result" \ "active").extract[Boolean]
+
+      val archived = (data \ "result" \ "archived").extract[Boolean]
+
+      if (!active || archived) {
+        throw new Exception()
+      }
+
+    } catch {
+      case _: Exception => throw new Exception()
     }
   }
 
@@ -188,9 +229,9 @@ class AutomaticChannelManagerRepository extends Repository {
 
   def getRequestFilter: Request = {
     new Request(
-      s""" ${this.apiChannelManager}${this.filterId}?customerId=${this.allinId}&listId=${this.listId} """
+      s""" ${Url.API_CHANNEL_MANAGER}/channel/filter/${this.filterId}?customerId=${this.allinId}&listId=${this.listId} """
     )
-      .setHeader("Authorization", this.apiChannelManagerToken)
+      .setHeader("Authorization", Token.API_CHANNEL_MANAGER)
       .setHeader("cache-control", "no-cache")
   }
 
@@ -277,6 +318,15 @@ class AutomaticChannelManagerRepository extends Repository {
 
     if( this.listExclusionId == 0 || this.listExclusionId == this.listId ) {
       return data
+    }
+
+    try {
+
+      this.isListActive(this.listExclusionId)
+
+    } catch {
+      case _: Exception =>
+        return data
     }
 
     data.subtractByKey(this.getDataChannelManager(this.listExclusionId,""))
