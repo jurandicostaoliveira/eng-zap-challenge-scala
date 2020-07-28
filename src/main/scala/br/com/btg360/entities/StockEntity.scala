@@ -8,6 +8,7 @@ case class StockEntity(
                         products: List[JsonProductEntity] = List(),
                         recommendations: List[JsonProductEntity] = List(),
                         references: Map[String, Any] = Map(),
+                        referencesToApp: Map[String, Any] = Map(),
                         configs: Map[String, Any] = Map(),
                         email: String = "",
                         client: String = "",

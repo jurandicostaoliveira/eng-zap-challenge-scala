@@ -1,6 +1,6 @@
 package br.com.btg360.run
 
-import br.com.btg360.entities.{QueueEntity, StockEntity}
+import br.com.btg360.entities.StockEntity
 import br.com.btg360.services.SolrReferenceListService
 import br.com.btg360.spark.SparkCoreSingleton
 
@@ -18,8 +18,8 @@ object SolrReferenceListRun {
 
     try {
 
-      val rf: SolrReferenceListService = new SolrReferenceListService()
-      val result = rf.add(new QueueEntity, data)
+      val rf = new SolrReferenceListService().allinId(164).listId(5415607)
+      val result = rf.add(data, true)
       result.foreach(row => println("RESULT >>>>>>> " + row._1 + " ==> " + row._2))
 
     } catch {

@@ -194,8 +194,22 @@ trait RuleTrait extends Application {
     var rdd = data
     if (Channel.isEmail(this.queue.channelName)) {
       if (this.queue.ruleTypeId != Rule.AUTOMATIC_ID) {
-        rdd = new ReferenceListService().add(this.queue, rdd)
-        println(Message.APPLIED_REFERENCE_LIST_SUCCESSFULLY)
+
+        /**
+          * Hack para o Hotel Urbano
+          */
+        if (List(2).contains(this.queue.userId)) {
+          rdd = new ReferenceListService().add(this.queue, rdd)
+          println(Message.APPLIED_REFERENCE_LIST_SUCCESSFULLY + " TO HU")
+        } else {
+          rdd = new SolrReferenceListService()
+            .allinId(this.queue.rule.allinId)
+            .listId(this.queue.rule.referenceListId)
+            .add(rdd, false)
+
+          println(Message.APPLIED_REFERENCE_LIST_SUCCESSFULLY)
+        }
+
       }
 
       rdd = new Port25Service().add(rdd)

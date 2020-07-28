@@ -2,7 +2,7 @@ package br.com.btg360.services
 
 import br.com.allin.ChannelManagerRepository.ChannelManagerRepository
 import br.com.btg360.constants.{Token, Url}
-import br.com.btg360.entities.{QueueEntity, StockEntity}
+import br.com.btg360.entities.StockEntity
 import br.com.btg360.spark.SparkCoreSingleton
 import com.m3.curly.Response
 import org.apache.spark.rdd.RDD
@@ -18,9 +18,45 @@ class SolrReferenceListService extends Serializable {
 
   private val repository = new ChannelManagerRepository(sc.getConf, null)
 
-  private var allinId: Int = 0
+  private var _allinId: Int = 0
 
-  private var listId: Int = 0
+  private var _listId: Int = 0
+
+  /**
+    * Getter
+    *
+    * @return Int
+    */
+  def allinId: Int = this._allinId
+
+  /**
+    * Setter
+    *
+    * @param Int value
+    * @return this
+    */
+  def allinId(value: Int): SolrReferenceListService = {
+    this._allinId = value
+    this
+  }
+
+  /**
+    * Getter
+    *
+    * @return Int
+    */
+  def listId: Int = this._listId
+
+  /**
+    * Setter
+    *
+    * @param Int value
+    * @return this
+    */
+  def listId(value: Int): SolrReferenceListService = {
+    this._listId = value
+    this
+  }
 
   /**
     * @return Response
@@ -61,17 +97,53 @@ class SolrReferenceListService extends Serializable {
   }
 
   /**
-    * Places the data referring to the user coming from the reference list
-    *
-    * @param QueueEntity queue
-    * @param RDD         data
+    * @param RDD     data
+    * @param Boolean isDataNormalized
     * @return RDD
     */
-  def add(queue: QueueEntity, data: RDD[(String, StockEntity)]): RDD[(String, StockEntity)] = {
-    try {
-      this.allinId = queue.rule.allinId
-      this.listId = queue.rule.referenceListId
+  private def toStandard(data: RDD[(String, StockEntity)], isDataNormalized: Boolean): RDD[(String, StockEntity)] = {
+    data.leftOuterJoin(this.getData(isDataNormalized)).map(row => {
+      var item = row._2._1
+      if (row._2._2.isDefined) {
+        item = new StockEntity(
+          products = item.products,
+          recommendations = item.recommendations,
+          references = row._2._2.get
+        )
+      }
+      (row._1, item)
+    })
+  }
 
+  /**
+    * @param RDD     data
+    * @param Boolean isDataNormalized
+    * @return RDD
+    */
+  private def toApp(data: RDD[(String, StockEntity)], isDataNormalized: Boolean): RDD[(String, StockEntity)] = {
+    data.leftOuterJoin(this.getData(isDataNormalized)).map(row => {
+      var item = row._2._1
+      if (row._2._2.isDefined) {
+        item = new StockEntity(
+          products = item.products,
+          recommendations = item.recommendations,
+          references = item.references,
+          referencesToApp = row._2._2.get
+        )
+      }
+      (row._1, item)
+    })
+  }
+
+  /**
+    * Places the data referring to the user coming from the reference list
+    *
+    * @param RDD     data
+    * @param Boolean toApp
+    * @return RDD
+    */
+  def add(data: RDD[(String, StockEntity)], toApp: Boolean = false): RDD[(String, StockEntity)] = {
+    try {
       val response = this.find
       if (response.getStatus != 200) {
         return data
@@ -82,17 +154,11 @@ class SolrReferenceListService extends Serializable {
         return data
       }
 
-      data.leftOuterJoin(this.getData(json("isDataNormalized"))).map(row => {
-        var item = row._2._1
-        if (row._2._2.isDefined) {
-          item = new StockEntity(
-            products = item.products,
-            recommendations = item.recommendations,
-            references = row._2._2.get
-          )
-        }
-        (row._1, item)
-      })
+      if (toApp) {
+        return this.toApp(data, json("isDataNormalized"))
+      }
+
+      this.toStandard(data, json("isDataNormalized"))
     } catch {
       case e: Exception => println(e.printStackTrace)
         data
