@@ -202,12 +202,18 @@ trait RuleTrait extends Application {
           rdd = new ReferenceListService().add(this.queue, rdd)
           println(Message.APPLIED_REFERENCE_LIST_SUCCESSFULLY + " TO HU")
         } else {
-          rdd = new SolrReferenceListService()
-            .allinId(this.queue.rule.allinId)
-            .listId(this.queue.rule.referenceListId)
-            .add(rdd, false)
 
-          println(Message.APPLIED_REFERENCE_LIST_SUCCESSFULLY)
+          try {
+            rdd = new SolrReferenceListService()
+              .allinId(this.queue.rule.allinId)
+              .listId(this.queue.rule.referenceListId)
+              .add(rdd, false)
+
+            println(Message.APPLIED_REFERENCE_LIST_SUCCESSFULLY)
+          } catch {
+            case e: Exception => println(e.printStackTrace())
+              rdd = data
+          }
         }
 
       }
