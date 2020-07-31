@@ -96,7 +96,7 @@ object Kernel extends App {
     override def run(userId: Int): Unit = {
       val pattern = "%s/rules/%s"
       new FileService().deleteRecursive(
-        pattern.format(Path.LOGS, new PeriodService("yyyy/MM").timeByMonth(-2))
+        pattern.format(Path.LOGS, new PeriodService("yyyy/MM").timeByMonth(-3))
       )
 
       val year = new PeriodService("yyyy")

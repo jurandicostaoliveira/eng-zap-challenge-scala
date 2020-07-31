@@ -11,15 +11,16 @@ object SolrReferenceListRun {
     val sc = SparkCoreSingleton.getContext
 
     val data = SparkCoreSingleton.getContext.parallelize(Seq(
-      "saudadedobaleal@yahoo.com" -> new StockEntity(),
-      "julianaribeiro_21@outlook.com" -> new StockEntity(),
-      "camilapaulagomes145@gmail.com" -> new StockEntity()
+      "valmiraf4@gmail.com" -> new StockEntity(),
+      "tatianaremonti@terra.com.br" -> new StockEntity(),
+      "teste@teste.com" -> new StockEntity(),
+      "aah.juju@gmail.com" -> new StockEntity()
     ))
 
     try {
 
-      val rf = new SolrReferenceListService().allinId(164).listId(5415607)
-      val result = rf.add(data, true)
+      val rf = new SolrReferenceListService().allinId(240).listId(3128475)
+      val result = rf.add(data)
       result.foreach(row => println("RESULT >>>>>>> " + row._1 + " ==> " + row._2))
 
     } catch {

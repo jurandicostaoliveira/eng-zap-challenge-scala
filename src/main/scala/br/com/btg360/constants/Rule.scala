@@ -34,6 +34,12 @@ object Rule {
   val SENDING_DATE_GROUP_ID: Int = 18
 
   /**
+    * RULE LABELS
+    */
+  val CART_ABANDONMENT_LABEL: String = "cart-abandonment"
+  //todo
+
+  /**
     * Check removal of daily limit
     *
     * @param Int ruleGroupId

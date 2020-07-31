@@ -89,7 +89,14 @@ class SolrReferenceListService extends Serializable {
     * @return RDD
     */
   private def getData(isDataNormalized: Boolean): RDD[(String, Map[String, Any])] = {
-    this.repository.get(this.listId.toString, this.allinId, isDataNormalized, null).rdd.map(json => {
+    val rdd = this.repository.get(this.listId.toString, this.allinId, isDataNormalized, null).rdd
+
+    if (rdd.isEmpty()) {
+      println("LIST NOT FOUND >> ALLIN-ID: " + this.allinId + ", LIST-ID: " + this.listId)
+      return SparkCoreSingleton.getContext.emptyRDD[(String, Map[String, Any])]
+    }
+
+    rdd.map(json => {
       implicit val formats = DefaultFormats
       val row = parse(json).asInstanceOf[JObject]
       ((row \ "email").extract[String].trim, row.extract[Map[String, Any]])
