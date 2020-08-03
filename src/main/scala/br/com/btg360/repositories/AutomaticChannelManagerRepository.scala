@@ -107,7 +107,9 @@ class AutomaticChannelManagerRepository extends Repository {
 
     try {
 
-      this.isListActive(this.listId)
+      val dataList = this.isListActive(this.listId)
+
+      this.fieldExists(dataList)
 
       val data = this.getDataChannelManager(this.listId, this.getFilter(AT.BIRTHDAY))
 
@@ -124,7 +126,9 @@ class AutomaticChannelManagerRepository extends Repository {
   def findSendingDate: RDD[(String, StockEntity)] = {
     try {
 
-      this.isListActive(this.listId)
+      val dataList = this.isListActive(this.listId)
+
+      this.fieldExists(dataList)
 
       val data = this.getDataChannelManager(this.listId, this.getFilter(AT.SENDING_DATE))
 
@@ -155,7 +159,7 @@ class AutomaticChannelManagerRepository extends Repository {
     }
   }
 
-  def isListActive(listId: Int) = {
+  def isListActive(listId: Int): String = {
 
     val response = HTTP.get(this.getRequestListIsActive(listId))
 
@@ -164,6 +168,8 @@ class AutomaticChannelManagerRepository extends Repository {
     }
 
     this.isListActiveJson(response.getTextBody)
+
+    response.getTextBody
   }
 
   def getRequestListIsActive(listId: Int): Request = {
@@ -189,6 +195,33 @@ class AutomaticChannelManagerRepository extends Repository {
       if (!active || archived) {
         throw new Exception()
       }
+
+    } catch {
+      case _: Exception => throw new Exception()
+    }
+  }
+
+  def fieldExists(json: String): Boolean = {
+
+    implicit val formats = DefaultFormats
+
+    try {
+
+      val data = parse(json).asInstanceOf[JObject]
+
+      (data \ "result" \ "fields").asInstanceOf[JArray].arr.foreach{
+        field => {
+
+          val name = (field \ "name").extract[String]
+
+          if( this.field == name ) {
+
+            return true;
+          }
+        }
+      }
+
+      throw new Exception()
 
     } catch {
       case _: Exception => throw new Exception()
@@ -281,7 +314,6 @@ class AutomaticChannelManagerRepository extends Repository {
     "(config.isEmailAuthorized:true)"
   }
 
-  //Erro de No Task Serializable se usar função auxiliar pro map
   def getDataChannelManager(list: Int, filter: String): RDD[(String, StockEntity)] = {
 
     try {
