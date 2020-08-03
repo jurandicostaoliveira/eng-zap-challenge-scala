@@ -36,18 +36,36 @@ object Rule {
   /**
     * RULE LABELS
     */
+  val NAVIGATION_DAILY_LABEL: String = "navigation-daily"
+  val NAVIGATION_WEEKLY_LABEL: String = "navigation-weekly"
+  val NAVIGATION_MONTHLY_LABEL: String = "navigation-monthly"
+  val AFTER_BUY_LABEL: String = "after-buy"
+  val SEARCH_LABEL: String = "search"
+  val NEWS_LABEL: String = "news"
+  val DECIDED_LABEL: String = "decided"
+  val WISH_LIST_LABEL: String = "wishlist"
+  val RECURRENCE_LABEL: String = "recurrence"
+  val REGAIN_LABEL: String = "regain"
+  val FIDELITY_LABEL: String = "fidelity"
+  val UNDECIDED_LABEL: String = "undecided"
+  val WARN_ME_LABEL: String = "warn-me"
   val CART_ABANDONMENT_LABEL: String = "cart-abandonment"
-  //todo
+  val PRICE_REDUCTION_LABEL: String = "price-reduction"
+  val SIMILAR_PRICE_REDUCTION_LABEL: String = "similar-price-reduction"
+  val TREND_LABEL: String = "trend"
+  val BIRTHDAY_LABEL: String = "birthday"
+  val INACTIVE_LABEL: String = "inactive"
+  val SENDING_DATE_LABEL: String = "sending-date"
 
   /**
     * Check removal of daily limit
     *
-    * @param Int ruleGroupId
+    * @param String ruleLabel
     * @return Boolean
     */
-  def isRemoveDailyLimit(ruleGroupId: Int): Boolean = {
-    val group: List[Int] = List(CART_ABANDONMENT_GROUP_ID)
-    if (group.contains(ruleGroupId)) {
+  def isRemoveDailyLimit(ruleLabel: String): Boolean = {
+    val group: List[String] = List(CART_ABANDONMENT_LABEL)
+    if (group.contains(ruleLabel)) {
       return false
     }
 
