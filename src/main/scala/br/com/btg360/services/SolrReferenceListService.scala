@@ -85,11 +85,10 @@ class SolrReferenceListService extends Serializable {
   /**
     * Get list data
     *
-    * @param Boolean isDataNormalized
     * @return RDD
     */
-  private def getData(isDataNormalized: Boolean): RDD[(String, Map[String, Any])] = {
-    val rdd = this.repository.get(this.listId.toString, this.allinId, isDataNormalized, null).rdd
+  private def getData(): RDD[(String, Map[String, Any])] = {
+    val rdd = this.repository.getHDFS(this.listId.toString, this.allinId).rdd
 
     if (rdd.isEmpty()) {
       println("LIST NOT FOUND >> ALLIN-ID: " + this.allinId + ", LIST-ID: " + this.listId)
@@ -104,12 +103,11 @@ class SolrReferenceListService extends Serializable {
   }
 
   /**
-    * @param RDD     data
-    * @param Boolean isDataNormalized
+    * @param RDD data
     * @return RDD
     */
-  private def toStandard(data: RDD[(String, StockEntity)], isDataNormalized: Boolean): RDD[(String, StockEntity)] = {
-    data.leftOuterJoin(this.getData(isDataNormalized)).map(row => {
+  private def toStandard(data: RDD[(String, StockEntity)]): RDD[(String, StockEntity)] = {
+    data.leftOuterJoin(this.getData()).map(row => {
       var item = row._2._1
       if (row._2._2.isDefined) {
         item = new StockEntity(
@@ -123,12 +121,11 @@ class SolrReferenceListService extends Serializable {
   }
 
   /**
-    * @param RDD     data
-    * @param Boolean isDataNormalized
+    * @param RDD data
     * @return RDD
     */
-  private def toApp(data: RDD[(String, StockEntity)], isDataNormalized: Boolean): RDD[(String, StockEntity)] = {
-    data.leftOuterJoin(this.getData(isDataNormalized)).map(row => {
+  private def toApp(data: RDD[(String, StockEntity)]): RDD[(String, StockEntity)] = {
+    data.leftOuterJoin(this.getData()).map(row => {
       var item = row._2._1
       if (row._2._2.isDefined) {
         item = new StockEntity(
@@ -162,10 +159,10 @@ class SolrReferenceListService extends Serializable {
       }
 
       if (toApp) {
-        return this.toApp(data, json("isDataNormalized"))
+        return this.toApp(data)
       }
 
-      this.toStandard(data, json("isDataNormalized"))
+      this.toStandard(data)
     } catch {
       case e: Exception => println(e.printStackTrace)
         data
