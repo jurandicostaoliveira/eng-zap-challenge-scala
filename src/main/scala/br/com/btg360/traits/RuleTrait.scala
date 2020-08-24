@@ -194,27 +194,36 @@ trait RuleTrait extends Application {
     var rdd = data
     if (Channel.isEmail(this.queue.channelName)) {
       if (this.queue.ruleTypeId != Rule.AUTOMATIC_ID) {
+        /**
+          * Apply Reference List Default
+          */
+        try {
+          rdd = new SolrReferenceListService()
+            .allinId(this.queue.rule.allinId)
+            .listId(this.queue.rule.referenceListId)
+            .add(rdd, false)
 
-        //Hack para o Hotel Urbano
-        if (List(2).contains(this.queue.userId)) {
-          rdd = new ReferenceListService().add(this.queue, rdd)
-          println(Message.APPLIED_REFERENCE_LIST_SUCCESSFULLY + " TO HU")
-        } else {
+          println(Message.APPLIED_REFERENCE_LIST_SUCCESSFULLY)
+        } catch {
+          case e: Exception => println(e.printStackTrace())
+            rdd = data
+        }
 
+        /**
+          * Apply Reference List to App
+          */
+        if (this.queue.referenceListToApp > 0) {
           try {
             rdd = new SolrReferenceListService()
               .allinId(this.queue.rule.allinId)
-              .listId(this.queue.rule.referenceListId)
-              .add(rdd, false)
+              .listId(this.queue.referenceListToApp)
+              .add(rdd, true)
 
-            println(Message.APPLIED_REFERENCE_LIST_SUCCESSFULLY)
+            println(Message.APPLIED_REFERENCE_LIST_SUCCESSFULLY_TO_APP)
           } catch {
             case e: Exception => println(e.printStackTrace())
-              rdd = data
           }
-
         }
-
       }
 
       rdd = new Port25Service().add(rdd)
