@@ -52,6 +52,7 @@ class QueueRepository extends Repository {
             rules_queue.*,
             configs.limit AS sendLimit,
             configs.vmta,
+            configs.referenceListToApp,
             consolidated_rules.data AS dataStringJson
         FROM
             ${this.rulesQueueTable} AS rules_queue

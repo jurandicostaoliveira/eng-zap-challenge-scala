@@ -73,7 +73,7 @@ class TransactionalService() extends Service {
         .templateId(templateId)
         .createSendTable
         .createClickTable
-        .alterSendTable
+        //.alterSendTable
         .saveSend
 
       if (!registered) {

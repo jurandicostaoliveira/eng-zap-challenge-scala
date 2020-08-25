@@ -241,6 +241,7 @@ class TransactionalRepository extends Repository {
            `id_envio_anterior` int(11) unsigned DEFAULT NULL,
            `fl_processado` int(11) DEFAULT NULL,
            `btg_user_rule_id` int(11) DEFAULT NULL,
+           `btg_peal` int(11) DEFAULT '0',
            PRIMARY KEY (`id_envio`),
            UNIQUE KEY `id_cv_envio_2` (`id_cv_envio`,`id_cv_acao`,`fl_cv_my`),
            UNIQUE KEY `nm_email` (`nm_email`,`nm_celular`,`nm_push_md5`,`nm_facebook`,`id_workflow`,`id_seletor`,`dt_envio`,`hr_envio`),
@@ -265,7 +266,8 @@ class TransactionalRepository extends Repository {
            KEY `id_envio_anterior` (`id_envio_anterior`),
            KEY `btg_user_rule_id` (`btg_user_rule_id`),
            KEY `dthr_envio` (`dt_envio`,`hr_envio`),
-           KEY `dt_abertura` (`dt_abertura`)
+           KEY `dt_abertura` (`dt_abertura`),
+           KEY `btg_peal` (`btg_peal`)
          ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;"""
 
     this.connection(this.db).queryExecutor(query, true)
