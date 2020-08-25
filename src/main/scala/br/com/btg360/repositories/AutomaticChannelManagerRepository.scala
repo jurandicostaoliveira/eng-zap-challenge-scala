@@ -17,6 +17,9 @@ import org.json4s.JsonAST.{JArray, JObject}
 import org.json4s.jackson.JsonMethods._
 import br.com.allin.ChannelManagerRepository.ChannelManagerRepository
 
+import scala.collection.mutable.{ArrayBuffer}
+import collection.JavaConverters._
+
 class AutomaticChannelManagerRepository extends Repository {
 
   private val db = new MySqlAllin()
@@ -111,7 +114,7 @@ class AutomaticChannelManagerRepository extends Repository {
 
       this.fieldExists(dataList)
 
-      val data = this.getDataChannelManager(this.listId, this.getFilter(AT.BIRTHDAY))
+      val data = this.getDataChannelManager(this.listId, this.getFilter(AT.BIRTHDAY), this.getFields(dataList))
 
       this.execExclusion(data)
 
@@ -130,7 +133,7 @@ class AutomaticChannelManagerRepository extends Repository {
 
       this.fieldExists(dataList)
 
-      val data = this.getDataChannelManager(this.listId, this.getFilter(AT.SENDING_DATE))
+      val data = this.getDataChannelManager(this.listId, this.getFilter(AT.SENDING_DATE), this.getFields(dataList))
 
       this.execExclusion(data)
 
@@ -145,9 +148,9 @@ class AutomaticChannelManagerRepository extends Repository {
   def findInactive(activity: RDD[(String, StockEntity)]): RDD[(String, StockEntity)] = {
     try {
 
-      this.isListActive(this.listId)
+      val dataList = this.isListActive(this.listId)
 
-      val data = this.getDataChannelManager(this.listId, this.getFilter(AT.INACTIVE))
+      val data = this.getDataChannelManager(this.listId, this.getFilter(AT.INACTIVE), this.getFields(dataList))
 
       this.execExclusion(data.join(activity).map(row => (row._1, row._2._1)))
 
@@ -226,6 +229,33 @@ class AutomaticChannelManagerRepository extends Repository {
     } catch {
       case _: Exception => throw new Exception()
     }
+  }
+
+  def getFields(json: String): ArrayBuffer[String] = {
+
+    implicit val formats = DefaultFormats
+
+    val fields = new ArrayBuffer[String]()
+
+    try {
+
+      val data = parse(json).asInstanceOf[JObject]
+
+      (data \ "result" \ "fields").asInstanceOf[JArray].arr.foreach{
+        field => {
+
+          fields += (field \ "name").extract[String]
+        }
+      }
+
+    } catch {
+      case _: Exception => {
+
+        return null;
+      }
+    }
+
+    fields
   }
 
   def getFilter(automaticType: String): String = {
@@ -314,11 +344,11 @@ class AutomaticChannelManagerRepository extends Repository {
     "(config.isEmailAuthorized:true)"
   }
 
-  def getDataChannelManager(list: Int, filter: String): RDD[(String, StockEntity)] = {
+  def getDataChannelManager(list: Int, filter: String, fields: ArrayBuffer[String]): RDD[(String, StockEntity)] = {
 
     try {
 
-      this.channelManagerRepository.get(list.toString, this.allinId, false, filter).rdd.map(json => {
+      this.channelManagerRepository.get(list.toString, this.allinId, false, filter, fields.asJava).rdd.map(json => {
         implicit val formats = DefaultFormats
 
         val data = parse(json).asInstanceOf[JObject]
@@ -332,7 +362,7 @@ class AutomaticChannelManagerRepository extends Repository {
 
     } catch {
       case _: Exception =>
-        this.channelManagerRepository.get(list.toString, this.allinId, false, filter).rdd.map(json => {
+        this.channelManagerRepository.get(list.toString, this.allinId, false, filter, fields.asJava).rdd.map(json => {
           implicit val formats = DefaultFormats
 
           val data = parse(json).asInstanceOf[JObject]
@@ -361,6 +391,6 @@ class AutomaticChannelManagerRepository extends Repository {
         return data
     }
 
-    data.subtractByKey(this.getDataChannelManager(this.listExclusionId,""))
+    data.subtractByKey(this.getDataChannelManager(this.listExclusionId, "", ArrayBuffer("email")))
   }
 }
