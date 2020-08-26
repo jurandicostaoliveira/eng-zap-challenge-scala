@@ -19,7 +19,7 @@ object Kernel extends App {
   /**
     * Queue generation
     */
-  scheduler.all("queue-generation", 0.second, 15.minutes, new RunnableScheduleTrait {
+  scheduler.all("queue-generation", 0.second, 30.minutes, new RunnableScheduleTrait {
     override def run(userId: Int): Unit = {
       new QueueManagerService().create(userId).create(userId, true)
     }
@@ -37,7 +37,7 @@ object Kernel extends App {
   /**
     * Hourly rules
     */
-  scheduler.all("hourly-rules", 1.minute, 20.minutes, new RunnableScheduleTrait {
+  scheduler.all("hourly-rules", 1.minute, 10.minutes, new RunnableScheduleTrait {
     override def run(userId: Int): Unit = {
       new Hourly().dispatch(userId)
     }

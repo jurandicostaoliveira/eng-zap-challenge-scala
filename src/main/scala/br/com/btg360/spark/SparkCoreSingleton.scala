@@ -49,6 +49,7 @@ object SparkCoreSingleton extends Serializable {
     return builder
       .appName(pCassandra.getProperty("appName"))
       .config("spark.cassandra.connection.host", pCassandra.getProperty("sparkCassandraConnectionHost"))
+      .config("spark.cassandra-connection.port", pCassandra.getProperty("sparkCassandraConnectionPort"))
       .config("spark.cassandra.auth.username", pCassandra.getProperty("sparkCassandraAuthUsername"))
       .config("spark.cassandra.auth.password", pCassandra.getProperty("sparkCassandraAuthPassword"))
       .config("spark.cassandra.connection.compression", pCassandra.getProperty("sparkCassandraConnectionCompression"))
