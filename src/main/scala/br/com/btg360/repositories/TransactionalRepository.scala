@@ -333,6 +333,7 @@ class TransactionalRepository extends Repository {
       "id_tipo_envio" -> Channel.all(this.queue.channelName),
       "id_template" -> this.templateId,
       "btg_user_rule_id" -> this.queue.userRuleId,
+      "btg_peal" -> this.queue.isPeal,
       "nm_email" -> this.fillUser(user, List(Channel.EMAIL)),
       "nm_celular" -> this.fillUser(user, List(Channel.SMS)),
       "nm_push" -> this.fillUser(user, List(Channel.PUSH_ANDROID, Channel.PUSH_IOS)),
