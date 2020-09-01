@@ -30,6 +30,7 @@ class QueueEntity extends Entity {
   var sendLimit: Int = 1
   var vmta: String = ""
   var referenceListToApp: Int = 0
+  var byAvailability: Boolean = false
   var dataStringJson: String = ""
   var rule: RuleDataEntity = _
   //Channel

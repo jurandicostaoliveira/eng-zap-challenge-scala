@@ -11,6 +11,8 @@ class ProductRepository extends Repository {
 
   private var _table: String = _
 
+  private var _byAvailability: Boolean = false
+
   /**
     * Getter
     *
@@ -30,12 +32,36 @@ class ProductRepository extends Repository {
   }
 
   /**
+    * Getter
+    *
+    * @return Boolean
+    */
+  def byAvailability: Boolean = this._byAvailability
+
+  /**
+    * Setter
+    *
+    * @param Boolean value
+    * @return
+    */
+  def byAvailability(value: Boolean): ProductRepository = {
+    this._byAvailability = value
+    this
+  }
+
+  /**
     * Get all registers
     *
     * @return RDD
     */
   def findAll: RDD[ProductEntity] = {
-    SparkCoreSingleton.getContext.cassandraTable[ProductEntity](Keyspace.BTG360, this.table)
+    val ctx = SparkCoreSingleton.getContext
+
+    if (this.byAvailability) {
+      return ctx.cassandraTable[ProductEntity](Keyspace.BTG360, this.table).where("availability = 1")
+    }
+
+    ctx.cassandraTable[ProductEntity](Keyspace.BTG360, this.table)
   }
 
   /**

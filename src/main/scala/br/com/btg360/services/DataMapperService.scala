@@ -49,7 +49,7 @@ class DataMapperService(queue: QueueEntity) extends Service with Serializable {
     }
 
     println(Message.PRODUCT_TABLE_NAME.format(keyspaceAndTable))
-    repository.table(table).findAllKeyBy(
+    repository.byAvailability(this.queue.byAvailability).table(table).findAllKeyBy(
       entity => (entity.productId.getOrElse(""), entity)
     )
   }
