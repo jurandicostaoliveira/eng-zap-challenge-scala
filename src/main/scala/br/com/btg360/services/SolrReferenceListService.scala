@@ -83,23 +83,26 @@ class SolrReferenceListService extends Serializable {
   }
 
   /**
-    * Get list data
+    * Allin list data
     *
     * @return RDD
     */
-  private def getData(): RDD[(String, Map[String, Any])] = {
-    val rdd = this.repository.getHDFS(this.listId.toString, this.allinId).rdd
+  private def toPair(rdd: RDD[String]): RDD[(String, Map[String, Any])] = {
+    try {
+      if (rdd.isEmpty()) {
+        println("LIST NOT FOUND >> ALLIN-ID: " + this.allinId + ", LIST-ID: " + this.listId)
+        return SparkCoreSingleton.getContext.emptyRDD
+      }
 
-    if (rdd.isEmpty()) {
-      println("LIST NOT FOUND >> ALLIN-ID: " + this.allinId + ", LIST-ID: " + this.listId)
-      return SparkCoreSingleton.getContext.emptyRDD[(String, Map[String, Any])]
+      rdd.map(json => {
+        implicit val formats = DefaultFormats
+        val row = parse(json).asInstanceOf[JObject]
+        ((row \ "email").extract[String].trim, row.extract[Map[String, Any]])
+      })
+    } catch {
+      case e: Exception => e.printStackTrace()
+        SparkCoreSingleton.getContext.emptyRDD
     }
-
-    rdd.map(json => {
-      implicit val formats = DefaultFormats
-      val row = parse(json).asInstanceOf[JObject]
-      ((row \ "email").extract[String].trim, row.extract[Map[String, Any]])
-    })
   }
 
   /**
@@ -107,7 +110,9 @@ class SolrReferenceListService extends Serializable {
     * @return RDD
     */
   private def toStandard(data: RDD[(String, StockEntity)]): RDD[(String, StockEntity)] = {
-    data.leftOuterJoin(this.getData()).map(row => {
+    val rdd = this.repository.getHDFS(this.listId.toString, this.allinId).rdd
+
+    data.leftOuterJoin(this.toPair(rdd)).map(row => {
       var item = row._2._1
       if (row._2._2.isDefined) {
         item = new StockEntity(
@@ -121,11 +126,14 @@ class SolrReferenceListService extends Serializable {
   }
 
   /**
-    * @param RDD data
+    * @param RDD     data
+    * @param Boolean isDataNormalized
     * @return RDD
     */
-  private def toApp(data: RDD[(String, StockEntity)]): RDD[(String, StockEntity)] = {
-    data.leftOuterJoin(this.getData()).map(row => {
+  private def toApp(data: RDD[(String, StockEntity)], isDataNormalized: Boolean): RDD[(String, StockEntity)] = {
+    val rdd = this.repository.get(this.listId.toString, this.allinId, isDataNormalized, null).rdd
+
+    data.leftOuterJoin(this.toPair(rdd)).map(row => {
       var item = row._2._1
       if (row._2._2.isDefined) {
         item = new StockEntity(
@@ -159,12 +167,12 @@ class SolrReferenceListService extends Serializable {
       }
 
       if (toApp) {
-        return this.toApp(data)
+        return this.toApp(data, json("isDataNormalized"))
       }
 
       this.toStandard(data)
     } catch {
-      case e: Exception => println(e.printStackTrace)
+      case e: Exception => e.printStackTrace()
         data
     }
   }

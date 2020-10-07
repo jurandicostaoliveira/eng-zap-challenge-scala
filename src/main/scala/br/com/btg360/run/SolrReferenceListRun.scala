@@ -14,12 +14,15 @@ object SolrReferenceListRun {
       "valmiraf4@gmail.com" -> new StockEntity(),
       "tatianaremonti@terra.com.br" -> new StockEntity(),
       "teste@teste.com" -> new StockEntity(),
-      "aah.juju@gmail.com" -> new StockEntity()
+      "aah.juju@gmail.com" -> new StockEntity(),
+      "rrodrigues@allin.com.br" -> new StockEntity(),
+      "nathan.cerioni@allin.com.br" -> new StockEntity()
     ))
 
     try {
 
-      val rf = new SolrReferenceListService().allinId(240).listId(3128475)
+      //val rf = new SolrReferenceListService().allinId(240).listId(3128475)
+      val rf = new SolrReferenceListService().allinId(14836).listId(5652457)
       val result = rf.add(data)
       result.foreach(row => println("RESULT >>>>>>> " + row._1 + " ==> " + row._2))
 
