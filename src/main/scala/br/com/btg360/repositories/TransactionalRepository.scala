@@ -342,6 +342,7 @@ class TransactionalRepository extends Repository {
         products = stock.products,
         recommendations = stock.recommendations,
         references = stock.references,
+        referencesToApp = stock.referencesToApp,
         configs = this.themeConfigs,
         email = user,
         client = client,
