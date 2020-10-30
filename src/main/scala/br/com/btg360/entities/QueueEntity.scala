@@ -40,6 +40,7 @@ class QueueEntity extends Entity {
   var deliveryAt: String = ""
   var deliveryTimestamp: Long = 0
   var utmLink: String = ""
+  var isSmid: Boolean = false
 
   /**
     * Parsed the rule configuration data

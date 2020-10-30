@@ -125,6 +125,7 @@ case class RuleDataEntity(
                            account: RuleDataRaw.Account
                          ) extends Entity {
 
+  var id = TC.toInt(rule.ruleId)
   var name = TC.toString(rule.alias)
   var latinName = TC.toString(configs.ruleName)
   var subject = TC.toString(configs.subject)

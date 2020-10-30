@@ -28,4 +28,6 @@ object Table {
 
   val CHANNEL_MANAGER_MIGRATION = "channel_manager_migration"
 
+  val COR_LOGIN_SM = "cor_login_sm"
+
 }

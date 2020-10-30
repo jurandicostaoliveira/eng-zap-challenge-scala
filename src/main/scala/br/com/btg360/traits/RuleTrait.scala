@@ -4,7 +4,7 @@ import br.com.btg360.application.Application
 import br.com.btg360.constants._
 import br.com.btg360.entities.{QueueEntity, StockEntity, UserEntity}
 import br.com.btg360.logger.Log4jPrinter
-import br.com.btg360.repositories.{ConsolidatedRepository, QueueRepository, UserRepository}
+import br.com.btg360.repositories.{ConsolidatedRepository, QueueRepository, SocialMinerRepository, UserRepository}
 import br.com.btg360.services._
 import org.apache.spark.rdd.RDD
 
@@ -25,6 +25,8 @@ trait RuleTrait extends Application {
   private val periodService = new PeriodService()
 
   private val jsonService = new JsonService()
+
+  private val socialMinerRepository = new SocialMinerRepository()
 
   /**
     * @return List[Int]
@@ -49,7 +51,8 @@ trait RuleTrait extends Application {
   def dispatch(userId: Int): Unit = {
     try {
       this.user = this.userRepository.findById(userId)
-      val rows = this.queueRepository.findAll(userId, this.getTypes)
+      val rows: List[QueueEntity] = this.queueRepository.findAll(userId, this.getTypes)
+      val isSmid: Boolean = this.socialMinerRepository.allinCrossExists(this.user.allinId)
 
       /**
         * Update queue hourly
@@ -66,6 +69,7 @@ trait RuleTrait extends Application {
       rows.foreach(row => {
         this.queue = row.parse
         this.queue.rule.transactionalId = this.user.transId
+        this.queue.isSmid = isSmid
         breakable {
           if (this.isDailyAndNotReady) {
             return
