@@ -4,11 +4,11 @@ import java.sql.SQLException
 
 import br.com.btg360.application.Repository
 import br.com.btg360.constants.{Database, Table}
-import br.com.btg360.jdbc.MySqlAllin
+import br.com.btg360.jdbc.MySqlBtg360
 
 class SocialMinerRepository extends Repository {
 
-  private val dbAllin = new MySqlAllin().open
+  private val db = new MySqlBtg360().open
 
   private val corLoginSmTable: String = "%s.%s".format(Database.MAIL_SENDER, Table.COR_LOGIN_SM)
 
@@ -18,7 +18,7 @@ class SocialMinerRepository extends Repository {
     */
   def allinCrossExists(allinId: Int): Boolean = {
     try {
-      val rs = this.connection(this.dbAllin).queryExecutor(
+      val rs = this.connection(this.db).queryExecutor(
         s"""SELECT COUNT(id_login) AS total FROM ${this.corLoginSmTable} WHERE id_login = ${allinId} LIMIT 1;"""
       )
 
