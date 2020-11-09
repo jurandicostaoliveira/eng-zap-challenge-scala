@@ -60,7 +60,7 @@ class UrlService extends Service {
               ): String = {
 
     val strClient = if (client.isEmpty) """{{ client }}""".trim else base64.encode(client)
-    val uri = this.generateUri(link, this.generateUtm(queue))
+    val uri = this.generateUri(link, queue.utmLink)
     val params: List[String] = List(
       "btgId=%s".format(queue.rule.btgId),
       "userId=%s".format(queue.userId),
@@ -103,25 +103,6 @@ class UrlService extends Service {
       case e: Exception => println(e.printStackTrace())
         html
     }
-  }
-
-  /**
-    * Manipulation of utm parameters
-    *
-    * @param QueueEntity queue
-    * @return String
-    */
-  def generateUtm(queue: QueueEntity): String = {
-    if (queue.isSmid) {
-      queue.utmLink = "%s&smid=BTG%s-%s-%s".format(
-        queue.utmLink,
-        queue.userRuleId,
-        Channel.all(queue.channelName),
-        queue.rule.id + 1
-      )
-    }
-
-    queue.utmLink
   }
 
 }

@@ -125,6 +125,15 @@ class QueueEntity extends Entity {
     this.rule.channelMap(this.channelName).utms.foreach(row => {
       list = list :+ "%s=%s".format(row.key, row.value)
     })
+
+    if (this.isSmid) {
+      list = list :+ "smid=BTG%s-%s-%s".format(
+        this.userRuleId,
+        Channel.all(this.channelName),
+        this.rule.id + 1
+      )
+    }
+
     list.mkString("&")
   }
 

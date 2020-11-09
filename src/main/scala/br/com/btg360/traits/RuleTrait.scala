@@ -67,9 +67,9 @@ trait RuleTrait extends Application {
         * Execute all
         */
       rows.foreach(row => {
+        row.isSmid = isSmid
         this.queue = row.parse
         this.queue.rule.transactionalId = this.user.transId
-        this.queue.isSmid = isSmid
         breakable {
           if (this.isDailyAndNotReady) {
             return
