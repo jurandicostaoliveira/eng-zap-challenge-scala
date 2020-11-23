@@ -11,7 +11,7 @@ object CountRun extends App {
 
     List(8932, 8165, 353).foreach(btgId => {
       val rdd = SparkCoreSingleton.getContext
-        .cassandraTable[CassandraRow](Keyspace.BTG360, "cookie_email_8932")
+        .cassandraTable[CassandraRow](Keyspace.BTG360, "cookie_email_" + btgId)
         .select("email")
         .distinct()
 
