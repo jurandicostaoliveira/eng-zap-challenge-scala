@@ -173,7 +173,7 @@ trait RuleTrait extends Application {
   private def filter(data: RDD[(String, StockEntity)]): RDD[(String, StockEntity)] = {
     var keys: RDD[String] = data.keys
 
-    if (Rule.isRemoveDailyLimit(this.queue.ruleName)) {
+    if (!this.queue.rule.ignoreDailyLimit) {
       keys = new DailySendLimitService(this.queue).filter(keys)
       println(Message.TOTAL_DAILY_LIMIT_REMOVED.format(keys.count()))
     }

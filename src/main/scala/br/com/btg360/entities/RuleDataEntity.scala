@@ -21,7 +21,8 @@ object RuleDataRaw {
                       replyEmail: Any,
                       emailResponsible: Any,
                       interval: Any,
-                      frequency: Any
+                      frequency: Any,
+                      ignoreDailyLimit: Any
                     )
 
   case class ModuleSelected(
@@ -138,6 +139,7 @@ case class RuleDataEntity(
   var frequency = TC.toInt(configs.frequency)
   var dayWeek = TC.toInt(configs.dayWeek)
   var dayMonth = TC.toInt(configs.dayMonth)
+  var ignoreDailyLimit = TC.toBoolean(configs.ignoreDailyLimit)
 
   //Automatics
   var listId = TC.toInt(automatics.list)
