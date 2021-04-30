@@ -1,16 +1,20 @@
-# eng-zap-challenge-java
+# eng-zap-challenge-scala
 
 Código Desafio Grupo ZAP
 
 ## Requisitos
 
- Ter o docker-compose version 1.25.0+ instalado.
+- docker-compose 1.25.0+
+- sbt 1.2.8+
 
 ## Instalação
 
 Após clonar o projeto.
 ```
 $ cd eng-zap-challenge-scala/
+```
+```
+$ sbt clean assembly
 ```
 
 Executar os comandos para levantar os conteiners docker do kafka e zookeeper:
@@ -30,7 +34,7 @@ docker_kafka_1       /etc/confluent/docker/run   Up      0.0.0.0:29092->29092/tc
 docker_zookeeper_1   /etc/confluent/docker/run   Up      0.0.0.0:2181->2181/tcp, 2888/tcp, 3888/tcp
 ```
 
-Executar os comandos para criar os tópicos necessários.
+Executar os comandos para criar os tópicos necessários:
 
 ```
 $ docker-compose exec kafka kafka-topics --create --topic output-zap --partitions 1 --replication-factor 1 --if-not-exists --zookeeper zookeeper:2181
@@ -39,19 +43,15 @@ $ docker-compose exec kafka kafka-topics --create --topic output-zap --partition
 $ docker-compose exec kafka kafka-topics --create --topic output-viva --partitions 1 --replication-factor 1 --if-not-exists --zookeeper zookeeper:2181
 ```
 
-## Compilação
-
-Para efeito de compilação é necessário ter o "sbt 1.2.8+" instalado. Porém já possui uma compilação pronta para ser executada: bin/Eng-Zap-Challenge-Scala-assembly-0.1.jar
+## Testes
 
 ```
-$ sbt clean assembly
+$ sbt test
 ```
 
-## Scripts para manipular a aplicação
+## Scripts para Manipular a Aplicação
 
 ### Deploy :
-
-Precisa se atentar ao item da compilação.
 
 ```
 $ ./bin/app.sh deploy
