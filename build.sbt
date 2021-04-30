@@ -1,10 +1,10 @@
-name := "Btg-Scala-Sending-Generator"
+name := "Eng-Zap-Challenge-Scala"
 version := "0.1"
 
-val scalaGeneralVersion = "2.11.8" //"2.10.6"
+val scalaGeneralVersion = "2.12.12"
 scalaVersion := scalaGeneralVersion
-val sparkVersion = "2.3.3" //"2.0.0"
-val entryPoint = Some("br.com.btg360.scheduling.Kernel")
+val sparkVersion = "3.0.1"
+val entryPoint = Some("br.com.zap.controller.MainController")
 
 mainClass in(Compile, run) := entryPoint
 mainClass in(Compile, packageBin) := entryPoint
@@ -12,21 +12,13 @@ mainClass in(Compile, packageBin) := entryPoint
 libraryDependencies ++= Seq(
   "org.apache.spark" %% "spark-core" % sparkVersion,
   "org.apache.spark" %% "spark-sql" % sparkVersion,
-  "com.datastax.spark" %% "spark-cassandra-connector" % sparkVersion,
-  "org.quartz-scheduler" % "quartz" % "2.2.1",
-  "com.typesafe.akka" %% "akka-cluster-tools" % "2.5.21",
-  "mysql" % "mysql-connector-java" % "5.1.46",
-  "org.apache.logging.log4j" % "log4j-scala" % "11.0",
-  "net.debasishg" %% "redisclient" % "3.20", //https://github.com/debasishg/scala-redis
-  //"org.json4s" %% "json4s-native" % "3.3.0", //https://github.com/json4s/json4s
-  "commons-validator" % "commons-validator" % "1.4.1",
-  "com.m3" % "curly" % "0.5.6",
-  "com.redislabs" % "spark-redis" % "2.4.0"
+  "org.apache.kafka" % "kafka-clients" % "2.6.0",
+  "org.scalatest" %% "scalatest" % "3.2.7" % Test
 )
 
 lazy val commonSettings = Seq(
   version := "0.1-SNAPSHOT",
-  organization := "br.com.btg360",
+  organization := "br.com.zap",
   scalaVersion := scalaGeneralVersion,
   test in assembly := {}
 )
@@ -47,6 +39,7 @@ assemblyMergeStrategy in assembly := {
   case PathList("com", "esotericsoftware", xs@_*) => MergeStrategy.last
   case PathList("com", "codahale", xs@_*) => MergeStrategy.last
   case PathList("com", "yammer", xs@_*) => MergeStrategy.last
+  case PathList("module-info.class") => MergeStrategy.discard
   case "about.html" => MergeStrategy.rename
   case "META-INF/ECLIPSEF.RSA" => MergeStrategy.last
   case "META-INF/mailcap" => MergeStrategy.last

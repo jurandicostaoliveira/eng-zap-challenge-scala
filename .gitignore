@@ -1,12 +1,7 @@
-#Development file identifier
-src/main/resources/environment.properties
-
 .cache-main
 .idea/
 .project
-.settings/
+.settings
 target/
-storage/
 src/main/main.iml
 .attach_pid8159
-nohup.out

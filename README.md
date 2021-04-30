@@ -1,53 +1,83 @@
-# Btg-Scala-Sending-Generator
+# eng-zap-challenge-java
 
-Sending generator to postimatic transational
+Código Desafio Grupo ZAP
 
-## Installation
+## Requisitos
 
- To inform the environment that will run the application, create a file named .development inside the src/main/resources/ directory and set the variables APP_ENV = [development*, homologation, production, cluster] and IS_DEDICATED_ENV = [true, false*]
+ Ter o docker-compose version 1.25.0+ instalado.
 
+## Instalação
+
+Após clonar o projeto.
 ```
-$ echo -e "APP_ENV=development\nIS_DEDICATED_ENV=false" > src/main/resources/environment.properties
-```
-
-## Compilation
-
-To compile the project, enter the project's directory and execute the command below
-
-```
-$ sbt assembly
+$ cd eng-zap-challenge-scala/
 ```
 
-#### Scripts to manipulate the application
-
-Enter the user spark to cluster  :
-
+Executar os comandos para levantar os conteiners docker do kafka e zookeeper:
 ```
-$ su spark
+$ cd docker/
 ```
-
-Deploy :
-
 ```
-$ /bin/bash /home/Btg-Scala-Sending-Generator/bin/[local-app or cluster-app].sh deploy
+$  docker-compose up -d
 ```
-
-Stop :
-
 ```
-$ /bin/bash /home/Btg-Scala-Sending-Generator/bin/[local-app or cluster-app].sh stop
+$  docker-compose ps
 ```
- 
-Start : 
-
 ```
-$ /bin/bash /home/Btg-Scala-Sending-Generator/bin/[local-app or cluster-app].sh start
+       Name                   Command            State                        Ports                      
+---------------------------------------------------------------------------------------------------------
+docker_kafka_1       /etc/confluent/docker/run   Up      0.0.0.0:29092->29092/tcp, 0.0.0.0:9092->9092/tcp
+docker_zookeeper_1   /etc/confluent/docker/run   Up      0.0.0.0:2181->2181/tcp, 2888/tcp, 3888/tcp
 ```
 
-Restart :
+Executar os comandos para criar os tópicos necessários.
 
 ```
-$ /bin/bash /home/Btg-Scala-Sending-Generator/bin/[local-app or cluster-app].sh restart
+$ docker-compose exec kafka kafka-topics --create --topic output-zap --partitions 1 --replication-factor 1 --if-not-exists --zookeeper zookeeper:2181
+```
+```
+$ docker-compose exec kafka kafka-topics --create --topic output-viva --partitions 1 --replication-factor 1 --if-not-exists --zookeeper zookeeper:2181
+```
+
+## Compilação
+
+Para efeito de compilação é necessário ter o "sbt 1.2.8+" instalado. Porém já possui uma compilação pronta para ser executada: bin/Eng-Zap-Challenge-Scala-assembly-0.1.jar
+
+```
+$ sbt clean assembly
+```
+
+## Scripts para manipular a aplicação
+
+### Deploy :
+
+Precisa se atentar ao item da compilação.
+
+```
+$ ./bin/app.sh deploy
+```
+
+### Zap : 
+
+Producer
+```
+$ ./bin/app.sh zap-producer
+```
+
+Consumer
+```
+$ ./bin/app.sh zap-consumer
+```
+### Viva :
+
+Producer :
+```
+$ ./bin/app.sh viva-producer
+```
+
+Consumer
+```
+$ ./bin/app.sh viva-consumer
 ```
 
 
