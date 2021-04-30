@@ -80,4 +80,9 @@ Consumer
 $ ./bin/app.sh viva-consumer
 ```
 
+### Stop
+
+```
+$ ./bin/app.sh stop
+```
 

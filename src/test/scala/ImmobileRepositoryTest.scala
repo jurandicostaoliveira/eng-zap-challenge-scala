@@ -1,10 +1,6 @@
-import br.com.zap.domain.Immobile
+import br.com.zap.repository.ImmobileRepository
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-
-import collection.mutable.Stack
-import br.com.zap.repository.ImmobileRepository
-import org.apache.spark.rdd.RDD
 
 class ImmobileRepositoryTest extends AnyFlatSpec with Matchers {
 
