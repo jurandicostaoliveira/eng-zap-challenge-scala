@@ -4,8 +4,9 @@ Código Desafio Grupo ZAP
 
 ## Requisitos
 
-- docker-compose 1.25.0+
+- java 1.8.0+
 - sbt 1.2.8+
+- docker-compose 1.25.0+
 
 ## Instalação
 

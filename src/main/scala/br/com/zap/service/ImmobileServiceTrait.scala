@@ -11,21 +11,21 @@ trait ImmobileServiceTrait extends Serializable {
    *
    * @return
    */
-  protected def getTopic: String
+  def getTopic: String
 
   /**
    *
    * @param data
    * @return
    */
-  protected def dataFilter(data: RDD[Immobile]): RDD[Immobile]
+  def dataFilter(data: RDD[Immobile]): RDD[Immobile]
 
   /**
    *
    * @param data
    * @return
    */
-  protected def dataMap(data: RDD[Immobile]): RDD[Immobile]
+  def dataMap(data: RDD[Immobile]): RDD[Immobile]
 
   /**
    *
